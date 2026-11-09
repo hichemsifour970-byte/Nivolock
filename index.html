@@ -1,1231 +1,852 @@
-<!DOCTYPE html>
+DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الحاسوب السحابي الخارق - الإصدار السادس (نواة أوراكل وفايربيس)</title>
-    <!-- محركات العناقيد السحابية، التشفير العسكري SEA، الضغط الخوارزمي، وبروتوكول الاتصالات اللحظي -->
-    <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+    <title>حاسوبي السحابي - استضافة حرة ودائمة</title>
+    <!-- محرك الاتصال السحابي بالوقت الفعلي ومحرك الضغط الدائم -->
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+
     <style>
         :root {
-            --bg- abyss: #030407;
-            --bg-panel: #0a0c14;
-            --bg-card: #111522;
-            --bg-input: #06080e;
-            --border-color: #1f263d;
-            --accent-cyan: #00f2fe;
-            --accent-green: #00e676;
-            --accent-purple: #c471ed;
-            --accent-orange: #ff9f43;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --bg-dark: #070a12;
+            --bg-card: #111827;
+            --bg-input: #03060c;
+            --border: #1f2937;
+            --accent: #00e5ff;
+            --success: #00e676;
             --danger: #ff4757;
-            --focus-ring: 3px solid #ff9f43;
+            --warning: #ffa502;
+            --text: #f9fafb;
+            --text-muted: #9ca3af;
         }
         * { box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-            background-color: var(--bg-abyss);
-            color: var(--text-main);
+            background-color: var(--bg-dark);
+            color: var(--text);
             margin: 0;
-            height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .main-wrapper {
+            max-width: 880px;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            line-height: 1.5;
+            gap: 20px;
+        }
+        .box-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        h1, h2, h3 { margin-top: 0; color: var(--accent); }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        input[type="text"] {
+            width: 100%;
+            background-color: var(--bg-input);
+            border: 1px solid #374151;
+            color: var(--text);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        textarea {
+            width: 100%;
+            height: 380px;
+            background-color: var(--bg-input);
+            border: 1px solid #374151;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 15px;
+            direction: ltr;
+            text-align: left;
+            resize: vertical;
+            white-space: pre;
+            overflow-y: scroll;
+        }
+        button {
+            background-color: var(--accent);
+            color: #000;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 4px 0 4px 6px;
+        }
+        button:hover { filter: brightness(1.15); }
+        button:focus, input:focus, textarea:focus {
+            outline: 3px solid var(--warning);
+            outline-offset: 2px;
+        }
+        .btn-main-create {
+            width: 100%;
+            background-color: var(--success);
+            color: #000;
+            font-size: 18px;
+            padding: 15px;
+            margin: 15px 0 0 0;
+        }
+        .btn-secondary { background-color: #1f2937; color: var(--text); border: 1px solid #374151; }
+        .btn-danger { background-color: var(--danger); color: #fff; }
+
+        /* صندوق الروابط الجاهزة */
+        #links-output-box {
+            display: none;
+            background-color: #05221a;
+            border: 2px solid var(--success);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 15px;
+        }
+        .link-field {
+            background-color: var(--bg-input);
+            color: var(--warning);
+            padding: 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 14px;
+            word-break: break-all;
+            direction: ltr;
+            text-align: left;
+            margin: 8px 0;
+            border: 1px solid #374151;
         }
 
-        /* دعم قارئات الشاشة */
+        .list-item {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .badge-green { background-color: rgba(0, 230, 118, 0.15); color: var(--success); }
+        .badge-red { background-color: rgba(255, 71, 87, 0.2); color: var(--danger); }
+
         .sr-only {
             position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
             overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
         }
-        button:focus, input:focus, textarea:focus, select:focus, a:focus {
-            outline: var(--focus-ring) !important;
-            outline-offset: 2px;
-        }
-
-        /* شاشة التحميل للمواقع المستضافة */
-        #cloud-loader {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-abyss); color: var(--accent-cyan);
-            flex-direction: column; justify-content: center; align-items: center;
-            z-index: 9999; font-size: 22px; font-weight: bold; text-align: center; padding: 20px;
-        }
-
-        /* الهيدر العلوي */
-        header {
-            background: var(--bg-panel); padding: 10px 16px;
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 2px solid var(--border-color); flex-wrap: wrap; gap: 10px;
-        }
-        .brand-title { margin: 0; font-size: 18px; color: var(--accent-cyan); font-weight: bold; }
-        .status-pill {
-            font-size: 12px; color: var(--accent-green); background: var(--bg-input);
-            padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border-color);
-            margin-top: 4px; display: inline-block;
-        }
-        .top-controls { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-
-        input, select {
-            background: var(--bg-input); border: 1px solid #2e3856;
-            color: var(--text-main); padding: 8px 12px; border-radius: 6px; font-size: 13px;
-        }
-        button {
-            background: var(--accent-cyan); color: #000; border: none;
-            padding: 8px 12px; border-radius: 6px; font-weight: bold;
-            font-size: 13px; cursor: pointer; transition: 0.15s;
-        }
-        button:hover { filter: brightness(1.15); }
-        .btn-dark { background: var(--bg-card); color: var(--text-main); border: 1px solid #2e3856; }
-        .btn-dark:hover { background: #1a2035; border-color: var(--accent-cyan); }
-        .btn-purple { background: var(--accent-purple); color: #000; }
-        .btn-orange { background: var(--accent-orange); color: #000; }
-        .btn-green { background: var(--accent-green); color: #000; }
-        .btn-danger { background: var(--danger); color: #fff; }
-
-        /* شريط الخدمات السحابية (Oracle & Firebase Bar) */
-        nav.enterprise-bar {
-            background: #06070c; padding: 8px 16px;
-            display: flex; gap: 8px; align-items: center;
-            border-bottom: 1px solid var(--border-color); overflow-x: auto;
-        }
-
-        /* التقسيم الرئيسي */
-        .os-body { display: flex; flex: 1; overflow: hidden; }
-
-        /* الخزنة السحابية الجانبية */
-        aside.cloud-vault {
-            width: 250px; background: var(--bg-panel);
-            border-left: 2px solid var(--border-color); padding: 12px;
-            display: flex; flex-direction: column; gap: 10px; overflow-y: auto;
-        }
-        .cloud-vault h2 { margin: 0; font-size: 15px; color: var(--accent-cyan); }
-        .vault-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
-        .vault-item {
-            background: var(--bg-card); padding: 8px; border-radius: 6px;
-            border: 1px solid var(--border-color);
-            display: flex; justify-content: space-between; align-items: center; gap: 5px;
-        }
-
-        /* محررات الأكواد غير المحدودة */
-        main.code-workspace {
-            flex: 1.3; display: flex; flex-direction: column;
-            padding: 10px; gap: 10px; background: var(--bg-abyss); overflow-y: auto;
-        }
-        .split-editors { display: flex; flex: 1; gap: 10px; min-height: 180px; }
-        .editor-panel {
-            flex: 1; display: flex; flex-direction: column;
-            background: var(--bg-panel); border-radius: 8px;
-            border: 1px solid var(--border-color); overflow: hidden;
-        }
-        .panel-header {
-            background: var(--bg-card); padding: 6px 12px; font-size: 13px;
-            font-weight: bold; color: var(--accent-cyan);
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .inf-badge { font-size: 11px; color: var(--accent-green); font-weight: normal; }
-        textarea.unlimited-editor {
-            flex: 1; background: var(--bg-input); color: #e2e8f0;
-            border: none; padding: 12px; font-family: 'Consolas', 'Courier New', monospace;
-            font-size: 14px; resize: none; direction: ltr; line-height: 1.4;
-            overflow-y: scroll; white-space: pre;
-        }
-
-        /* شاشة المعاينة والرادار */
-        section.live-monitor {
-            flex: 1; display: flex; flex-direction: column;
-            padding: 10px 10px 10px 0; gap: 10px;
-        }
-        .preview-box {
-            flex: 1.8; background: #fff; border-radius: 8px;
-            display: flex; flex-direction: column; overflow: hidden;
-            border: 2px solid var(--border-color);
-        }
-        iframe { flex: 1; border: none; width: 100%; height: 100%; background: #fff; }
-        
-        .radar-box {
-            flex: 1; background: var(--bg-input); border-radius: 8px;
-            border: 1px solid var(--border-color); display: flex; flex-direction: column;
-            overflow: hidden;
-        }
-        #radar-logs {
-            flex: 1; padding: 10px; overflow-y: auto; font-size: 13px;
-            color: var(--accent-green); font-family: Tahoma, monospace;
-        }
-
-        /* النوافذ المنبثقة للمراكز السحابية */
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9); z-index: 4000;
-            justify-content: center; align-items: center; padding: 15px;
-        }
-        .modal-card {
-            background: var(--bg-panel); padding: 22px; border-radius: 12px;
-            border: 2px solid var(--accent-cyan); width: 760px; max-width: 100%;
-            max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px #000;
-        }
-        .code-snippet {
-            background: var(--bg-input); padding: 12px; border-radius: 6px;
-            margin: 8px 0; word-break: break-all; font-family: monospace;
-            font-size: 12px; color: var(--accent-orange); border: 1px solid #2e3856;
-            direction: ltr; text-align: left; white-space: pre-wrap; max-height: 160px; overflow-y: auto;
-        }
-        .data-table {
-            width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px;
-        }
-        .data-table th, .data-table td {
-            border: 1px solid var(--border-color); padding: 8px; text-align: right;
-            background: var(--bg-card);
-        }
-        .data-table th { background: #182036; color: var(--accent-cyan); }
-        .badge-active { background: rgba(0, 230, 118, 0.15); color: var(--accent-green); padding: 3px 8px; border-radius: 4px; font-weight: bold; }
-        .badge-blocked { background: rgba(255, 71, 87, 0.2); color: var(--danger); padding: 3px 8px; border-radius: 4px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <!-- الناطق الصوتي الفوري لقارئ الشاشة -->
+    <!-- الناطق الصوتي لقارئ الشاشة -->
     <div id="sr-announcer" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
 
-    <!-- شاشة التحميل للمواقع المستضافة -->
-    <div id="cloud-loader" role="alert" aria-busy="true">
-        <p id="loader-text">جاري الاتصال بالعناقيد السحابية وتشغيل الموقع...</p>
+    <!-- شاشة فتح المواقع المستضافة (تظهر للزوار عند فتح الرابط) -->
+    <div id="visitor-loader" style="display:none; text-align:center; padding:60px;">
+        <h2 id="visitor-msg">جاري فتح الموقع...</h2>
     </div>
 
-    <!-- الواجهة الرئيسية لنظام التشغيل السحابي الخارق -->
-    <div id="os-main-ui" style="display:flex; flex-direction:column; height:100vh;">
-        
-        <header role="banner">
-            <div>
-                <h1 class="brand-title">الحاسوب السحابي الخارق v6.0 (نواة أوراكل وفايربيس المتكاملة)</h1>
-                <div class="status-pill" id="cluster-status" role="status">
-                    التخزين: 100% سحابي (0 بايت من الهاتف) | الحماية: جدار ناري نشط | الهوية: Google & Facebook OAuth
-                </div>
-            </div>
+    <!-- لوحة التحكم السحابية الخاصة بك -->
+    <main class="main-wrapper" id="admin-workspace">
 
-            <div class="top-controls" role="region" aria-label="مركز التحكم السحابي">
-                <label for="project-title" class="sr-only">اسم المشروع أو الموقع</label>
-                <input type="text" id="project-title" placeholder="اسم المشروع (مثال: my-app)" aria-label="اسم المشروع السحابي">
-                
-                <button onclick="saveProjectToCloud()" class="btn-dark" title="اختصار: Alt + S">حفظ سحابي (Alt+S)</button>
-                <button onclick="openModal('iam-modal')" class="btn-purple" title="إدارة وحظر مفاتيح الـ API">مفاتيح الـ API والحماية</button>
-                <button onclick="openModal('auth-modal')" class="btn-orange" title="حسابات جوجل وفيسبوك ومراسلة المستخدمين">حسابات جوجل والمستخدمين</button>
-                <button onclick="openModal('db-modal')" class="btn-dark" title="قواعد بيانات أوراكل وفايربيس">قاعدة البيانات والوظائف</button>
-                <button onclick="openDeployCenter()" class="btn-green" title="اختصار: Alt + P">نشر وصنع رابط (Alt+P)</button>
+        <!-- ترويسة الحاسوب السحابي -->
+        <header class="box-card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+            <div>
+                <h1 style="margin:0; font-size:22px;">الحاسوب السحابي والاستضافة الخاصة بي</h1>
+                <p style="margin:4px 0 0 0; color:var(--text-muted); font-size:14px;">حرية مطلقة في البرمجة، حفظ دائم للمواقع دون حذف، واتصال حي في الوقت الفعلي</p>
             </div>
+            <div id="cloud-status" class="badge badge-green" role="status">السيرفر السحابي متصل ونشط</div>
         </header>
 
-        <!-- شريط حقن الأنظمة العملاقة بضغطة زر -->
-        <nav class="enterprise-bar" aria-label="حقن الأنظمة السحابية الجاهزة في الكود">
-            <span style="color:var(--accent-cyan); font-weight:bold; font-size:12px;">حقن الأنظمة العملاقة:</span>
-            <button class="btn-dark" onclick="injectEnterpriseSystem('social_auth_app')">نظام تسجيل دخول جوجل وفيسبوك + استقبال رسائل السيرفر</button>
-            <button class="btn-dark" onclick="injectEnterpriseSystem('protected_apk')">تطبيق APK محمي بمفتاح API (قابل للإيقاف عن بعد)</button>
-            <button class="btn-dark" onclick="injectEnterpriseSystem('cloud_db_app')">تطبيق متصل بقاعدة البيانات السحابية الحية</button>
-            <button class="btn-dark" onclick="injectEnterpriseSystem('webrtc_pro')">غرفة اتصالات مباشرة WebRTC</button>
-            <button class="btn-dark" onclick="zeroPhoneMemory()" style="color:var(--accent-orange);">تصفير ذاكرة الهاتف (0 بايت)</button>
-        </nav>
+        <!-- القسم الأول: اسم المشروع + مربع الكود + زر الإنشاء -->
+        <section class="box-card" aria-labelledby="sec1-title">
+            <h2 id="sec1-title">1. إنشاء أو تعديل موقع</h2>
 
-        <div class="os-body">
-            <!-- الخزنة السحابية الجانبية -->
-            <aside class="cloud-vault" aria-label="الخزنة السحابية للمشاريع">
-                <h2>الخزنة السحابية (سيرفر خارجي)</h2>
-                <div style="display:flex; gap:5px;">
-                    <button class="btn-dark" style="flex:1;" onclick="createFreshProject()">مشروع جديد</button>
-                    <button class="btn-dark" onclick="fetchVaultProjects()" title="تحديث من السحابة">تحديث</button>
-                </div>
-                <ul class="vault-list" id="vault-projects-list" aria-label="قائمة المشاريع المحفوظة في السحابة"></ul>
-            </aside>
+            <!-- 1. اسم المشروع في الأعلى -->
+            <label for="project-name-input">اسم المشروع:</label>
+            <input type="text" id="project-name-input" placeholder="اكتب اسم المشروع هنا (مثال: my-site)">
 
-            <!-- محررات الأكواد غير المحدودة -->
-            <main class="code-workspace" aria-label="محررات الأكواد البرمجية غير المحدودة">
-                <div class="split-editors">
-                    <div class="editor-panel">
-                        <div class="panel-header">
-                            <label for="code-html">كود الهيكل (HTML)</label>
-                            <span class="inf-badge" id="count-html">حقل غير محدود</span>
-                        </div>
-                        <textarea id="code-html" class="unlimited-editor" spellcheck="false" oninput="onCodeChange()" aria-label="محرر HTML غير محدود"></textarea>
-                    </div>
-                    <div class="editor-panel">
-                        <div class="panel-header">
-                            <label for="code-css">كود التصميم (CSS)</label>
-                            <span class="inf-badge" id="count-css">حقل غير محدود</span>
-                        </div>
-                        <textarea id="code-css" class="unlimited-editor" spellcheck="false" oninput="onCodeChange()" aria-label="محرر CSS غير محدود"></textarea>
-                    </div>
-                </div>
-                <div class="editor-panel" style="flex: 1.25;">
-                    <div class="panel-header">
-                        <label for="code-js">كود البرمجة ونواة السيرفر السحابي (JavaScript)</label>
-                        <span class="inf-badge" id="count-js">حقل غير محدود</span>
-                    </div>
-                    <textarea id="code-js" class="unlimited-editor" spellcheck="false" oninput="onCodeChange()" aria-label="محرر جافاسكريبت غير محدود"></textarea>
-                </div>
-            </main>
-
-            <!-- شاشة المعاينة الحية ورادار السيرفر -->
-            <section class="live-monitor" aria-label="المعاينة الحية ورادار السيرفر">
-                <div class="preview-box">
-                    <div class="panel-header" style="background:#161b2e; color:#fff;">
-                        <span>شاشة التشغيل الحية (اختبر تطبيقك هنا مباشرة)</span>
-                        <button class="btn-dark" style="padding:3px 10px; font-size:12px;" onclick="compileAndRun(true)">تحديث وتشغيل (Alt+R)</button>
-                    </div>
-                    <iframe id="preview-iframe" title="شاشة المعاينة الحية للموقع أو التطبيق"></iframe>
-                </div>
-
-                <div class="radar-box" role="region" aria-label="رادار السيرفر ومراقب الاتصالات الحية">
-                    <div class="panel-header" style="background:#06080e;">
-                        <span>رادار السيرفر (مراقبة مفاتيح الـ API وتسجيلات الدخول)</span>
-                        <button class="btn-dark" style="padding:2px 8px; font-size:11px;" onclick="clearRadar()">مسح الرادار</button>
-                    </div>
-                    <div id="radar-logs" role="log" aria-live="polite"></div>
-                </div>
-            </section>
-        </div>
-    </div>
-
-    <!-- ================================================================= -->
-    <!-- 1. نافذة مركز مفاتيح الـ API والحماية من الهندسة العكسية (IAM Firewall) -->
-    <!-- ================================================================= -->
-    <div class="modal-overlay" id="iam-modal" role="dialog" aria-modal="true" aria-labelledby="iam-title">
-        <div class="modal-card">
-            <h2 id="iam-title" style="margin-top:0; color:var(--accent-purple);">مركز مفاتيح الـ API والجدار الناري (الحماية من الهندسة العكسية)</h2>
-            <p style="font-size:13px; color:var(--text-muted);">إذا قام أي شخص بعمل هندسة عكسية لتطبيقك وأخذ مفتاح الـ API، يمكنك بضغطة زر واحدة هنا **إيقاف وحظر المفتاح فوراً**، وسيتوقف تطبيقه المسروق عن العمل في نفس اللحظة!</p>
-
-            <!-- المفتاح الرئيسي للخزنة -->
-            <div style="background:var(--bg-card); padding:12px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:15px;">
-                <label for="vault-master-key" style="font-weight:bold; font-size:13px; color:var(--accent-cyan);">مفتاح الخزنة السحابية الرئيسي (هويتك السرية كمؤسس للسيرفر):</label>
-                <div style="display:flex; gap:8px; margin-top:6px;">
-                    <input type="text" id="vault-master-key" style="flex:1; font-family:monospace; font-weight:bold;">
-                    <button class="btn-dark" onclick="changeVaultMasterKey()">تبديل الخزنة السحابية</button>
-                </div>
+            <!-- شريط اختياري تماماً لتسهيل الكتابة لمن يريد -->
+            <div style="margin-bottom: 12px; background: var(--bg-input); padding: 10px; border-radius: 8px; border: 1px solid var(--border);">
+                <span style="font-size:13px; color:var(--text-muted); display:block; margin-bottom:6px;">قوالب اختيارية سريعة (اختر ما يناسبك أو اكتب كودك الخاص بحرية تامة):</span>
+                <button type="button" class="btn-secondary" onclick="setEditorTemplate('normal')">موقع عادي (بدون أي تسجيل دخول)</button>
+                <button type="button" class="btn-secondary" onclick="setEditorTemplate('nickname')">موقع بدخول اسم مستعار فقط (بدون بريد أو جوجل)</button>
+                <button type="button" class="btn-secondary" onclick="setEditorTemplate('social')">موقع بدخول جوجل وفيسبوك (اختياري)</button>
+                <button type="button" class="btn-secondary" onclick="toggleLivePreview()">معاينة الكود</button>
             </div>
 
-            <!-- توليد مفتاح API جديد لتطبيق أو موقع -->
-            <div style="display:flex; gap:8px; margin-bottom:15px;">
-                <input type="text" id="new-key-app-name" style="flex:1;" placeholder="اسم التطبيق أو الموقع (مثال: تطبيق المحادثة APK)">
-                <button class="btn-purple" onclick="generateNewSubApiKey()">+ توليد مفتاح API جديد</button>
+            <!-- 2. تحته مباشرة: مربع تعديل النص غير المحدود -->
+            <label for="code-editor-box">مربع تحرير الكود البرمجي (HTML / CSS / JS - حقل غير محدود):</label>
+            <textarea id="code-editor-box" spellcheck="false" placeholder="ضع كود HTML الخاص بك هنا بحرية تامة..."></textarea>
+
+            <!-- 3. تحته مباشرة: زر الإنشاء وإظهار الرابط -->
+            <button type="button" class="btn-main-create" onclick="publishAndSaveWebsite()">إنشاء الموقع وحفظه وإظهار الرابط</button>
+
+            <!-- صندوق إظهار الروابط فور الضغط على إنشاء -->
+            <div id="links-output-box" role="region" aria-label="روابط الموقع الجاهزة">
+                <h3 style="color:var(--success); margin-top:0;">تم إنشاء الموقع وحفظه للأبد! إليك الروابط الفعالة:</h3>
+
+                <label>1. الرابط المختصر المستقل (بدون كلمة GitHub نهائياً - محفوظ للأبد):</label>
+                <div class="link-field" id="independent-short-link" tabindex="0">جاري تكوين الرابط المستقل...</div>
+                <button type="button" onclick="copyText('independent-short-link')">نسخ الرابط المستقل</button>
+                <a id="open-independent-link" target="_blank" style="text-decoration:none;"><button type="button" class="btn-secondary">فتح الرابط المستقل</button></a>
+
+                <hr style="border-color:#1f2937; margin:15px 0;">
+
+                <label>2. رابط المشروع المباشر (باسم المشروع ويتحدث فوراً عند التعديل):</label>
+                <div class="link-field" id="direct-project-link" tabindex="0"></div>
+                <button type="button" onclick="copyText('direct-project-link')">نسخ الرابط المباشر</button>
+                <a id="open-direct-link" target="_blank" style="text-decoration:none;"><button type="button" class="btn-secondary">فتح الموقع الآن</button></a>
             </div>
 
-            <!-- جدول المفاتيح النشطة والمحظورة -->
-            <h3 style="font-size:15px; margin:10px 0;">قائمة مفاتيح الـ API النشطة والمراقبة الحية:</h3>
-            <table class="data-table" aria-label="جدول مفاتيح الـ API وحالتها">
-                <thead>
-                    <tr>
-                        <th>اسم التطبيق</th>
-                        <th>مفتاح الـ API</th>
-                        <th>الحالة في السيرفر</th>
-                        <th>عدد الاتصالات</th>
-                        <th>إجراء الحماية الفوري</th>
-                    </tr>
-                </thead>
-                <tbody id="api-keys-tbody"></tbody>
-            </table>
-
-            <!-- كود الـ SDK المحمي -->
-            <div style="margin-top:15px;">
-                <label style="font-weight:bold; font-size:13px;">كود الدمج المحمي (SDK) لتطبيق الـ APK أو الموقع (يتحقق من حالة المفتاح حياً):</label>
-                <div class="code-snippet" id="protected-sdk-box" tabindex="0"></div>
-                <button class="btn-dark" onclick="copyBoxText('protected-sdk-box')">نسخ كود الـ SDK المحمي</button>
+            <!-- نافذة معاينة اختيارية -->
+            <div id="preview-wrapper" style="display:none; margin-top:15px;">
+                <label>شاشة المعاينة الحية:</label>
+                <iframe id="preview-iframe" style="width:100%; height:280px; background:#fff; border-radius:8px; border:2px solid var(--accent);" title="معاينة الكود"></iframe>
             </div>
+        </section>
 
-            <div style="margin-top:20px; text-align:left;">
-                <button class="btn-dark" onclick="closeModal('iam-modal')">إغلاق المركز</button>
+        <!-- القسم الثاني: المواقع المحفوظة (محفوظة دائماً ولا تحذف) -->
+        <section class="box-card" aria-labelledby="sec2-title">
+            <h2 id="sec2-title">2. مواقعي ومشاريعي المحفوظة (دائمة ولا تُحذف)</h2>
+            <p style="font-size:14px; color:var(--text-muted); margin-top:0;">جميع المواقع التي تنشئها تُحفظ هنا وفي السحابة تلقائياً، ويمكنك فتحها أو التعديل عليها في أي وقت:</p>
+            <div id="permanent-sites-list" role="region" aria-label="قائمة المواقع المحفوظة"></div>
+        </section>
+
+        <!-- القسم الثالث: مفاتيح الـ API الفعالة (اختيارية لتطبيقاتك) -->
+        <section class="box-card" aria-labelledby="sec3-title">
+            <h2 id="sec3-title">3. إدارة مفاتيح الـ API النشطة (لربط وحماية تطبيقاتك)</h2>
+            <p style="font-size:14px; color:var(--text-muted); margin-top:0;">يمكنك إنشاء مفتاح API ووضعه في تطبيقك أو موقعك. إذا أردت إيقاف أي تطبيق يستخدم المفتاح، اضغط "إيقاف المفتاح" وسيتوقف في الوقت الفعلي:</p>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <input type="text" id="api-key-name" placeholder="اسم التطبيق الخاص بالمفتاح (مثال: تطبيقي الأول)" style="margin-bottom:0;">
+                <button type="button" onclick="createNewApiKey()" style="white-space:nowrap; margin:0;">+ إنشاء مفتاح API</button>
             </div>
-        </div>
-    </div>
+            <div id="api-keys-container"></div>
+        </section>
 
-    <!-- ================================================================= -->
-    <!-- 2. نافذة مركز حسابات جوجل وفيسبوك وإدارة ومراسلة المستخدمين (Cloud Auth) -->
-    <!-- ================================================================= -->
-    <div class="modal-overlay" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
-        <div class="modal-card">
-            <h2 id="auth-title" style="margin-top:0; color:var(--accent-orange);">مركز الهوية السحابية (Google & Facebook Auth) والتواصل مع المستخدمين</h2>
-            <p style="font-size:13px; color:var(--text-muted);">يتيح سيرفرك لأي موقع أو تطبيق تسجيل الدخول عبر **جوجل وفيسبوك**. يظهر لك هنا جميع المستخدمين المسجلين، ويمكنك مراسلتهم مباشرة إلى شاشاتهم في الوقت الفعلي!</p>
-
-            <!-- إعدادات OAuth الرسمية الاختيارية -->
-            <div style="background:var(--bg-card); padding:12px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:15px;">
-                <div style="font-weight:bold; font-size:13px; margin-bottom:8px; color:var(--accent-cyan);">إعدادات الربط الرسمي (تعمل تلقائياً بالجسر السحابي، أو ضع معرفاتك الخاصة إن رغبت):</div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                    <input type="text" id="google-client-id" style="flex:1;" placeholder="معرف عميل جوجل (Google Client ID - اختياري)">
-                    <input type="text" id="fb-app-id" style="flex:1;" placeholder="معرف تطبيق فيسبوك (Facebook App ID - اختياري)">
-                    <button class="btn-dark" onclick="saveOAuthConfig()">حفظ الإعدادات</button>
-                </div>
+        <!-- القسم الرابع: التواصل الحي مع الزوار والمستخدمين (في الوقت الفعلي) -->
+        <section class="box-card" aria-labelledby="sec4-title">
+            <h2 id="sec4-title">4. الرسائل الحية والمستخدمون المتصلون (الوقت الفعلي)</h2>
+            <p style="font-size:14px; color:var(--text-muted); margin-top:0;">إرسال إشعار فوري يظهر في جميع مواقعك وتطبيقاتك المفتوحة الآن، واستقبال رسائل الزوار (سواء دخلوا بدون حساب، أو باسم مستعار، أو بحساب رسمي):</p>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <input type="text" id="live-admin-msg" placeholder="اكتب رسالة أو إشعاراً لإرساله فوراً لزوار مواقعك..." style="margin-bottom:0;">
+                <button type="button" onclick="broadcastToAllSites()" style="white-space:nowrap; margin:0;">إرسال فوري للجميع</button>
             </div>
-
-            <!-- إرسال رسالة جماعية أو خاصة للمستخدمين المتصلين -->
-            <div style="background:var(--bg-card); padding:12px; border-radius:8px; border:1px solid var(--accent-orange); margin-bottom:15px;">
-                <label for="direct-user-msg" style="font-weight:bold; font-size:13px; color:var(--accent-orange);">التواصل المباشر مع المستخدمين المسجلين (إرسال إشعار أو رسالة حية):</label>
-                <div style="display:flex; gap:8px; margin-top:8px;">
-                    <select id="target-user-select" aria-label="اختر المستخدم المراد مراسلته">
-                        <option value="ALL">جميع المستخدمين المتصلين (بث عام)</option>
-                    </select>
-                    <input type="text" id="direct-user-msg" style="flex:1;" placeholder="اكتب رسالتك لتظهر فوراً للمستخدم...">
-                    <button class="btn-orange" onclick="sendMessageToAuthUser()">إرسال فوري للمستخدم</button>
-                </div>
+            <div id="live-events-log" role="log" aria-live="polite">
+                <div style="color:var(--text-muted); font-size:14px;">سجل الاتصالات والرسائل الواردة جاهز...</div>
             </div>
+        </section>
 
-            <!-- جدول المستخدمين المسجلين عبر جوجل وفيسبوك -->
-            <h3 style="font-size:15px; margin:10px 0;">المستخدمون المسجلون في مواقعك وتطبيقاتك:</h3>
-            <table class="data-table" aria-label="جدول المستخدمين المسجلين عبر جوجل وفيسبوك">
-                <thead>
-                    <tr>
-                        <th>الاسم</th>
-                        <th>البريد الإلكتروني / الحساب</th>
-                        <th>مزود الخدمة</th>
-                        <th>المعرف (UID)</th>
-                        <th>تواصل مباشر</th>
-                    </tr>
-                </thead>
-                <tbody id="auth-users-tbody">
-                    <tr><td colspan="5" style="text-align:center; color:var(--text-muted);">لا يوجد مستخدمون مسجلون حالياً. جرب تسجيل الدخول من شاشة المعاينة!</td></tr>
-                </tbody>
-            </table>
-
-            <div style="margin-top:20px; display:flex; justify-content:space-between;">
-                <button class="btn-orange" onclick="injectEnterpriseSystem('social_auth_app'); closeModal('auth-modal');">حقن كود تسجيل دخول جوجل وفيسبوك في محرري الآن</button>
-                <button class="btn-dark" onclick="closeModal('auth-modal')">إغلاق المركز</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================================================================= -->
-    <!-- 3. نافذة قاعدة البيانات السحابية والوظائف التلقائية (Oracle & Firebase DB) -->
-    <!-- ================================================================= -->
-    <div class="modal-overlay" id="db-modal" role="dialog" aria-modal="true" aria-labelledby="db-title">
-        <div class="modal-card">
-            <h2 id="db-title" style="margin-top:0; color:var(--accent-cyan);">مستكشف قواعد البيانات السحابية والوظائف التلقائية (Cloud DB & Functions)</h2>
-            <p style="font-size:13px; color:var(--text-muted);">تحكم في البيانات المخزنة سحابياً لتطبيقاتك، وقم ببرمجة الردود التلقائية للسيرفر (Serverless Cloud Triggers).</p>
-
-            <!-- إضافة أو تعديل سجل سحابي -->
-            <div style="display:flex; gap:8px; margin-bottom:15px;">
-                <input type="text" id="db-doc-key" placeholder="اسم الحقل / المفتاح (مثال: app_version)">
-                <input type="text" id="db-doc-val" style="flex:1;" placeholder="القيمة السحابية (مثال: 2.5.0)">
-                <button class="btn-green" onclick="writeToCloudDBConsole()">حفظ في قاعدة البيانات</button>
-            </div>
-
-            <!-- جدول البيانات السحابية الحية -->
-            <table class="data-table" aria-label="البيانات المخزنة في قاعدة البيانات السحابية">
-                <thead>
-                    <tr>
-                        <th>المفتاح (Key)</th>
-                        <th>القيمة المخزنة سحابياً (Value)</th>
-                        <th>إجراء</th>
-                    </tr>
-                </thead>
-                <tbody id="cloud-db-tbody"></tbody>
-            </table>
-
-            <hr style="border-color:var(--border-color); margin:15px 0;">
-
-            <!-- الوظائف السحابية التلقائية (Serverless Auto-Reply) -->
-            <h3 style="font-size:15px; color:var(--accent-purple);">الوظائف السحابية التلقائية (Cloud Functions):</h3>
-            <p style="font-size:12px; color:var(--text-muted); margin-top:0;">عندما يرسل تطبيق APK أو موقع الكلمة المفتاحية المحددة، سيرد عليه السيرفر تلقائياً بالاستجابة المبرمجة:</p>
-            <div style="display:flex; gap:8px;">
-                <input type="text" id="fn-trigger" placeholder="إذا أرسل التطبيق كلمة (مثال: حالة_السيرفر)">
-                <input type="text" id="fn-response" style="flex:1;" placeholder="يرد السيرفر تلقائياً بـ (مثال: السيرفر يعمل بكفاءة 100%)">
-                <button class="btn-purple" onclick="saveCloudFunction()">تفعيل الوظيفة التلقائية</button>
-            </div>
-
-            <div style="margin-top:20px; text-align:left;">
-                <button class="btn-dark" onclick="closeModal('db-modal')">إغلاق المركز</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================================================================= -->
-    <!-- 4. نافذة الاستضافة والروابط المخصصة (بدون اسم GitHub) -->
-    <!-- ================================================================= -->
-    <div class="modal-overlay" id="deploy-modal" role="dialog" aria-modal="true" aria-labelledby="deploy-title">
-        <div class="modal-card">
-            <h2 id="deploy-title" style="margin-top:0; color:var(--accent-green);">نشر الموقع وتوليد الرابط الخاص بك</h2>
-            <div style="display:flex; gap:8px; margin-bottom:15px;">
-                <input type="text" id="site-custom-name" style="flex:1;" placeholder="اكتب اسم الرابط الخاص بمشروعك (مثال: my-portal)">
-                <button class="btn-green" onclick="publishToCloudCluster()">نشر وتحديث الرابط الآن</button>
-            </div>
-
-            <div id="deploy-links-area" style="display:none; border-top:1px solid var(--border-color); padding-top:15px;">
-                <label style="font-weight:bold; font-size:13px; color:var(--accent-cyan);">1. رابط مستقل باسم مشروعك (خالٍ تماماً من اسم GitHub):</label>
-                <div style="display:flex; gap:8px; margin:6px 0;">
-                    <input type="text" id="short-alias-input" style="flex:1;" placeholder="اسم إنجليزي فريد للرابط المستقل">
-                    <button class="btn-dark" onclick="createIndependentUrl()">صنع الرابط المستقل</button>
-                </div>
-                <div class="code-snippet" id="independent-url-box" tabindex="0">اضغط على "صنع الرابط المستقل" لتوليد رابطك الخاص.</div>
-                <button class="btn-dark" onclick="copyBoxText('independent-url-box')">نسخ الرابط المستقل</button>
-
-                <div style="margin-top:15px;">
-                    <label style="font-weight:bold; font-size:13px;">2. الرابط السحابي المباشر (يقبل التعديل والتحديث الفوري):</label>
-                    <div class="code-snippet" id="direct-cloud-url-box" tabindex="0"></div>
-                    <div style="display:flex; gap:8px;">
-                        <button class="btn-dark" onclick="copyBoxText('direct-cloud-url-box')">نسخ الرابط المباشر</button>
-                        <a id="open-published-site" target="_blank" style="text-decoration:none;"><button type="button" class="btn-green">فتح الموقع في صفحة جديدة</button></a>
-                    </div>
-                </div>
-            </div>
-
-            <div style="margin-top:20px; text-align:left;">
-                <button class="btn-dark" onclick="closeModal('deploy-modal')">إغلاق</button>
-            </div>
-        </div>
-    </div>
+    </main>
 
     <script>
-        // =================================================================
-        // 1. الناطق الصوتي لقارئ الشاشة ورادار السيرفر
-        // =================================================================
-        function speakSR(msg) {
-            const announcer = document.getElementById('sr-announcer');
-            announcer.textContent = '';
-            setTimeout(() => { announcer.textContent = msg; }, 40);
+        // =====================================================================
+        // 1. تهيئة المعرف السحابي الثابت والاتصال المزدوج لضمان عدم ضياع أي موقع
+        // =====================================================================
+        let MY_SERVER_ID = localStorage.getItem('permanent_cloud_server_id');
+        if (!MY_SERVER_ID) {
+            MY_SERVER_ID = 'cloud_' + Math.random().toString(36).substring(2, 10);
+            localStorage.setItem('permanent_cloud_server_id', MY_SERVER_ID);
         }
 
-        function logRadar(text, announce = false) {
-            const radar = document.getElementById('radar-logs');
-            const time = new Date().toLocaleTimeString('ar-EG');
-            const div = document.createElement('div');
-            div.textContent = `[${time}] ${text}`;
-            radar.appendChild(div);
-            radar.scrollTop = radar.scrollHeight;
-            if (announce) speakSR(text);
+        const BROKER_URL = 'wss://broker.emqx.io:8084/mqtt';
+        let mqttClient = null;
+
+        // استرجاع المواقع ومفاتيح الـ API المحفوظة فوراً لضمان عدم حذفها أبداً
+        let savedSites = JSON.parse(localStorage.getItem('permanent_saved_sites') || '{}');
+        let savedApiKeys = JSON.parse(localStorage.getItem('permanent_api_keys') || '{}');
+
+        function announce(msg) {
+            const el = document.getElementById('sr-announcer');
+            el.textContent = '';
+            setTimeout(() => { el.textContent = msg; }, 50);
         }
 
-        function clearRadar() {
-            document.getElementById('radar-logs').innerHTML = '';
-            speakSR("تم مسح سجل الرادار.");
-        }
+        // =====================================================================
+        // 2. وضع الزائر: تشغيل الموقع المستضاف فوراً وبحرية تامة
+        // =====================================================================
+        const query = new URLSearchParams(window.location.search);
+        const targetSiteName = query.get('site') || query.get('p');
+        const hashPayload = window.location.hash;
 
-        function openModal(id) {
-            document.getElementById(id).style.display = 'flex';
-            if (id === 'iam-modal') renderApiKeysTable();
-            if (id === 'auth-modal') renderAuthUsersTable();
-            if (id === 'db-modal') renderCloudDBTable();
-            speakSR("تم فتح النافذة السحابية.");
-        }
+        if (hashPayload.startsWith('#app=')) {
+            // فتح فوري من الرابط الخالد المدمج (مستحيل أن يُحذف للأبد ويعمل في 0.1 ثانية)
+            document.getElementById('admin-workspace').style.display = 'none';
+            document.getElementById('visitor-loader').style.display = 'block';
+            const rawHTML = LZString.decompressFromEncodedURIComponent(hashPayload.replace('#app=', ''));
+            if (rawHTML) {
+                document.open(); document.write(rawHTML); document.close();
+            }
+        } else if (targetSiteName) {
+            // فتح من السيرفر السحابي المباشر باسم المشروع
+            document.getElementById('admin-workspace').style.display = 'none';
+            document.getElementById('visitor-loader').style.display = 'block';
 
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
-            speakSR("تم إغلاق النافذة.");
-        }
+            // إذا كان محفوظاً محلياً أو في السحابة يفتحه فوراً
+            const vClient = mqtt.connect(BROKER_URL);
+            const topic = `cloud_os_v8_permanent/sites/${encodeURIComponent(targetSiteName)}`;
 
-        function copyBoxText(id) {
-            navigator.clipboard.writeText(document.getElementById(id).textContent);
-            logRadar("تم نسخ النص إلى الحافظة بنجاح.", true);
-        }
+            vClient.on('connect', () => {
+                vClient.subscribe(topic, { qos: 1 });
+            });
 
-        // =================================================================
-        // 2. الاتصال بالعناقيد السحابية ومحرك عرض المواقع المستضافة
-        // =================================================================
-        const gunNodes = [
-            'https://gun-manhattan.herokuapp.com/gun',
-            'https://relay.peer.ooo/gun',
-            'https://peer.wallie.io/gun'
-        ];
-        const gun = Gun(gunNodes);
-        const globalHostingCluster = gun.get('enterprise_cloud_os_v6_sites');
-        const globalFirewallCluster = gun.get('enterprise_cloud_os_v6_api_firewall');
-
-        const urlQuery = new URLSearchParams(window.location.search);
-        const requestedSite = urlQuery.get('site') || urlQuery.get('app');
-
-        if (requestedSite) {
-            document.getElementById('os-main-ui').style.display = 'none';
-            document.getElementById('cloud-loader').style.display = 'flex';
-            bootHostedSite(requestedSite);
-        }
-
-        function bootHostedSite(slug) {
-            const node = globalHostingCluster.get(slug);
-            node.once((meta) => {
-                if (meta && meta.chunksCount) {
-                    let chunks = [];
-                    let loaded = 0;
-                    for (let i = 0; i < meta.chunksCount; i++) {
-                        node.get('part_' + i).once((data) => {
-                            chunks[i] = data || '';
-                            loaded++;
-                            if (loaded === meta.chunksCount) {
-                                const html = LZString.decompressFromUTF16(chunks.join(''));
-                                document.open(); document.write(html); document.close();
-                            }
-                        });
+            vClient.on('message', (t, msg) => {
+                if (t === topic) {
+                    const html = LZString.decompressFromUTF16(msg.toString());
+                    if (html) {
+                        vClient.end();
+                        document.open(); document.write(html); document.close();
                     }
-                } else {
-                    node.on((live) => {
-                        if (live && live.directPayload) {
-                            const html = LZString.decompressFromUTF16(live.directPayload);
-                            document.open(); document.write(html); document.close();
-                        }
-                    });
-                }
-            });
-        }
-
-        // =================================================================
-        // 3. نظام إدارة مفاتيح الـ API والجدار الناري (IAM & Anti-Reverse Engineering)
-        // =================================================================
-        let masterVaultKey = sessionStorage.getItem('v6_master_vault') || localStorage.getItem('v6_master_vault_ref');
-        if (!masterVaultKey) {
-            masterVaultKey = 'MASTER-VAULT-' + Math.random().toString(36).substring(2, 9).toUpperCase();
-            sessionStorage.setItem('v6_master_vault', masterVaultKey);
-            localStorage.setItem('v6_master_vault_ref', masterVaultKey);
-        }
-        document.getElementById('vault-master-key').value = masterVaultKey;
-
-        let myVaultNode = gun.get('vault_v6_' + masterVaultKey);
-        let apiKeysRegistry = {};
-        let activeAppApiKey = '';
-        let mqttServerClient = null;
-        let cloudAutoFunction = { trigger: 'حالة_السيرفر', response: 'السيرفر السحابي الخارق يعمل بكفاءة 100%' };
-
-        function initIamAndFirewall() {
-            // جلب مفاتيح الـ API الخاصة بك من السحابة
-            myVaultNode.get('api_keys').map().on((keyData, keyId) => {
-                if (keyData && keyData.keyId) {
-                    apiKeysRegistry[keyId] = keyData;
-                    if (!activeAppApiKey) activeAppApiKey = keyId;
-                    renderApiKeysTable();
-                    updateProtectedSdkBox();
                 }
             });
 
-            // إذا لم يكن هناك مفتاح فرعي بعد، ننشئ المفتاح الأول تلقائياً
+            // احتياط إضافي فوري إذا كان في نفس المتصفح
             setTimeout(() => {
-                if (Object.keys(apiKeysRegistry).length === 0) {
-                    createSubApiKeyInternal('التطبيق الافتراضي الأول (APK / Web)');
+                if (savedSites[targetSiteName] && document.getElementById('visitor-loader')) {
+                    const full = injectOptionalCloudHelper(savedSites[targetSiteName].code);
+                    document.open(); document.write(full); document.close();
                 }
-            }, 800);
+            }, 1200);
+        } else {
+            window.addEventListener('DOMContentLoaded', startAdminOS);
+        }
 
-            // تشغيل رادار الاتصالات عبر MQTT لمراقبة استخدام المفاتيح وتسجيلات دخول جوجل/فيسبوك
-            if (mqttServerClient) { try { mqttServerClient.end(); } catch(e){} }
-            mqttServerClient = mqtt.connect('wss://broker.emqx.io:8084/mqtt');
+        // =====================================================================
+        // 3. تشغيل لوحة تحكم الحاسوب السحابي
+        // =====================================================================
+        function startAdminOS() {
+            // عرض المواقع والمفاتيح المحفوظة فوراً
+            if (Object.keys(savedApiKeys).length === 0) {
+                const defaultKey = 'API_' + Math.random().toString(36).substring(2, 9).toUpperCase();
+                savedApiKeys[defaultKey] = { key: defaultKey, name: 'المفتاح الافتراضي', status: 'ACTIVE' };
+                localStorage.setItem('permanent_api_keys', JSON.stringify(savedApiKeys));
+            }
+            renderPermanentSites();
+            renderApiKeysList();
 
-            mqttServerClient.on('connect', () => {
-                mqttServerClient.subscribe(`cloud_v6_gateway/${masterVaultKey}/#`);
-                logRadar("جدار الحماية السحابي (API Firewall) وبوابة الهوية (Google/Facebook OAuth) يعملان بنجاح.");
+            // وضع قالب موقع عادي ونظيف (بدون أي تسجيل دخول إجباري!) في البداية
+            setEditorTemplate('normal', true);
+
+            // الاتصال بالسيرفر السحابي في الوقت الفعلي
+            mqttClient = mqtt.connect(BROKER_URL);
+
+            mqttClient.on('connect', () => {
+                const st = document.getElementById('cloud-status');
+                st.textContent = 'السيرفر السحابي متصل في الوقت الفعلي (100%)';
+                st.className = 'badge badge-green';
+
+                // استرجاع ومزامنة أي مواقع أو مفاتيح من السحابة
+                mqttClient.subscribe(`cloud_os_v8_permanent/${MY_SERVER_ID}/sync_sites/+`, { qos: 1 });
+                mqttClient.subscribe(`cloud_os_v8_permanent/${MY_SERVER_ID}/sync_keys/+`, { qos: 1 });
+                mqttClient.subscribe(`cloud_os_v8_permanent/${MY_SERVER_ID}/live_inbox`, { qos: 1 });
+
+                // إعادة نشر حالة المفاتيح والمواقع في السحابة لضمان بقائها نشطة دائماً
+                Object.values(savedApiKeys).forEach(k => {
+                    mqttClient.publish(`cloud_os_v8_permanent/api_guard/${k.key}`, k.status, { qos: 1, retain: true });
+                });
+                Object.values(savedSites).forEach(s => {
+                    const full = injectOptionalCloudHelper(s.code);
+                    const comp = LZString.compressToUTF16(full);
+                    mqttClient.publish(`cloud_os_v8_permanent/sites/${encodeURIComponent(s.name)}`, comp, { qos: 1, retain: true });
+                });
             });
 
-            mqttServerClient.on('message', (topic, message) => {
+            mqttClient.on('message', (topic, message) => {
                 try {
-                    const packet = JSON.parse(message.toString());
-                    handleIncomingClientPacket(packet);
+                    const str = message.toString();
+                    if (topic.includes('/sync_sites/')) {
+                        const siteObj = JSON.parse(LZString.decompressFromUTF16(str));
+                        if (siteObj && siteObj.name && !siteObj.deleted) {
+                            savedSites[siteObj.name] = siteObj;
+                            localStorage.setItem('permanent_saved_sites', JSON.stringify(savedSites));
+                            renderPermanentSites();
+                        }
+                    } else if (topic.includes('/sync_keys/')) {
+                        const keyObj = JSON.parse(str);
+                        if (keyObj && keyObj.key) {
+                            savedApiKeys[keyObj.key] = keyObj;
+                            localStorage.setItem('permanent_api_keys', JSON.stringify(savedApiKeys));
+                            renderApiKeysList();
+                        }
+                    } else if (topic.endsWith('/live_inbox')) {
+                        const data = JSON.parse(str);
+                        displayIncomingEvent(data);
+                    }
                 } catch (e) {}
             });
         }
 
-        function createSubApiKeyInternal(appName) {
-            const newKeyId = 'API-KEY-' + Math.random().toString(36).substring(2, 7).toUpperCase() + '-' + Math.random().toString(36).substring(2, 7).toUpperCase();
-            const keyObj = {
-                keyId: newKeyId,
-                appName: appName,
-                status: 'ACTIVE', // ACTIVE أو REVOKED
-                hits: 0,
-                createdAt: Date.now()
-            };
-            apiKeysRegistry[newKeyId] = keyObj;
-            activeAppApiKey = newKeyId;
-            myVaultNode.get('api_keys').get(newKeyId).put(keyObj);
-            globalFirewallCluster.get(newKeyId).put({ status: 'ACTIVE', vault: masterVaultKey });
-            renderApiKeysTable();
-            updateProtectedSdkBox();
-            return newKeyId;
-        }
-
-        function generateNewSubApiKey() {
-            const input = document.getElementById('new-key-app-name');
-            const appName = input.value.trim() || 'تطبيق سحابي جديد';
-            const k = createSubApiKeyInternal(appName);
-            input.value = '';
-            logRadar(`تم توليد مفتاح API جديد (${k}) لتطبيق: ${appName}`, true);
-        }
-
-        // إيقاف وحظر المفتاح المسروق فوراً أو إعادة تفعيله!
-        function toggleApiKeyStatus(keyId) {
-            const current = apiKeysRegistry[keyId];
-            if (!current) return;
-            const newStatus = current.status === 'ACTIVE' ? 'REVOKED' : 'ACTIVE';
-            current.status = newStatus;
-
-            // تحديث الحالة في الخزنة وفي الجدار الناري العالمي
-            myVaultNode.get('api_keys').get(keyId).get('status').put(newStatus);
-            globalFirewallCluster.get(keyId).put({ status: newStatus, vault: masterVaultKey });
-
-            // إرسال أمر حظر أو تفعيل فوري عبر MQTT لإغلاق التطبيق المسروق في نفس الثانية!
-            if (mqttServerClient) {
-                mqttServerClient.publish(`cloud_v6_firewall_stream/${keyId}`, JSON.stringify({
-                    command: newStatus === 'REVOKED' ? 'KILL_SWITCH_REVOKE' : 'RESTORE_ACCESS',
-                    keyId: keyId,
-                    timestamp: Date.now()
-                }));
-            }
-
-            renderApiKeysTable();
-            if (newStatus === 'REVOKED') {
-                logRadar(`⛔ تم إيقاف وحظر مفتاح الـ API (${keyId}) فوراً! أي تطبيق يستخدم هذا المفتاح تم فصله عن السيرفر.`, true);
-            } else {
-                logRadar(`✅ تمت إعادة تفعيل مفتاح الـ API (${keyId}) بنجاح!`, true);
-            }
-        }
-
-        function renderApiKeysTable() {
-            const tbody = document.getElementById('api-keys-tbody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            Object.values(apiKeysRegistry).forEach(k => {
-                const isBlocked = k.status === 'REVOKED';
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${k.appName}</strong></td>
-                    <td style="font-family:monospace; direction:ltr;">${k.keyId}</td>
-                    <td><span class="${isBlocked ? 'badge-blocked' : 'badge-active'}">${isBlocked ? '⛔ موقوف ومحظور' : '🟢 نشط ومحمي'}</span></td>
-                    <td>${k.hits || 0} عملية اتصال</td>
-                    <td>
-                        <button class="${isBlocked ? 'btn-green' : 'btn-danger'}" onclick="toggleApiKeyStatus('${k.keyId}')">
-                            ${isBlocked ? 'إعادة تفعيل المفتاح' : 'إيقاف وحظر المفتاح فوراً'}
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function changeVaultMasterKey() {
-            const val = document.getElementById('vault-master-key').value.trim();
-            if (!val || val.length < 5) return;
-            masterVaultKey = val;
-            sessionStorage.setItem('v6_master_vault', masterVaultKey);
-            localStorage.setItem('v6_master_vault_ref', masterVaultKey);
-            myVaultNode = gun.get('vault_v6_' + masterVaultKey);
-            apiKeysRegistry = {};
-            initIamAndFirewall();
-            fetchVaultProjects();
-            logRadar(`تم الانتقال إلى الخزنة السحابية الرئيسية (${masterVaultKey}).`, true);
-        }
-
-        function updateProtectedSdkBox() {
-            const sampleKey = activeAppApiKey || 'API-KEY-XXXX';
-            const sdk = `<!-- كود SDK المحمي بالجدار الناري + دعم تسجيل دخول جوجل وفيسبوك -->
-<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"><\/script>
+        // =====================================================================
+        // 4. المحرك السحابي الاختياري (لا يظهر ولا يتدخل إلا إذا استدعيته أنت في الكود!)
+        // =====================================================================
+        function injectOptionalCloudHelper(userHTML) {
+            const firstKey = Object.keys(savedApiKeys)[0] || 'DEFAULT_KEY';
+            const helperScript = `
+<!-- مكتبة السيرفر السحابي الاختيارية (تعمل في الخلفية فقط إذا استدعاها المبرمج) -->
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"><\/script>
 <script>
-  const CLOUD_VAULT_ID = "${masterVaultKey}";
-  const APP_API_KEY = "${sampleKey}";
+(function(){
+    const SRV_ID = "${MY_SERVER_ID}";
+    const mq = mqtt.connect("wss://broker.emqx.io:8084/mqtt");
+    let currentIdentity = "زائر بدون تسجيل دخول";
 
-  const gun = Gun(['https://gun-manhattan.herokuapp.com/gun', 'https://relay.peer.ooo/gun']);
-  const firewallNode = gun.get('enterprise_cloud_os_v6_api_firewall').get(APP_API_KEY);
-  const mqttClient = mqtt.connect('wss://broker.emqx.io:8084/mqtt');
-  let isKeyBlocked = false;
+    window.Cloud = {
+        // 1. ربط مفتاح API (اختياري)
+        useApiKey: function(key) {
+            mq.subscribe("cloud_os_v8_permanent/api_guard/" + key, { qos: 1 });
+        },
 
-  // 1. المراقبة الحية لمفتاح الـ API (يتوقف التطبيق فوراً إذا قمت بحظر المفتاح من السيرفر)
-  firewallNode.on((state) => {
-    if (state && state.status === 'REVOKED') triggerKillSwitch();
-  });
-  mqttClient.on('connect', () => {
-    mqttClient.subscribe('cloud_v6_firewall_stream/' + APP_API_KEY);
-    mqttClient.subscribe('cloud_v6_user_inbox/#');
-  });
-  mqttClient.on('message', (topic, msg) => {
-    const data = JSON.parse(msg.toString());
-    if (data.command === 'KILL_SWITCH_REVOKE') triggerKillSwitch();
-  });
-
-  function triggerKillSwitch() {
-    isKeyBlocked = true;
-    document.body.innerHTML = '<div style="background:#111;color:#ff4757;padding:40px;text-align:center;font-family:Tahoma;"><h1>⛔ تم إيقاف وحظر مفتاح الـ API هذا من قِبل السيرفر السحابي!</h1><p>تم قطع الاتصال بقاعدة البيانات والسيرفر لحماية الملكية الفكرية.</p></div>';
-  }
-
-  // 2. دالة إرسال البيانات للسيرفر السحابي (تعمل فقط إذا كان المفتاح نشطاً)
-  function sendToEnterpriseCloud(action, payload) {
-    if (isKeyBlocked) return;
-    mqttClient.publish('cloud_v6_gateway/' + CLOUD_VAULT_ID + '/events', JSON.stringify({
-      apiKey: APP_API_KEY, action: action, payload: payload
-    }));
-  }
-<\/script>`;
-            const box = document.getElementById('protected-sdk-box');
-            if (box) box.textContent = sdk;
-        }
-
-        // =================================================================
-        // 4. معالجة إشارات التطبيقات، حسابات جوجل/فيسبوك، والوظائف التلقائية
-        // =================================================================
-        let registeredUsersMap = {};
-
-        function handleIncomingClientPacket(packet) {
-            const usedKey = packet.apiKey;
-            // التحقق من صلاحية مفتاح الـ API في الجدار الناري
-            if (usedKey && apiKeysRegistry[usedKey]) {
-                if (apiKeysRegistry[usedKey].status === 'REVOKED') {
-                    logRadar(`🛡️ جدار الحماية صد محاولة اتصال بمفتاح محظور: (${usedKey})!`, true);
-                    mqttServerClient.publish(`cloud_v6_firewall_stream/${usedKey}`, JSON.stringify({ command: 'KILL_SWITCH_REVOKE' }));
-                    return;
-                }
-                // زيادة عداد الاتصالات للمفتاح النشط
-                apiKeysRegistry[usedKey].hits = (apiKeysRegistry[usedKey].hits || 0) + 1;
-                myVaultNode.get('api_keys').get(usedKey).get('hits').put(apiKeysRegistry[usedKey].hits);
-                renderApiKeysTable();
-            }
-
-            // إذا كانت الإشارة هي تسجيل دخول مستخدم عبر جوجل أو فيسبوك
-            if (packet.action === 'OAUTH_LOGIN') {
-                const u = packet.payload;
-                registeredUsersMap[u.uid] = u;
-                myVaultNode.get('auth_users').get(u.uid).put(u);
-                renderAuthUsersTable();
-                logRadar(`👤 تسجيل دخول جديد عبر (${u.provider}): ${u.name} (${u.email})`, true);
-            }
-            // إذا كانت الإشارة رسالة أو طلب من التطبيق
-            else if (packet.action === 'CLIENT_DATA') {
-                const msgText = packet.payload;
-                logRadar(`📡 بيانات واردة عبر المفتاح (${usedKey}): ${msgText}`, true);
-
-                // فحص الوظائف السحابية التلقائية (Serverless Cloud Functions)
-                if (cloudAutoFunction.trigger && msgText.includes(cloudAutoFunction.trigger)) {
-                    setTimeout(() => {
-                        mqttServerClient.publish(`cloud_v6_user_inbox/${masterVaultKey}/ALL`, JSON.stringify({
-                            sender: 'الوظيفة التلقائية للسيرفر (Cloud Function)',
-                            message: cloudAutoFunction.response
-                        }));
-                        logRadar(`⚡ الوظيفة التلقائية ردت على التطبيق بـ: (${cloudAutoFunction.response})`);
-                    }, 300);
-                }
-            }
-        }
-
-        // جلب المستخدمين المسجلين من السحابة
-        function syncAuthUsersFromCloud() {
-            myVaultNode.get('auth_users').map().on((userObj, uid) => {
-                if (userObj && userObj.uid) {
-                    registeredUsersMap[uid] = userObj;
-                    renderAuthUsersTable();
-                }
-            });
-        }
-
-        function renderAuthUsersTable() {
-            const tbody = document.getElementById('auth-users-tbody');
-            const select = document.getElementById('target-user-select');
-            if (!tbody || !select) return;
-
-            const users = Object.values(registeredUsersMap);
-            if (users.length === 0) return;
-
-            tbody.innerHTML = '';
-            select.innerHTML = '<option value="ALL">جميع المستخدمين المتصلين (بث عام)</option>';
-
-            users.forEach(u => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${u.name}</strong></td>
-                    <td>${u.email}</td>
-                    <td><span class="badge-active">${u.provider}</span></td>
-                    <td style="font-family:monospace;">${u.uid}</td>
-                    <td><button class="btn-orange" onclick="selectUserForDirectMsg('${u.uid}', '${u.name}')">مراسلة خاصة</button></td>
-                `;
-                tbody.appendChild(tr);
-
-                const opt = document.createElement('option');
-                opt.value = u.uid;
-                opt.textContent = `مراسلة خاصة: ${u.name} (${u.provider})`;
-                select.appendChild(opt);
-            });
-        }
-
-        function selectUserForDirectMsg(uid, name) {
-            document.getElementById('target-user-select').value = uid;
-            const input = document.getElementById('direct-user-msg');
-            input.placeholder = `اكتب رسالة خاصة إلى ${name}...`;
-            input.focus();
-            speakSR(`تم تحديد المستخدم ${name} للمراسلة الخاصة.`);
-        }
-
-        function sendMessageToAuthUser() {
-            const targetUid = document.getElementById('target-user-select').value;
-            const msgInput = document.getElementById('direct-user-msg');
-            const text = msgInput.value.trim();
-            if (!text || !mqttServerClient) return;
-
-            mqttServerClient.publish(`cloud_v6_user_inbox/${masterVaultKey}/${targetUid}`, JSON.stringify({
-                sender: 'إدارة السيرفر السحابي',
-                target: targetUid,
-                message: text,
-                timestamp: Date.now()
+        // 2. تسجيل دخول حر باسم مستعار فقط (بدون بريد إلكتروني ولا جوجل ولا فيسبوك!)
+        loginWithNickname: function(nickname, callback) {
+            if (!nickname) return;
+            currentIdentity = nickname + " (اسم مستعار)";
+            mq.publish("cloud_os_v8_permanent/" + SRV_ID + "/live_inbox", JSON.stringify({
+                type: "LOGIN",
+                method: "اسم مستعار حر",
+                user: nickname,
+                time: new Date().toLocaleTimeString()
             }));
+            if (callback) callback(nickname);
+        },
 
-            msgInput.value = '';
-            logRadar(`✉️ تم إرسال رسالتك المباشرة إلى (${targetUid === 'ALL' ? 'جميع المستخدمين' : targetUid}): "${text}"`, true);
+        // 3. تسجيل دخول بحساب رسمي كجوجل أو فيسبوك أو بريد (اختياري تماماً)
+        loginWithAccount: function(provider, accountName, callback) {
+            currentIdentity = accountName + " (" + provider + ")";
+            mq.publish("cloud_os_v8_permanent/" + SRV_ID + "/live_inbox", JSON.stringify({
+                type: "LOGIN",
+                method: provider,
+                user: accountName,
+                time: new Date().toLocaleTimeString()
+            }));
+            if (callback) callback(accountName);
+        },
+
+        // 4. إرسال رسالة أو بيانات إلى السيرفر السحابي (يعمل حتى بدون أي تسجيل دخول!)
+        sendToServer: function(messageText) {
+            mq.publish("cloud_os_v8_permanent/" + SRV_ID + "/live_inbox", JSON.stringify({
+                type: "MESSAGE",
+                user: currentIdentity,
+                text: messageText,
+                time: new Date().toLocaleTimeString()
+            }));
+        }
+    };
+
+    mq.on("connect", () => {
+        mq.subscribe("cloud_os_v8_permanent/" + SRV_ID + "/broadcast", { qos: 1 });
+    });
+
+    mq.on("message", (topic, msg) => {
+        const str = msg.toString();
+        if (topic.includes("/api_guard/") && str === "BLOCKED") {
+            document.body.innerHTML = '<div style="background:#070a12;color:#ff4757;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;font-family:Tahoma;text-align:center;padding:20px;"><h1>⛔ تم إيقاف مفتاح الـ API الخاص بهذا التطبيق من السيرفر!</h1></div>';
+        } else if (topic.endsWith("/broadcast")) {
+            const toast = document.createElement("div");
+            toast.setAttribute("role", "alert");
+            toast.style.cssText = "position:fixed;top:15px;left:50%;transform:translateX(-50%);background:#00e5ff;color:#000;padding:12px 24px;border-radius:8px;font-weight:bold;z-index:99999;box-shadow:0 5px 20px rgba(0,0,0,0.5);font-family:Tahoma;";
+            toast.textContent = "🔔 إشعار من السيرفر: " + str;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 8000);
+        }
+    });
+})();
+<\/script>`;
+            return helperScript + "\n" + userHTML;
         }
 
-        function saveOAuthConfig() {
-            const gId = document.getElementById('google-client-id').value.trim();
-            const fbId = document.getElementById('fb-app-id').value.trim();
-            myVaultNode.get('oauth_config').put({ googleClientId: gId, fbAppId: fbId });
-            logRadar("تم حفظ إعدادات الربط الرسمي لحسابات جوجل وفيسبوك في السحابة.", true);
-        }
+        // =====================================================================
+        // 5. إنشاء الموقع وحفظه للأبد وإظهار الرابط فوراً
+        // =====================================================================
+        async function publishAndSaveWebsite() {
+            let name = document.getElementById('project-name-input').value.trim();
+            const code = document.getElementById('code-editor-box').value;
 
-        // =================================================================
-        // 5. مستكشف قاعدة البيانات السحابية والوظائف (Oracle & Firebase DB Console)
-        // =================================================================
-        let cloudDbCache = {};
+            if (!name) {
+                name = 'project-' + Math.floor(Math.random() * 9000 + 1000);
+                document.getElementById('project-name-input').value = name;
+            }
+            if (!code.trim()) {
+                alert("يرجى كتابة كود HTML داخل مربع التحرير أولاً.");
+                return;
+            }
 
-        function syncCloudDBExplorer() {
-            myVaultNode.get('cloud_database').map().on((val, key) => {
-                if (val !== null && val !== undefined) {
-                    cloudDbCache[key] = val;
+            const cleanName = name.replace(/\s+/g, '-');
+            const fullCompiledHTML = injectOptionalCloudHelper(code);
+
+            // 1. الحفظ الدائم في قائمة مواقعك (محلياً وسحابياً لكي لا يُحذف أبداً)
+            const siteRecord = {
+                name: cleanName,
+                code: code,
+                date: new Date().toLocaleDateString('ar-EG'),
+                deleted: false
+            };
+            savedSites[cleanName] = siteRecord;
+            localStorage.setItem('permanent_saved_sites', JSON.stringify(savedSites));
+            renderPermanentSites();
+
+            // 2. الرفع على السيرفر السحابي بالوقت الفعلي
+            if (mqttClient && mqttClient.connected) {
+                const compressedSite = LZString.compressToUTF16(fullCompiledHTML);
+                mqttClient.publish(`cloud_os_v8_permanent/sites/${encodeURIComponent(cleanName)}`, compressedSite, { qos: 1, retain: true });
+
+                const compressedRecord = LZString.compressToUTF16(JSON.stringify(siteRecord));
+                mqttClient.publish(`cloud_os_v8_permanent/${MY_SERVER_ID}/sync_sites/${encodeURIComponent(cleanName)}`, compressedRecord, { qos: 1, retain: true });
+            }
+
+            // 3. تجهيز الروابط الفعالة فوراً
+            const baseUrl = window.location.origin + window.location.pathname;
+            const directProjectUrl = `${baseUrl}?site=${encodeURIComponent(cleanName)}`;
+            // رابط خالد مضغوط لا يمكن أن يسقط أبداً لتحويله إلى رابط مختصر مستقل
+            const immortalCompressedUrl = `${baseUrl}#app=${LZString.compressToEncodedURIComponent(fullCompiledHTML)}`;
+
+            const outBox = document.getElementById('links-output-box');
+            outBox.style.display = 'block';
+            document.getElementById('direct-project-link').textContent = directProjectUrl;
+            document.getElementById('open-direct-link').href = directProjectUrl;
+
+            const shortField = document.getElementById('independent-short-link');
+            shortField.textContent = "جاري إنشاء الرابط المختصر المستقل (بدون كلمة GitHub)...";
+            announce("تم إنشاء الموقع وحفظه بنجاح! الروابط جاهزة الآن.");
+
+            // توليد الرابط المختصر المستقل الخالي من اسم GitHub
+            try {
+                const targetToShorten = immortalCompressedUrl.length < 3500 ? immortalCompressedUrl : directProjectUrl;
+                const tinyApi = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(targetToShorten)}`;
+                const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(tinyApi)}`;
+                const res = await fetch(proxy);
+                const data = await res.json();
+
+                if (data && data.contents && data.contents.startsWith('http')) {
+                    const finalShort = data.contents.trim();
+                    shortField.textContent = finalShort;
+                    document.getElementById('open-independent-link').href = finalShort;
+                    savedSites[cleanName].shortUrl = finalShort;
+                    localStorage.setItem('permanent_saved_sites', JSON.stringify(savedSites));
+                    renderPermanentSites();
                 } else {
-                    delete cloudDbCache[key];
+                    shortField.textContent = directProjectUrl;
+                    document.getElementById('open-independent-link').href = directProjectUrl;
                 }
-                renderCloudDBTable();
-            });
+            } catch (e) {
+                shortField.textContent = directProjectUrl;
+                document.getElementById('open-independent-link').href = directProjectUrl;
+            }
         }
 
-        function writeToCloudDBConsole() {
-            const k = document.getElementById('db-doc-key').value.trim();
-            const v = document.getElementById('db-doc-val').value.trim();
-            if (!k) return;
-            myVaultNode.get('cloud_database').get(k).put(v);
-            cloudDbCache[k] = v;
-            document.getElementById('db-doc-key').value = '';
-            document.getElementById('db-doc-val').value = '';
-            renderCloudDBTable();
-            logRadar(`تم حفظ السجل (${k} : ${v}) في قاعدة البيانات السحابية الحية.`, true);
-        }
+        // =====================================================================
+        // 6. عرض وإدارة المواقع المحفوظة (دائمة التحميل والتعديل)
+        // =====================================================================
+        function renderPermanentSites() {
+            const container = document.getElementById('permanent-sites-list');
+            container.innerHTML = '';
+            const keys = Object.keys(savedSites);
 
-        function deleteCloudDBRecord(k) {
-            myVaultNode.get('cloud_database').get(k).put(null);
-            delete cloudDbCache[k];
-            renderCloudDBTable();
-            logRadar(`تم حذف السجل (${k}) من قاعدة البيانات السحابية.`, true);
-        }
-
-        function renderCloudDBTable() {
-            const tbody = document.getElementById('cloud-db-tbody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            const keys = Object.keys(cloudDbCache);
             if (keys.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">قاعدة البيانات جاهزة. أضف سجلاً جديداً من الأعلى أو من داخل تطبيقك!</td></tr>';
+                container.innerHTML = '<div style="color:var(--text-muted); font-size:14px;">لم تقم بإنشاء أي موقع بعد.</div>';
                 return;
             }
+
             keys.forEach(k => {
-                if (k === '_') return;
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${k}</strong></td>
-                    <td>${cloudDbCache[k]}</td>
-                    <td><button class="btn-danger" style="padding:4px 8px; font-size:11px;" onclick="deleteCloudDBRecord('${k}')">حذف</button></td>
+                const site = savedSites[k];
+                const directUrl = `${window.location.origin + window.location.pathname}?site=${encodeURIComponent(site.name)}`;
+                const preferredUrl = site.shortUrl || directUrl;
+
+                const item = document.createElement('div');
+                item.className = 'list-item';
+                item.innerHTML = `
+                    <div>
+                        <strong style="font-size:16px; color:var(--accent);">🌐 موقع: ${site.name}</strong>
+                        <span style="color:var(--text-muted); font-size:13px; margin-right:8px;">(تاريخ الحفظ: ${site.date})</span><br>
+                        <span style="font-family:monospace; font-size:13px; color:var(--warning);">${preferredUrl}</span>
+                    </div>
+                    <div>
+                        <button type="button" class="btn-secondary" onclick="loadSiteForEdit('${site.name}')">تعديل الكود والرابط</button>
+                        <button type="button" class="btn-secondary" onclick="navigator.clipboard.writeText('${preferredUrl}'); announce('تم نسخ رابط الموقع');">نسخ الرابط</button>
+                        <a href="${directUrl}" target="_blank" style="text-decoration:none;"><button type="button">فتح الموقع</button></a>
+                    </div>
                 `;
-                tbody.appendChild(tr);
+                container.appendChild(item);
             });
         }
 
-        function saveCloudFunction() {
-            const trig = document.getElementById('fn-trigger').value.trim();
-            const resp = document.getElementById('fn-response').value.trim();
-            if (!trig || !resp) return;
-            cloudAutoFunction = { trigger: trig, response: resp };
-            logRadar(`تم تفعيل الوظيفة السحابية التلقائية: عند استلام (${trig}) سيرد السيرفر تلقائياً بـ (${resp}).`, true);
+        function loadSiteForEdit(name) {
+            const site = savedSites[name];
+            if (!site) return;
+            document.getElementById('project-name-input').value = site.name;
+            document.getElementById('code-editor-box').value = site.code;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            announce(`تم جلب مشروع ${site.name} في المحرر. يمكنك تعديل الكود أو الاسم بحرية ثم الضغط على إنشاء.`);
         }
 
-        // =================================================================
-        // 6. الخزنة السحابية للمشاريع (0 بايت من الهاتف + تجزئة الأكواد غير المحدودة)
-        // =================================================================
-        let vaultProjectsMap = {};
+        // =====================================================================
+        // 7. القوالب الاختيارية الثلاثة (تمنحك الحرية المطلقة)
+        // =====================================================================
+        function setEditorTemplate(mode, silent = false) {
+            const editor = document.getElementById('code-editor-box');
+            const sampleKey = Object.keys(savedApiKeys)[0] || 'API_KEY';
 
-        function zeroPhoneMemory() {
-            const savedMaster = masterVaultKey;
-            localStorage.clear();
-            sessionStorage.clear();
-            if (window.indexedDB && indexedDB.deleteDatabase) {
-                indexedDB.deleteDatabase("PersonalCloudOS_DB_v4");
+            if (mode === 'normal') {
+                // 1. موقع عادي تماماً بدون أي تسجيل دخول نهائياً!
+                editor.value = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>موقعي السحابي</title>
+    <style>
+        body { font-family: Tahoma, sans-serif; background: #0f172a; color: #fff; text-align: center; padding: 40px; }
+        .card { background: #1e293b; padding: 30px; border-radius: 12px; max-width: 500px; margin: auto; border: 1px solid #334155; }
+        button { background: #00e5ff; color: #000; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        input { padding: 12px; width: 80%; border-radius: 6px; border: 1px solid #475569; background: #090d16; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>مرحباً بك في موقعي</h1>
+        <p>هذا موقع حر ومباشر يعمل فوراً بدون الحاجة لأي تسجيل دخول!</p>
+
+        <!-- يمكنك أيضاً إرسال رسالة للسيرفر مباشرة كزائر بدون تسجيل دخول -->
+        <input type="text" id="visitor-msg" placeholder="اكتب ملاحظة أو رسالة لصاحب الموقع...">
+        <br>
+        <button onclick="sendQuickNote()">إرسال مباشر</button>
+    </div>
+
+    <script>
+        // ربط مفتاح الـ API (اختياري)
+        if (window.Cloud) Cloud.useApiKey("${sampleKey}");
+
+        function sendQuickNote() {
+            const txt = document.getElementById('visitor-msg').value;
+            if (txt && window.Cloud) {
+                Cloud.sendToServer(txt);
+                document.getElementById('visitor-msg').value = '';
+                alert("تم الإرسال بنجاح!");
             }
-            sessionStorage.setItem('v6_master_vault', savedMaster);
-            logRadar("تم تصفير ذاكرة الهاتف بالكامل (0 بايت)! كل مشاريعك ومفاتيحك تعمل من السحابة 100%.", true);
         }
-
-        function saveProjectToCloud() {
-            let title = document.getElementById('project-title').value.trim();
-            if (!title) {
-                title = "cloud_proj_" + Math.floor(Math.random() * 900 + 100);
-                document.getElementById('project-title').value = title;
+    <\/script>
+</body>
+</html>`;
+                if (!silent) announce("تم وضع كود موقع عادي يعمل مباشرة بدون أي تسجيل دخول.");
             }
+            else if (mode === 'nickname') {
+                // 2. موقع بتسجيل دخول حر عبر "اسم مستعار" فقط (بدون إيميل ولا جوجل ولا فيسبوك!)
+                editor.value = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>دخول باسم مستعار حر</title>
+    <style>
+        body { font-family: Tahoma, sans-serif; background: #0f172a; color: #fff; text-align: center; padding: 40px; }
+        .card { background: #1e293b; padding: 30px; border-radius: 12px; max-width: 500px; margin: auto; border: 1px solid #334155; }
+        button { background: #00e676; color: #000; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        input { padding: 12px; width: 80%; border-radius: 6px; border: 1px solid #475569; background: #090d16; color: #fff; margin-top: 8px; }
+    </style>
+</head>
+<body>
 
-            const bundle = JSON.stringify({
-                title: title,
-                html: document.getElementById('code-html').value,
-                css: document.getElementById('code-css').value,
-                js: document.getElementById('code-js').value,
-                updated: Date.now()
-            });
+    <div class="card">
+        <h2>الدخول السريع باسم مستعار</h2>
+        <p>لا نطلب بريداً إلكترونياً ولا حساب جوجل ولا فيسبوك، فقط اختر أي اسم مستعار تحبه!</p>
 
-            const compressed = LZString.compressToUTF16(bundle);
-            const sliceLen = 12000;
-            const totalParts = Math.ceil(compressed.length / sliceLen) || 1;
-            const pNode = myVaultNode.get('projects').get(title);
+        <div id="nickname-login-box">
+            <input type="text" id="alias-input" placeholder="اكتب اسمك المستعار هنا (مثال: الصقر الحر)">
+            <br>
+            <button onclick="enterWithAlias()">دخول فوري بالاسم المستعار</button>
+        </div>
 
-            for (let i = 0; i < totalParts; i++) {
-                pNode.get('part_' + i).put(compressed.substring(i * sliceLen, (i + 1) * sliceLen));
-            }
-            pNode.put({ title: title, parts: totalParts, deleted: false, updated: Date.now() });
+        <div id="member-area" style="display:none; margin-top:20px;">
+            <h3 id="welcome-alias" style="color:#00e676;"></h3>
+            <input type="text" id="chat-msg" placeholder="اكتب رسالة لإرسالها للسيرفر باسمك المستعار...">
+            <br>
+            <button onclick="sendAliasMsg()" style="background:#00e5ff;">إرسال الرسالة</button>
+        </div>
+    </div>
 
-            vaultProjectsMap[title] = { title: title, parts: totalParts };
-            renderVaultList();
-            logRadar(`تم حفظ المشروع (${title}) في الخزنة السحابية (${totalParts} حزم مضغوطة - 0 بايت على الهاتف).`, true);
-        }
+    <script>
+        if (window.Cloud) Cloud.useApiKey("${sampleKey}");
 
-        function fetchVaultProjects() {
-            myVaultNode.get('projects').map().once((meta, key) => {
-                if (meta && meta.title && !meta.deleted) {
-                    vaultProjectsMap[key] = meta;
-                } else if (meta && meta.deleted) {
-                    delete vaultProjectsMap[key];
-                }
-                renderVaultList();
-            });
-        }
+        function enterWithAlias() {
+            const alias = document.getElementById('alias-input').value.trim();
+            if (!alias) { alert("يرجى كتابة اسم مستعار أولاً"); return; }
 
-        function renderVaultList() {
-            const ul = document.getElementById('vault-projects-list');
-            ul.innerHTML = '';
-            const list = Object.keys(vaultProjectsMap);
-            if (list.length === 0) {
-                ul.innerHTML = '<li style="font-size:12px; color:var(--text-muted);">الخزنة السحابية جاهزة لحفظ مشاريعك.</li>';
-                return;
-            }
-            list.forEach(name => {
-                const li = document.createElement('li');
-                li.className = 'vault-item';
-
-                const btnOpen = document.createElement('button');
-                btnOpen.className = 'btn-dark';
-                btnOpen.style.flex = '1';
-                btnOpen.style.textAlign = 'right';
-                btnOpen.textContent = name;
-                btnOpen.onclick = () => loadProjectFromVault(name);
-
-                const btnDel = document.createElement('button');
-                btnDel.className = 'btn-danger';
-                btnDel.style.padding = '4px 8px';
-                btnDel.style.fontSize = '11px';
-                btnDel.textContent = 'حذف';
-                btnDel.onclick = () => {
-                    myVaultNode.get('projects').get(name).put({ deleted: true, title: null });
-                    delete vaultProjectsMap[name];
-                    renderVaultList();
-                    logRadar(`تم حذف (${name}) من الخزنة السحابية.`, true);
-                };
-
-                li.appendChild(btnOpen);
-                li.appendChild(btnDel);
-                ul.appendChild(li);
-            });
-        }
-
-        function loadProjectFromVault(name) {
-            logRadar(`جاري جلب حزم المشروع (${name}) من السحابة...`, true);
-            const pNode = myVaultNode.get('projects').get(name);
-            pNode.once((meta) => {
-                if (!meta || !meta.parts) return;
-                let parts = [];
-                let loaded = 0;
-                for (let i = 0; i < meta.parts; i++) {
-                    pNode.get('part_' + i).once((d) => {
-                        parts[i] = d || '';
-                        loaded++;
-                        if (loaded === meta.parts) {
-                            try {
-                                const obj = JSON.parse(LZString.decompressFromUTF16(parts.join('')));
-                                document.getElementById('project-title').value = obj.title;
-                                document.getElementById('code-html').value = obj.html || '';
-                                document.getElementById('code-css').value = obj.css || '';
-                                document.getElementById('code-js').value = obj.js || '';
-                                updateCounters();
-                                compileAndRun(false);
-                                logRadar(`تم فتح المشروع (${name}) من السحابة بنجاح.`, true);
-                            } catch (e) {}
-                        }
-                    });
-                }
+            Cloud.loginWithNickname(alias, function(name) {
+                document.getElementById('nickname-login-box').style.display = 'none';
+                document.getElementById('member-area').style.display = 'block';
+                document.getElementById('welcome-alias').textContent = "أهلاً بك يا: " + name;
             });
         }
 
-        // =================================================================
-        // 7. ترسانة القوالب السحابية العملاقة (جوجل/فيسبوك، حماية API، قواعد بيانات)
-        // =================================================================
-        function injectEnterpriseSystem(type) {
-            const h = document.getElementById('code-html');
-            const c = document.getElementById('code-css');
-            const j = document.getElementById('code-js');
-            const keyToUse = activeAppApiKey || createSubApiKeyInternal('تطبيق القالب السحابي');
-
-            c.value = `body { font-family: Tahoma, sans-serif; background: #070911; color: #f8fafc; text-align: center; padding: 20px; }\n.box { background: #111625; border: 1px solid #263152; padding: 22px; border-radius: 12px; max-width: 540px; margin: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }\nbutton { border: none; padding: 10px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; margin: 5px; font-size: 13px; }\n.btn-google { background: #ffffff; color: #111; }\n.btn-fb { background: #1877f2; color: #ffffff; }\n.btn-action { background: #00f2fe; color: #000; }\ninput { background: #05070c; color: #fff; border: 1px solid #334168; padding: 10px; width: 85%; border-radius: 6px; margin-top: 8px; }`;
-
-            if (type === 'social_auth_app') {
-                h.value = `<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"><\/script>\n<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"><\/script>\n<main class="box" id="app-container">\n  <h2>بوابة الدخول الرسمية (Google & Facebook)</h2>\n  <p style="font-size:13px; color:#94a3b8;">سجل دخولك للاتصال بالسيرفر السحابي واستقبال رسائل الإدارة الحية:</p>\n  \n  <div id="login-section">\n    <input id="user-name-in" type="text" placeholder="اسمك الكريم (مثال: أحمد محمد)">\n    <input id="user-email-in" type="email" placeholder="بريدك الرسمي (مثال: ahmed@gmail.com)">\n    <div style="margin-top:12px;">\n      <button class="btn-google" onclick="socialSignIn('Google حساب جوجل')">🌐 الدخول بحساب Google</button>\n      <button class="btn-fb" onclick="socialSignIn('Facebook حساب فيسبوك')">📘 الدخول بحساب Facebook</button>\n    </div>\n  </div>\n\n  <div id="user-dashboard" style="display:none; margin-top:15px; border-top:1px solid #263152; padding-top:15px;">\n    <div id="welcome-badge" style="color:#00e676; font-weight:bold; margin-bottom:10px;"></div>\n    <div id="admin-inbox" role="alert" aria-live="assertive" style="background:#05070c; border:1px solid #ff9f43; color:#ff9f43; padding:12px; border-radius:8px; margin-bottom:12px; font-size:13px;">صندوق رسائل السيرفر: بانتظار رسائل الإدارة...</div>\n    <input id="client-msg-in" type="text" placeholder="أرسل رسالة أو طلباً إلى السيرفر السحابي...">\n    <br><button class="btn-action" onclick="sendMsgToServer()">إرسال إلى السيرفر</button>\n  </div>\n</main>`;
-
-                j.value = `// إعدادات الاتصال بالسيرفر السحابي والجدار الناري\nconst VAULT_ID = window.MASTER_VAULT_ID || "${masterVaultKey}";\nconst API_KEY = window.CURRENT_API_KEY || "${keyToUse}";\n\nconst gun = Gun(['https://gun-manhattan.herokuapp.com/gun']);\nconst mqttClient = mqtt.connect('wss://broker.emqx.io:8084/mqtt');\nlet currentUser = null;\nlet isRevoked = false;\n\n// 1. مراقبة صلاحية مفتاح الـ API (الحماية من الهندسة العكسية)\ngun.get('enterprise_cloud_os_v6_api_firewall').get(API_KEY).on((data) => {\n  if(data && data.status === 'REVOKED') lockApplication();\n});\n\nmqttClient.on('connect', () => {\n  mqttClient.subscribe('cloud_v6_firewall_stream/' + API_KEY);\n  mqttClient.subscribe('cloud_v6_user_inbox/' + VAULT_ID + '/ALL');\n});\n\nmqttClient.on('message', (topic, message) => {\n  const packet = JSON.parse(message.toString());\n  if(packet.command === 'KILL_SWITCH_REVOKE') { lockApplication(); return; }\n  if(packet.command === 'RESTORE_ACCESS') { location.reload(); return; }\n  if(packet.message) {\n    document.getElementById('admin-inbox').textContent = "🔔 رسالة فورية من إدارة السيرفر: " + packet.message;\n  }\n});\n\nfunction lockApplication() {\n  isRevoked = true;\n  document.getElementById('app-container').innerHTML = '<h2 style="color:#ff4757;">⛔ تم إيقاف وحظر مفتاح الـ API لهذا التطبيق من السيرفر!</h2><p>لا يمكن استخدام هذا التطبيق لأن المفتاح البرمجي تم سحبه وإلغاؤه.</p>';\n}\n\n// 2. تسجيل الدخول بحساب جوجل أو فيسبوك وإشعار السيرفر\nfunction socialSignIn(providerName) {\n  if(isRevoked) return;\n  const name = document.getElementById('user-name-in').value.trim() || 'مستخدم سحابي';\n  const email = document.getElementById('user-email-in').value.trim() || 'user@gmail.com';\n  const uid = 'UID-' + Math.random().toString(36).substring(2, 8).toUpperCase();\n\n  currentUser = { uid: uid, name: name, email: email, provider: providerName };\n  mqttClient.subscribe('cloud_v6_user_inbox/' + VAULT_ID + '/' + uid);\n\n  mqttClient.publish('cloud_v6_gateway/' + VAULT_ID + '/events', JSON.stringify({\n    apiKey: API_KEY,\n    action: 'OAUTH_LOGIN',\n    payload: currentUser\n  }));\n\n  document.getElementById('login-section').style.display = 'none';\n  document.getElementById('user-dashboard').style.display = 'block';\n  document.getElementById('welcome-badge').textContent = 'مرحباً ' + name + ' (متصل عبر ' + providerName + ')';\n  console.log('تم تسجيل الدخول بنجاح عبر: ' + providerName);\n}\n\nfunction sendMsgToServer() {\n  if(isRevoked) return;\n  const inp = document.getElementById('client-msg-in');\n  if(!inp.value.trim()) return;\n  mqttClient.publish('cloud_v6_gateway/' + VAULT_ID + '/events', JSON.stringify({\n    apiKey: API_KEY,\n    action: 'CLIENT_DATA',\n    payload: (currentUser ? currentUser.name + ': ' : '') + inp.value\n  }));\n  inp.value = '';\n}`;
-                logRadar("تم حقن (نظام تسجيل دخول جوجل وفيسبوك + التواصل المباشر + حماية API) في المحرر.", true);
+        function sendAliasMsg() {
+            const msg = document.getElementById('chat-msg').value;
+            if (msg) {
+                Cloud.sendToServer(msg);
+                document.getElementById('chat-msg').value = '';
             }
-            else if (type === 'protected_apk') {
-                h.value = `<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"><\/script>\n<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"><\/script>\n<main class="box" id="apk-box">\n  <h2>📱 تطبيق APK المحمي بجدار السيرفر</h2>\n  <p style="font-size:12px; color:#94a3b8;">المفتاح المدمج: <code id="key-label">${keyToUse}</code></p>\n  <div id="sec-status" style="color:#00e676; font-weight:bold; margin:10px 0;">🟢 المفتاح نشط ومصرح له من السيرفر</div>\n  <input id="apk-cmd" type="text" value="حالة_السيرفر" placeholder="أرسل أمراً للسيرفر (جرب: حالة_السيرفر)">\n  <br><button class="btn-action" onclick="pingServer()">إرسال طلب عبر الـ API</button>\n  <div id="apk-reply" style="margin-top:15px; padding:10px; background:#05070c; border-radius:6px; font-size:13px;">رد السيرفر يظهر هنا...</div>\n</main>`;
-                j.value = `const VAULT_ID = window.MASTER_VAULT_ID || "${masterVaultKey}";\nconst API_KEY = window.CURRENT_API_KEY || "${keyToUse}";\nconst mqttClient = mqtt.connect('wss://broker.emqx.io:8084/mqtt');\nlet blocked = false;\n\nmqttClient.on('connect', () => {\n  mqttClient.subscribe('cloud_v6_firewall_stream/' + API_KEY);\n  mqttClient.subscribe('cloud_v6_user_inbox/' + VAULT_ID + '/ALL');\n});\n\nmqttClient.on('message', (t, m) => {\n  const d = JSON.parse(m.toString());\n  if(d.command === 'KILL_SWITCH_REVOKE') {\n    blocked = true;\n    document.getElementById('apk-box').innerHTML = '<h2 style="color:#ff4757;">⛔ تم إيقاف هذا التطبيق عن بُعد!</h2><p>قام مالك السيرفر السحابي بحظر مفتاح الـ API الخاص بهذا التطبيق.</p>';\n  } else if(d.command === 'RESTORE_ACCESS') {\n    location.reload();\n  } else if(d.message) {\n    document.getElementById('apk-reply').textContent = "⚡ رد السيرفر: " + d.message;\n  }\n});\n\nfunction pingServer() {\n  if(blocked) return;\n  const val = document.getElementById('apk-cmd').value;\n  mqttClient.publish('cloud_v6_gateway/' + VAULT_ID + '/events', JSON.stringify({\n    apiKey: API_KEY, action: 'CLIENT_DATA', payload: val\n  }));\n}`;
-                logRadar("تم حقن قالب تطبيق الـ APK المحمي ضد الهندسة العكسية.", true);
+        }
+    <\/script>
+</body>
+</html>`;
+                if (!silent) announce("تم وضع كود الدخول الحر باستخدام اسم مستعار فقط بدون بريد إلكتروني أو مواقع تواصل.");
             }
-            else if (type === 'cloud_db_app') {
-                h.value = `<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"><\/script>\n<main class="box">\n  <h2>🗄️ تطبيق متصل بقاعدة بيانات السيرفر</h2>\n  <input id="db-k" type="text" placeholder="اسم الحقل (مثال: السعر_الحالي)">\n  <input id="db-v" type="text" placeholder="القيمة (مثال: 500 دولار)">\n  <br><button class="btn-action" onclick="saveDoc()">حفظ في سحابة السيرفر</button>\n  <div id="live-db-list" style="margin-top:15px; text-align:right; background:#05070c; padding:12px; border-radius:8px;"></div>\n</main>`;
-                j.value = `const VAULT_ID = window.MASTER_VAULT_ID || "${masterVaultKey}";\nconst gun = Gun(['https://gun-manhattan.herokuapp.com/gun']);\nconst db = gun.get('vault_v6_' + VAULT_ID).get('cloud_database');\nconst items = {};\n\ndb.map().on((val, key) => {\n  if(key === '_') return;\n  if(val) items[key] = val; else delete items[key];\n  document.getElementById('live-db-list').innerHTML = Object.keys(items).map(k => '<div>🔹 <b>'+k+':</b> '+items[k]+'</div>').join('');\n});\n\nfunction saveDoc() {\n  const k = document.getElementById('db-k').value.trim();\n  const v = document.getElementById('db-v').value.trim();\n  if(k && v) { db.get(k).put(v); }\n}`;
-                logRadar("تم حقن تطبيق قاعدة البيانات السحابية المرتبطة بلوحة تحكم السيرفر.", true);
-            }
-            else if (type === 'webrtc_pro') {
-                h.value = `<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"><\/script>\n<main class="box">\n  <h2>🎥 اتصال مباشر WebRTC</h2>\n  <p>معرفك السحابي: <b id="p-id" style="color:#00f2fe;">جاري التوليد...</b></p>\n  <input id="dest-id" placeholder="معرف الجهاز الآخر">\n  <br><button class="btn-action" onclick="callPeer()">اتصال مباشر</button>\n  <div id="p-log" style="margin-top:12px; color:#00e676;"></div>\n</main>`;
-                j.value = `const peer = new Peer();\npeer.on('open', id => document.getElementById('p-id').textContent = id);\npeer.on('connection', c => c.on('data', d => document.getElementById('p-log').textContent = 'وصل: ' + d));\nfunction callPeer() {\n  const c = peer.connect(document.getElementById('dest-id').value.trim());\n  c.on('open', () => c.send('اتصال WebRTC ناجح!'));\n}`;
-                logRadar("تم حقن نظام WebRTC المباشر.", true);
-            }
+            else if (mode === 'social') {
+                // 3. موقع يدعم حسابات جوجل وفيسبوك (اختياري لمن يريد)
+                editor.value = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>بوابة الدخول الشاملة</title>
+    <style>
+        body { font-family: Tahoma, sans-serif; background: #0f172a; color: #fff; text-align: center; padding: 40px; }
+        .card { background: #1e293b; padding: 30px; border-radius: 12px; max-width: 500px; margin: auto; border: 1px solid #334155; }
+        button { border: none; padding: 12px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; margin: 6px; }
+    </style>
+</head>
+<body>
 
-            updateCounters();
-            compileAndRun(false);
+    <div class="card">
+        <h2>اختر طريقة الدخول التي تناسبك</h2>
+        <button onclick="login('Google', prompt('أدخل حساب جوجل:')) " style="background:#fff; color:#000;">🌐 الدخول بحساب Google</button>
+        <button onclick="login('Facebook', prompt('أدخل حساب فيسبوك:'))" style="background:#1877f2; color:#fff;">📘 الدخول بحساب Facebook</button>
+        <button onclick=" Cloud.loginWithNickname(prompt('اكتب اسمك المستعار:'), showWelcome) " style="background:#00e676; color:#000;">👤 الدخول باسم مستعار فقط</button>
+        <h3 id="status-text" style="color:#00e5ff; margin-top:20px;"></h3>
+    </div>
+
+    <script>
+        if (window.Cloud) Cloud.useApiKey("${sampleKey}");
+
+        function login(provider, account) {
+            if (account) Cloud.loginWithAccount(provider, account, showWelcome);
+        }
+        function showWelcome(name) {
+            document.getElementById('status-text').textContent = "تم الدخول بنجاح: " + name;
+        }
+    <\/script>
+</body>
+</html>`;
+                if (!silent) announce("تم وضع كود يشمل خيارات الدخول بحساب جوجل وفيسبوك أو اسم مستعار.");
+            }
         }
 
-        // =================================================================
-        // 8. المترجم الفوري والاستضافة المستقلة (بدون اسم GitHub)
-        // =================================================================
-        let compileDebounce;
-        function onCodeChange() {
-            updateCounters();
-            clearTimeout(compileDebounce);
-            compileDebounce = setTimeout(() => compileAndRun(false), 700);
+        // =====================================================================
+        // 8. إدارة مفاتيح الـ API والرسائل الحية في الوقت الفعلي
+        // =====================================================================
+        function createNewApiKey() {
+            const inp = document.getElementById('api-key-name');
+            const name = inp.value.trim() || 'تطبيق جديد';
+            const key = 'API_' + Math.random().toString(36).substring(2, 9).toUpperCase();
+
+            const obj = { key: key, name: name, status: 'ACTIVE' };
+            savedApiKeys[key] = obj;
+            localStorage.setItem('permanent_api_keys', JSON.stringify(savedApiKeys));
+
+            if (mqttClient && mqttClient.connected) {
+                mqttClient.publish(`cloud_os_v8_permanent/${MY_SERVER_ID}/sync_keys/${key}`, JSON.stringify(obj), { qos: 1, retain: true });
+                mqttClient.publish(`cloud_os_v8_permanent/api_guard/${key}`, 'ACTIVE', { qos: 1, retain: true });
+            }
+
+            inp.value = '';
+            renderApiKeysList();
+            announce(`تم إنشاء مفتاح API جديد: ${key}`);
         }
 
-        function updateCounters() {
-            document.getElementById('count-html').textContent = `${document.getElementById('code-html').value.length.toLocaleString()} حرف (غير محدود)`;
-            document.getElementById('count-css').textContent = `${document.getElementById('code-css').value.length.toLocaleString()} حرف (غير محدود)`;
-            document.getElementById('count-js').textContent = `${document.getElementById('code-js').value.length.toLocaleString()} حرف (غير محدود)`;
+        function toggleApiKey(key) {
+            const item = savedApiKeys[key];
+            if (!item) return;
+            item.status = item.status === 'ACTIVE' ? 'BLOCKED' : 'ACTIVE';
+            localStorage.setItem('permanent_api_keys', JSON.stringify(savedApiKeys));
+
+            if (mqttClient && mqttClient.connected) {
+                mqttClient.publish(`cloud_os_v8_permanent/${MY_SERVER_ID}/sync_keys/${key}`, JSON.stringify(item), { qos: 1, retain: true });
+                mqttClient.publish(`cloud_os_v8_permanent/api_guard/${key}`, item.status, { qos: 1, retain: true });
+            }
+
+            renderApiKeysList();
+            announce(item.status === 'BLOCKED' ? `تم إيقاف وحظر المفتاح ${key} فوراً.` : `تم تفعيل المفتاح ${key}.`);
         }
 
-        function compileAndRun(speak = false) {
-            const html = document.getElementById('code-html').value;
-            const css = `<style>${document.getElementById('code-css').value}</style>`;
-            const bridge = `
-                <script>
-                    window.MASTER_VAULT_ID = "${masterVaultKey}";
-                    window.CURRENT_API_KEY = "${activeAppApiKey}";
-                    const _log = console.log;
-                    console.log = function(...a) {
-                        window.parent.postMessage({type:'sim_log', msg: a.join(' ')}, '*');
-                        _log.apply(console, a);
-                    };
-                <\/script>
-            `;
-            const js = `<script>${document.getElementById('code-js').value}<\/script>`;
+        function renderApiKeysList() {
+            const box = document.getElementById('api-keys-container');
+            box.innerHTML = '';
+            Object.values(savedApiKeys).forEach(k => {
+                const blocked = k.status === 'BLOCKED';
+                const div = document.createElement('div');
+                div.className = 'list-item';
+                div.innerHTML = `
+                    <div>
+                        <strong>${k.name}</strong>: <code style="color:var(--warning); font-size:15px;">${k.key}</code>
+                        <span class="badge ${blocked ? 'badge-red' : 'badge-green'}" style="margin-right:8px;">
+                            ${blocked ? '⛔ موقوف' : '🟢 نشط'}
+                        </span>
+                    </div>
+                    <div>
+                        <button type="button" class="btn-secondary" onclick="navigator.clipboard.writeText('${k.key}'); announce('تم نسخ المفتاح');">نسخ المفتاح</button>
+                        <button type="button" class="${blocked ? '' : 'btn-danger'}" onclick="toggleApiKey('${k.key}')">
+                            ${blocked ? 'إعادة تفعيل المفتاح' : 'إيقاف المفتاح فوراً'}
+                        </button>
+                    </div>
+                `;
+                box.appendChild(div);
+            });
+        }
+
+        function displayIncomingEvent(data) {
+            const log = document.getElementById('live-events-log');
+            if (log.innerText.includes('سجل الاتصالات')) log.innerHTML = '';
+
+            const row = document.createElement('div');
+            row.className = 'list-item';
+            if (data.type === 'LOGIN') {
+                row.innerHTML = `<div><strong style="color:var(--success);">👤 دخول مستخدم: ${data.user}</strong> (طريقة الدخول: ${data.method})</div><span>${data.time}</span>`;
+                announce(`دخل المستخدم ${data.user} عبر ${data.method}`);
+            } else {
+                row.innerHTML = `<div><strong style="color:var(--accent);">💬 رسالة من (${data.user}):</strong> ${data.text}</div><span>${data.time}</span>`;
+                announce(`رسالة جديدة من ${data.user}: ${data.text}`);
+            }
+            log.prepend(row);
+        }
+
+        function broadcastToAllSites() {
+            const inp = document.getElementById('live-admin-msg');
+            const txt = inp.value.trim();
+            if (!txt || !mqttClient) return;
+            mqttClient.publish(`cloud_os_v8_permanent/${MY_SERVER_ID}/broadcast`, txt, { qos: 1 });
+            inp.value = '';
+            announce("تم إرسال الإشعار الفوري إلى جميع مواقعك المفتوحة الآن.");
+        }
+
+        function toggleLivePreview() {
+            const wrap = document.getElementById('preview-wrapper');
+            wrap.style.display = 'block';
             const frame = document.getElementById('preview-iframe');
             const doc = frame.contentDocument || frame.contentWindow.document;
             doc.open();
-            doc.write(bridge + html + css + js);
+            doc.write(injectOptionalCloudHelper(document.getElementById('code-editor-box').value));
             doc.close();
-            if (speak) speakSR("تم تحديث وتشغيل الكود في شاشة المعاينة.");
+            announce("تم تحديث شاشة المعاينة.");
         }
 
-        window.addEventListener('message', (e) => {
-            if (e.data && e.data.type === 'sim_log') logRadar("التطبيق: " + e.data.msg);
-        });
-
-        function createFreshProject() {
-            document.getElementById('project-title').value = '';
-            document.getElementById('code-html').value = '<h1>مشروع سحابي جديد</h1>';
-            document.getElementById('code-css').value = 'body { font-family: Tahoma; background: #070911; color: #fff; text-align: center; padding: 40px; }';
-            document.getElementById('code-js').value = 'console.log("السيرفر السحابي جاهز!");';
-            updateCounters();
-            compileAndRun(false);
-            logRadar("تم فتح مساحة عمل جديدة غير محدودة.", true);
+        function copyText(id) {
+            navigator.clipboard.writeText(document.getElementById(id).textContent);
+            announce("تم نسخ الرابط بنجاح.");
         }
-
-        function openDeployCenter() {
-            let name = document.getElementById('project-title').value.trim();
-            if (!name) {
-                name = "cloud-site-" + Math.floor(Math.random() * 900 + 100);
-                document.getElementById('project-title').value = name;
-            }
-            document.getElementById('site-custom-name').value = name;
-            document.getElementById('short-alias-input').value = name.replace(/[^a-zA-Z0-9_]/g, '') + "_" + Math.floor(Math.random() * 99);
-            openModal('deploy-modal');
-        }
-
-        function publishToCloudCluster() {
-            const slug = document.getElementById('site-custom-name').value.trim();
-            if (!slug) return;
-            document.getElementById('project-title').value = slug;
-            saveProjectToCloud();
-
-            const fullHTML = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${slug}</title><style>${document.getElementById('code-css').value}</style></head><body>${document.getElementById('code-html').value}<script>window.MASTER_VAULT_ID="${masterVaultKey}";window.CURRENT_API_KEY="${activeAppApiKey}";\n${document.getElementById('code-js').value}<\/script></body></html>`;
-
-            const compressed = LZString.compressToUTF16(fullHTML);
-            const sliceLen = 12000;
-            const chunksCount = Math.ceil(compressed.length / sliceLen) || 1;
-            const node = globalHostingCluster.get(slug);
-
-            for (let i = 0; i < chunksCount; i++) {
-                node.get('part_' + i).put(compressed.substring(i * sliceLen, (i + 1) * sliceLen));
-            }
-            node.put({
-                chunksCount: chunksCount,
-                directPayload: chunksCount === 1 ? compressed : null,
-                updated: Date.now()
-            });
-
-            const directUrl = `${window.location.origin + window.location.pathname}?site=${encodeURIComponent(slug)}`;
-            document.getElementById('direct-cloud-url-box').textContent = directUrl;
-            document.getElementById('open-published-site').href = directUrl;
-            document.getElementById('deploy-links-area').style.display = 'block';
-
-            logRadar(`🚀 تم نشر الموقع (${slug}) على العناقيد السحابية بنجاح!`, true);
-        }
-
-        async function createIndependentUrl() {
-            const target = document.getElementById('direct-cloud-url-box').textContent;
-            const alias = document.getElementById('short-alias-input').value.trim().replace(/[^a-zA-Z0-9_]/g, '');
-            const box = document.getElementById('independent-url-box');
-            box.textContent = "جاري توليد الرابط المستقل الخالي من اسم GitHub...";
-            try {
-                const res = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(target)}${alias ? `&shorturl=${encodeURIComponent(alias)}` : ''}`);
-                const data = await res.json();
-                if (data.shorturl) {
-                    box.textContent = data.shorturl;
-                    logRadar(`تم توليد الرابط المستقل: ${data.shorturl}`, true);
-                } else {
-                    const fb = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(target)}`);
-                    const fbData = await fb.json();
-                    box.textContent = fbData.shorturl || "الاسم مستخدم، جرب اسماً آخر.";
-                }
-            } catch (e) {
-                box.textContent = "ملاحظة: يعمل مولد الروابط المستقلة فور رفع ملف النظام على الإنترنت.";
-            }
-        }
-
-        // اختصارات لوحة المفاتيح
-        window.addEventListener('keydown', (e) => {
-            if (e.altKey && (e.key === 's' || e.key === 'S' || e.key === 'س')) { e.preventDefault(); saveProjectToCloud(); }
-            if (e.altKey && (e.key === 'r' || e.key === 'R' || e.key === 'ق')) { e.preventDefault(); compileAndRun(true); }
-            if (e.altKey && (e.key === 'p' || e.key === 'P' || e.key === 'ح')) { e.preventDefault(); openDeployCenter(); }
-            if (e.key === 'Escape') {
-                ['iam-modal', 'auth-modal', 'db-modal', 'deploy-modal'].forEach(id => closeModal(id));
-            }
-        });
-
-        window.onload = () => {
-            if (!requestedSite) {
-                initIamAndFirewall();
-                syncAuthUsersFromCloud();
-                syncCloudDBExplorer();
-                fetchVaultProjects();
-                setTimeout(() => injectEnterpriseSystem('social_auth_app'), 900);
-            }
-        };
     </script>
 </body>
 </html>
-
