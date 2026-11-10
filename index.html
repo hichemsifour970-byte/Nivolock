@@ -1,851 +1,1745 @@
-DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حاسوبي السحابي - استضافة حرة ودائمة</title>
-    <!-- محرك الاتصال السحابي بالوقت الفعلي ومحرك الضغط الدائم -->
-    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <title>الحاسوب السحابي الشخصي | منصة الاستضافة والسيرفر الدائم v9</title>
+
+    <!-- مكتبة ضغط الأكواد البرمجية غير المحدودة LZ-String -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+    <!-- مكتبة الاتصالات السحابية الفورية والدائمة MQTT WebSockets -->
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <!-- مكتبة الاتصالات المباشرة PeerJS WebRTC -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
     <style>
         :root {
-            --bg-dark: #070a12;
+            --bg-main: #090d16;
             --bg-card: #111827;
-            --bg-input: #03060c;
-            --border: #1f2937;
-            --accent: #00e5ff;
-            --success: #00e676;
-            --danger: #ff4757;
-            --warning: #ffa502;
-            --text: #f9fafb;
-            --text-muted: #9ca3af;
-        }
-        * { box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
-        }
-        .main-wrapper {
-            max-width: 880px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .box-card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 20px;
-        }
-        h1, h2, h3 { margin-top: 0; color: var(--accent); }
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 8px;
-            font-size: 16px;
-        }
-        input[type="text"] {
-            width: 100%;
-            background-color: var(--bg-input);
-            border: 1px solid #374151;
-            color: var(--text);
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-        textarea {
-            width: 100%;
-            height: 380px;
-            background-color: var(--bg-input);
-            border: 1px solid #374151;
-            color: #e2e8f0;
-            padding: 15px;
-            border-radius: 8px;
-            font-family: 'Consolas', 'Courier New', monospace;
-            font-size: 15px;
-            direction: ltr;
-            text-align: left;
-            resize: vertical;
-            white-space: pre;
-            overflow-y: scroll;
-        }
-        button {
-            background-color: var(--accent);
-            color: #000;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            margin: 4px 0 4px 6px;
-        }
-        button:hover { filter: brightness(1.15); }
-        button:focus, input:focus, textarea:focus {
-            outline: 3px solid var(--warning);
-            outline-offset: 2px;
-        }
-        .btn-main-create {
-            width: 100%;
-            background-color: var(--success);
-            color: #000;
-            font-size: 18px;
-            padding: 15px;
-            margin: 15px 0 0 0;
-        }
-        .btn-secondary { background-color: #1f2937; color: var(--text); border: 1px solid #374151; }
-        .btn-danger { background-color: var(--danger); color: #fff; }
-
-        /* صندوق الروابط الجاهزة */
-        #links-output-box {
-            display: none;
-            background-color: #05221a;
-            border: 2px solid var(--success);
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 15px;
-        }
-        .link-field {
-            background-color: var(--bg-input);
-            color: var(--warning);
-            padding: 12px;
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 14px;
-            word-break: break-all;
-            direction: ltr;
-            text-align: left;
-            margin: 8px 0;
-            border: 1px solid #374151;
+            --bg-input: #060911;
+            --border-clr: #1f2937;
+            --accent: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --purple: #8b5cf6;
+            --text-light: #f9fafb;
+            --text-dim: #9ca3af;
         }
 
-        .list-item {
-            background-color: var(--bg-input);
-            border: 1px solid var(--border);
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: bold;
-        }
-        .badge-green { background-color: rgba(0, 230, 118, 0.15); color: var(--success); }
-        .badge-red { background-color: rgba(255, 71, 87, 0.2); color: var(--danger); }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, system-ui, sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-light); line-height: 1.6; padding: 15px; overflow-x: hidden; }
+        .container { max-width: 980px; margin: 0 auto; }
 
-        .sr-only {
-            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-            overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+        /* قارئ الشاشة للمكفوفين */
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+        /* شريط حالة السيرفر العلوي */
+        header {
+            background: var(--bg-card); border: 1px solid var(--border-clr);
+            border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
+        header h1 { font-size: 1.35rem; color: #60a5fa; display: flex; align-items: center; gap: 8px; }
+        .status-badge {
+            background: #064e3b; color: #a7f3d0; padding: 6px 14px;
+            border-radius: 99px; font-size: 0.85rem; font-weight: bold; border: 1px solid var(--success);
+            transition: all 0.3s ease;
+        }
+
+        /* البطاقات والأقسام */
+        .section-card {
+            background: var(--bg-card); border: 1px solid var(--border-clr);
+            border-radius: 12px; padding: 22px; margin-bottom: 22px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+        }
+        .section-title {
+            font-size: 1.2rem; color: #93c5fd; margin-bottom: 16px;
+            padding-bottom: 10px; border-bottom: 1px solid var(--border-clr);
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+        }
+
+        /* الحقول والأزرار */
+        label { display: block; font-weight: bold; margin-bottom: 8px; color: #e5e7eb; font-size: 0.95rem; }
+        input[type="text"], textarea {
+            width: 100%; background: var(--bg-input); color: #fff;
+            border: 2px solid var(--border-clr); border-radius: 8px; padding: 12px 15px;
+            font-size: 1rem; margin-bottom: 15px; transition: border-color 0.2s;
+        }
+        input[type="text"]:focus, textarea:focus { outline: none; border-color: var(--accent); }
+        
+        /* مربع تحرير الكود الواحد غير المحدود */
+        textarea#code-editor {
+            font-family: 'Courier New', Consolas, monospace; direction: ltr; text-align: left;
+            min-height: 400px; color: #34d399; line-height: 1.5; resize: vertical;
+            tab-size: 2;
+        }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            border: none; border-radius: 8px; padding: 13px 20px; font-size: 1rem;
+            font-weight: bold; cursor: pointer; color: #fff; transition: 0.2s; text-decoration: none;
+        }
+        .btn:hover { filter: brightness(1.1); }
+        .btn:active { transform: scale(0.99); }
+        .btn-create { background: var(--success); width: 100%; font-size: 1.15rem; padding: 16px; box-shadow: 0 4px 14px rgba(16,185,129,0.25); }
+        .btn-blue { background: var(--accent); }
+        .btn-red { background: var(--danger); }
+        .btn-yellow { background: #d97706; }
+        .btn-purple { background: var(--purple); }
+        .btn-dark { background: #374151; font-size: 0.85rem; padding: 8px 14px; }
+
+        .templates-bar {
+            display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;
+            background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid var(--border-clr);
+        }
+
+        /* صندوق إظهار الروابط الفوري */
+        #generated-links-box {
+            display: none; background: #06281e; border: 2px solid var(--success);
+            border-radius: 10px; padding: 18px; margin-top: 18px;
+        }
+        .link-row {
+            display: flex; gap: 8px; align-items: center; margin-top: 8px; margin-bottom: 14px; flex-wrap: wrap;
+        }
+        .link-row input { margin-bottom: 0; flex: 1; min-width: 220px; direction: ltr; color: #fde047; font-weight: bold; font-size: 0.92rem; }
+
+        /* قوائم المشاريع ومفاتيح الـ API */
+        .item-box {
+            background: var(--bg-input); border: 1px solid var(--border-clr);
+            border-radius: 8px; padding: 14px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+        }
+        .item-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        /* سجل الرسائل والإشعارات الحية */
+        #live-inbox {
+            background: var(--bg-input); border: 1px solid var(--border-clr);
+            border-radius: 8px; padding: 12px; height: 240px; overflow-y: auto; font-size: 0.9rem;
+        }
+        .log-line { padding: 8px 10px; border-bottom: 1px solid #1f2937; border-right: 3px solid var(--accent); margin-bottom: 6px; background: rgba(255,255,255,0.02); border-radius: 4px; }
+
+        /* شاشة المعاينة الحية المحسّنة */
+        #preview-container {
+            display: none; margin-top: 16px; border: 2px solid var(--accent); border-radius: 10px; overflow: hidden;
+            background: #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        #preview-header {
+            background: #0f172a; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+            border-bottom: 1px solid var(--border-clr);
+        }
+        #preview-frame-wrapper { width: 100%; height: 480px; background: #ffffff; position: relative; }
+        #preview-frame-wrapper.fullscreen-preview { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 999990; }
+        #preview-frame-wrapper iframe { width: 100%; height: 100%; border: none; display: block; background: #ffffff; }
+
+        /* شاشة عرض الموقع المستضاف للزوار بملء الشاشة */
+        #visitor-viewport {
+            display: none; position: fixed; inset: 0; width: 100vw; height: 100vh;
+            background: #ffffff; z-index: 999995; margin: 0; padding: 0; border: none; overflow: hidden;
+        }
+        #visitor-viewport iframe {
+            width: 100%; height: 100%; border: none; margin: 0; padding: 0; display: block;
+        }
+
+        /* شاشة تحميل الزائر */
+        #visitor-loader {
+            display: none; position: fixed; inset: 0; background: #090d16; color: #fff;
+            z-index: 999999; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 20px;
+        }
+        .spinner {
+            width: 48px; height: 48px; border: 5px solid #1f2937; border-top-color: var(--success);
+            border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 18px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <!-- الناطق الصوتي لقارئ الشاشة -->
+    <!-- ناطق قارئ الشاشة الفوري -->
     <div id="sr-announcer" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
 
-    <!-- شاشة فتح المواقع المستضافة (تظهر للزوار عند فتح الرابط) -->
-    <div id="visitor-loader" style="display:none; text-align:center; padding:60px;">
-        <h2 id="visitor-msg">جاري فتح الموقع...</h2>
+    <!-- حاوية عرض موقع الزائر بملء الشاشة (مفصولة تماماً عن لوحة التحكم) -->
+    <div id="visitor-viewport"></div>
+
+    <!-- شاشة التحميل الخاصة بالزوار عند فتح رابط موقع مستضاف -->
+    <div id="visitor-loader">
+        <div class="spinner" id="visitor-spinner"></div>
+        <h2 id="visitor-status-title">جاري فتح الموقع السحابي...</h2>
+        <p id="visitor-status-sub" style="color:#9ca3af; margin-top:8px;">يتم الجلب الفوري عبر عنقود السيرفرات السحابية المشفرة</p>
+        <div id="visitor-retry-box" style="display:none; margin-top:20px;">
+            <button class="btn btn-blue" onclick="window.location.reload()">🔄 إعادة المحاولة الآن</button>
+        </div>
     </div>
 
-    <!-- لوحة التحكم السحابية الخاصة بك -->
-    <main class="main-wrapper" id="admin-workspace">
-
-        <!-- ترويسة الحاسوب السحابي -->
-        <header class="box-card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+    <!-- لوحة تحكم السيرفر والاستضافة الرئيسية -->
+    <div class="container" id="admin-dashboard">
+        
+        <header role="banner">
             <div>
-                <h1 style="margin:0; font-size:22px;">الحاسوب السحابي والاستضافة الخاصة بي</h1>
-                <p style="margin:4px 0 0 0; color:var(--text-muted); font-size:14px;">حرية مطلقة في البرمجة، حفظ دائم للمواقع دون حذف، واتصال حي في الوقت الفعلي</p>
+                <h1>☁️ الحاسوب السحابي والاستضافة الدائمة (v9 Enterprise)</h1>
+                <p style="font-size:0.85rem; color:var(--text-dim);">معرف السيرفر الدائم: <strong id="server-id-label" style="color:#fde047; font-family:monospace;">...</strong></p>
             </div>
-            <div id="cloud-status" class="badge badge-green" role="status">السيرفر السحابي متصل ونشط</div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <div id="cloud-status" class="status-badge" role="status">جاري الاتصال بعنقود السيرفرات...</div>
+            </div>
         </header>
 
-        <!-- القسم الأول: اسم المشروع + مربع الكود + زر الإنشاء -->
-        <section class="box-card" aria-labelledby="sec1-title">
-            <h2 id="sec1-title">1. إنشاء أو تعديل موقع</h2>
+        <!-- 1. قسم إنشاء وتعديل المواقع (التصميم البسيط والمباشر) -->
+        <main>
+            <section class="section-card" aria-labelledby="editor-heading">
+                <div class="section-title">
+                    <span id="editor-heading">1. إنشاء موقع جديد أو تعديل مشروع</span>
+                    <span style="font-size:0.82rem; color:#10b981;">حفظ رباعي دائم (LocalStorage + IndexedDB + Multi-MQTT + Hash)</span>
+                </div>
 
-            <!-- 1. اسم المشروع في الأعلى -->
-            <label for="project-name-input">اسم المشروع:</label>
-            <input type="text" id="project-name-input" placeholder="اكتب اسم المشروع هنا (مثال: my-site)">
+                <!-- حقل اسم المشروع في الأعلى -->
+                <label for="site-name">اسم المشروع أو الموقع (بالحروف الإنجليزية أو العربية أو الأرقام):</label>
+                <input type="text" id="site-name" placeholder="مثال: my-awesome-app أو متجري-السحابي" autocomplete="off">
 
-            <!-- شريط اختياري تماماً لتسهيل الكتابة لمن يريد -->
-            <div style="margin-bottom: 12px; background: var(--bg-input); padding: 10px; border-radius: 8px; border: 1px solid var(--border);">
-                <span style="font-size:13px; color:var(--text-muted); display:block; margin-bottom:6px;">قوالب اختيارية سريعة (اختر ما يناسبك أو اكتب كودك الخاص بحرية تامة):</span>
-                <button type="button" class="btn-secondary" onclick="setEditorTemplate('normal')">موقع عادي (بدون أي تسجيل دخول)</button>
-                <button type="button" class="btn-secondary" onclick="setEditorTemplate('nickname')">موقع بدخول اسم مستعار فقط (بدون بريد أو جوجل)</button>
-                <button type="button" class="btn-secondary" onclick="setEditorTemplate('social')">موقع بدخول جوجل وفيسبوك (اختياري)</button>
-                <button type="button" class="btn-secondary" onclick="toggleLivePreview()">معاينة الكود</button>
-            </div>
+                <!-- قوالب مساعدة اختيارية لتسهيل البداية + أدوات التحكم السريع بالمحرر -->
+                <div class="templates-bar" role="toolbar" aria-label="قوالب وأدوات المحرر السريعة">
+                    <span style="font-size:0.85rem; color:var(--text-dim); align-self:center; margin-left:4px;">قوالب جاهزة (اختياري):</span>
+                    <button type="button" class="btn btn-dark" onclick="loadTemplate('free')">📄 قالب 1: موقع حر (بدون تسجيل دخول)</button>
+                    <button type="button" class="btn btn-dark" onclick="loadTemplate('nickname')">👤 قالب 2: موقع بدخول (اسم مستعار فقط)</button>
+                    <button type="button" class="btn btn-dark" onclick="loadTemplate('social')">🌐 قالب 3: موقع بدخول (حساب جوجل وفيسبوك)</button>
+                    <button type="button" class="btn btn-dark" style="background:#1e3a8a;" onclick="pasteCodeFromClipboard()">📋 لصق الكود من الحافظة</button>
+                    <button type="button" class="btn btn-dark" style="background:#7f1d1d;" onclick="clearEditorCode()">🗑️ تفريغ المحرر للكتابة من الصفر</button>
+                </div>
 
-            <!-- 2. تحته مباشرة: مربع تعديل النص غير المحدود -->
-            <label for="code-editor-box">مربع تحرير الكود البرمجي (HTML / CSS / JS - حقل غير محدود):</label>
-            <textarea id="code-editor-box" spellcheck="false" placeholder="ضع كود HTML الخاص بك هنا بحرية تامة..."></textarea>
+                <!-- مربع تحرير النصوص الواحد غير المحدود للكود تحت الاسم مباشرة -->
+                <label for="code-editor">كود الموقع الكامل (HTML / CSS / JavaScript في مربع واحد غير محدود):</label>
+                <textarea id="code-editor" spellcheck="false" placeholder="اكتب أو الصق كود موقعك الكامل هنا بدون أي قيود..."></textarea>
 
-            <!-- 3. تحته مباشرة: زر الإنشاء وإظهار الرابط -->
-            <button type="button" class="btn-main-create" onclick="publishAndSaveWebsite()">إنشاء الموقع وحفظه وإظهار الرابط</button>
+                <!-- زر إنشاء الموقع وحفظه وإظهار الرابط تحت المحرر مباشرة -->
+                <button type="button" class="btn btn-create" onclick="publishAndSaveWebsite()">
+                    🚀 إنشاء الموقع وحفظه دائماً وإظهار الرابط
+                </button>
 
-            <!-- صندوق إظهار الروابط فور الضغط على إنشاء -->
-            <div id="links-output-box" role="region" aria-label="روابط الموقع الجاهزة">
-                <h3 style="color:var(--success); margin-top:0;">تم إنشاء الموقع وحفظه للأبد! إليك الروابط الفعالة:</h3>
+                <!-- أزرار المعاينة الحية المحسّنة -->
+                <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-blue" style="flex:1;" onclick="toggleLivePreview(true)">
+                        👁️ معاينة الكود الحيّة الآن (تشغيل / تحديث المعاينة)
+                    </button>
+                </div>
 
-                <label>1. الرابط المختصر المستقل (بدون كلمة GitHub نهائياً - محفوظ للأبد):</label>
-                <div class="link-field" id="independent-short-link" tabindex="0">جاري تكوين الرابط المستقل...</div>
-                <button type="button" onclick="copyText('independent-short-link')">نسخ الرابط المستقل</button>
-                <a id="open-independent-link" target="_blank" style="text-decoration:none;"><button type="button" class="btn-secondary">فتح الرابط المستقل</button></a>
+                <!-- نافذة المعاينة الحية المعزولة والآمنة -->
+                <div id="preview-container" role="region" aria-label="نافذة المعاينة الحية للكود">
+                    <div id="preview-header">
+                        <span style="font-weight:bold; font-size:0.92rem; color:#93c5fd;">⚡ المعاينة الحية الفورية للموقع (تعمل بكامل خصائص السيرفر السحابي):</span>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button type="button" class="btn btn-blue" style="padding:5px 12px; font-size:0.82rem;" onclick="refreshLivePreview()">🔄 تحديث الكود المعروض</button>
+                            <button type="button" class="btn btn-purple" style="padding:5px 12px; font-size:0.82rem;" onclick="toggleFullscreenPreview()">🖥️ ملء الشاشة</button>
+                            <button type="button" class="btn btn-red" style="padding:5px 12px; font-size:0.82rem;" onclick="closeLivePreview()">✖ إغلاق المعاينة</button>
+                        </div>
+                    </div>
+                    <div id="preview-frame-wrapper"></div>
+                </div>
 
-                <hr style="border-color:#1f2937; margin:15px 0;">
+                <!-- صندوق الروابط الذي يظهر فوراً بعد الضغط على الزر -->
+                <div id="generated-links-box" role="region" aria-label="روابط الموقع الجاهزة للمشاركة">
+                    <h3 style="color:#34d399; margin-bottom:10px;">✅ تم إنشاء وحفظ موقعك بنجاح! إليك الروابط الفعالة:</h3>
 
-                <label>2. رابط المشروع المباشر (باسم المشروع ويتحدث فوراً عند التعديل):</label>
-                <div class="link-field" id="direct-project-link" tabindex="0"></div>
-                <button type="button" onclick="copyText('direct-project-link')">نسخ الرابط المباشر</button>
-                <a id="open-direct-link" target="_blank" style="text-decoration:none;"><button type="button" class="btn-secondary">فتح الموقع الآن</button></a>
-            </div>
+                    <label for="out-hybrid-url">1. الرابط الهجين الفوري للموقع (يفتح في 0.01 ثانية من الـ Hash ويتحدث سحابياً):</label>
+                    <div class="link-row">
+                        <input type="text" id="out-hybrid-url" readonly>
+                        <button type="button" class="btn btn-blue" onclick="copyInput('out-hybrid-url')">📋 نسخ الرابط</button>
+                        <button type="button" class="btn btn-dark" onclick="openInputUrl('out-hybrid-url')">🌐 فتح الموقع</button>
+                    </div>
 
-            <!-- نافذة معاينة اختيارية -->
-            <div id="preview-wrapper" style="display:none; margin-top:15px;">
-                <label>شاشة المعاينة الحية:</label>
-                <iframe id="preview-iframe" style="width:100%; height:280px; background:#fff; border-radius:8px; border:2px solid var(--accent);" title="معاينة الكود"></iframe>
-            </div>
-        </section>
+                    <label for="out-cloud-url">2. الرابط السحابي الديناميكي القصير للمشروع (يتحدث تلقائياً عند أي تعديل مستقبلي):</label>
+                    <div class="link-row">
+                        <input type="text" id="out-cloud-url" readonly>
+                        <button type="button" class="btn btn-blue" onclick="copyInput('out-cloud-url')">📋 نسخ الرابط</button>
+                        <button type="button" class="btn btn-dark" onclick="openInputUrl('out-cloud-url')">🌐 فتح الموقع</button>
+                    </div>
 
-        <!-- القسم الثاني: المواقع المحفوظة (محفوظة دائماً ولا تحذف) -->
-        <section class="box-card" aria-labelledby="sec2-title">
-            <h2 id="sec2-title">2. مواقعي ومشاريعي المحفوظة (دائمة ولا تُحذف)</h2>
-            <p style="font-size:14px; color:var(--text-muted); margin-top:0;">جميع المواقع التي تنشئها تُحفظ هنا وفي السحابة تلقائياً، ويمكنك فتحها أو التعديل عليها في أي وقت:</p>
-            <div id="permanent-sites-list" role="region" aria-label="قائمة المواقع المحفوظة"></div>
-        </section>
+                    <label for="out-short-url">3. الرابط المختصر المستقل (بدون ظهور اسم GitHub نهائياً):</label>
+                    <div class="link-row">
+                        <input type="text" id="out-short-url" readonly value="جاري توليد الرابط المختصر...">
+                        <button type="button" class="btn btn-purple" onclick="copyInput('out-short-url')">📋 نسخ الرابط المختصر</button>
+                        <button type="button" class="btn btn-dark" onclick="openInputUrl('out-short-url')">🌐 فتح المختصر</button>
+                    </div>
+                </div>
+            </section>
 
-        <!-- القسم الثالث: مفاتيح الـ API الفعالة (اختيارية لتطبيقاتك) -->
-        <section class="box-card" aria-labelledby="sec3-title">
-            <h2 id="sec3-title">3. إدارة مفاتيح الـ API النشطة (لربط وحماية تطبيقاتك)</h2>
-            <p style="font-size:14px; color:var(--text-muted); margin-top:0;">يمكنك إنشاء مفتاح API ووضعه في تطبيقك أو موقعك. إذا أردت إيقاف أي تطبيق يستخدم المفتاح، اضغط "إيقاف المفتاح" وسيتوقف في الوقت الفعلي:</p>
-            <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <input type="text" id="api-key-name" placeholder="اسم التطبيق الخاص بالمفتاح (مثال: تطبيقي الأول)" style="margin-bottom:0;">
-                <button type="button" onclick="createNewApiKey()" style="white-space:nowrap; margin:0;">+ إنشاء مفتاح API</button>
-            </div>
-            <div id="api-keys-container"></div>
-        </section>
+            <!-- 2. قائمة المواقع والمشاريع المحفوظة دائماً (قابلة للتعديل في أي وقت) -->
+            <section class="section-card" aria-labelledby="saved-sites-heading">
+                <div class="section-title">
+                    <span id="saved-sites-heading">2. مواقعك ومشاريعك المحفوظة دائماً (تعديل / فتح / نسخ الرابط)</span>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button type="button" class="btn btn-dark" onclick="exportFullBackup()">💾 تصدير نسخة احتياطية (JSON)</button>
+                        <button type="button" class="btn btn-dark" onclick="document.getElementById('backup-file-input').click()">📂 استيراد نسخة احتياطية</button>
+                        <input type="file" id="backup-file-input" accept=".json" style="display:none;" onchange="importFullBackup(event)">
+                    </div>
+                </div>
+                <div id="saved-sites-list">
+                    <p style="color:var(--text-dim);">لا توجد مواقع محفوظة بعد. أنشئ موقعك الأول في الأعلى.</p>
+                </div>
+            </section>
 
-        <!-- القسم الرابع: التواصل الحي مع الزوار والمستخدمين (في الوقت الفعلي) -->
-        <section class="box-card" aria-labelledby="sec4-title">
-            <h2 id="sec4-title">4. الرسائل الحية والمستخدمون المتصلون (الوقت الفعلي)</h2>
-            <p style="font-size:14px; color:var(--text-muted); margin-top:0;">إرسال إشعار فوري يظهر في جميع مواقعك وتطبيقاتك المفتوحة الآن، واستقبال رسائل الزوار (سواء دخلوا بدون حساب، أو باسم مستعار، أو بحساب رسمي):</p>
-            <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <input type="text" id="live-admin-msg" placeholder="اكتب رسالة أو إشعاراً لإرساله فوراً لزوار مواقعك..." style="margin-bottom:0;">
-                <button type="button" onclick="broadcastToAllSites()" style="white-space:nowrap; margin:0;">إرسال فوري للجميع</button>
-            </div>
-            <div id="live-events-log" role="log" aria-live="polite">
-                <div style="color:var(--text-muted); font-size:14px;">سجل الاتصالات والرسائل الواردة جاهز...</div>
-            </div>
-        </section>
+            <!-- 3. نظام مفاتيح API الفعالة لحماية تطبيقات الأندرويد APK والمواقع في الوقت الفعلي -->
+            <section class="section-card" aria-labelledby="api-heading">
+                <div class="section-title">
+                    <span id="api-heading">3. مفاتيح الـ API الفعالة (ربط وحماية تطبيقات الأندرويد APK والمواقع)</span>
+                </div>
+                <p style="font-size:0.9rem; color:var(--text-dim); margin-bottom:14px;">
+                    إذا قام أي شخص بكسر تطبيقك (الهندسة العكسية) وسرقة مفتاح الـ API، اضغط "حظر وإيقاف المفتاح" هنا، وسيتوقف التطبيق أو الموقع المسروق عن العمل في نفس اللحظة لدى الجميع!
+                </p>
 
-    </main>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px;">
+                    <input type="text" id="new-key-label" placeholder="اسم التطبيق أو الموقع (مثال: تطبيق الأندرويد الإصدار 1)" style="flex:1; margin-bottom:0;">
+                    <button type="button" class="btn btn-yellow" onclick="generateNewApiKey()">🔑 توليد مفتاح API جديد</button>
+                </div>
+
+                <div id="api-keys-list"></div>
+            </section>
+
+            <!-- 4. التواصل الفوري وسجل رسائل وتسجيلات دخول المستخدمين -->
+            <section class="section-card" aria-labelledby="comms-heading">
+                <div class="section-title">
+                    <span id="comms-heading">4. البث الفوري وسجل الرسائل وتسجيلات الدخول الحية</span>
+                    <button type="button" class="btn btn-dark" onclick="clearLiveInbox()">🧹 مسح السجل</button>
+                </div>
+                
+                <label for="broadcast-input">إرسال إشعار أو أمر فوري يظهر لكل من يفتح مواقعك أو تطبيقاتك الآن:</label>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px;">
+                    <input type="text" id="broadcast-input" placeholder="اكتب رسالتك أو تنبيهك هنا ليصل في الوقت الفعلي..." style="flex:1; margin-bottom:0;">
+                    <button type="button" class="btn btn-purple" onclick="sendBroadcastNow()">📢 إرسال فوري للجميع</button>
+                </div>
+
+                <label>سجل الأحداث الحية (تسجيلات الدخول بالاسم المستعار أو الحسابات، والرسائل الواردة من مواقعك):</label>
+                <div id="live-inbox" role="log" aria-live="polite">
+                    <div class="log-line">📡 السيرفر السحابي جاهز ويستمع لجميع مواقعك وتطبيقاتك في الوقت الفعلي...</div>
+                </div>
+            </section>
+        </main>
+    </div>
 
     <script>
-        // =====================================================================
-        // 1. تهيئة المعرف السحابي الثابت والاتصال المزدوج لضمان عدم ضياع أي موقع
-        // =====================================================================
+        /* =========================================================================
+           المرحلة 0: الفحص الفوري لوضع الزائر (Pre-Init Route Interception)
+           يعمل في الجزء الأول من الثانية قبل تهيئة لوحة التحكم لمنع ظهور القالب الافتراضي
+           ========================================================================= */
+        const CURRENT_URL_PARAMS = new URLSearchParams(window.location.search);
+        const VISITOR_SITE_PARAM = (CURRENT_URL_PARAMS.get('site') || CURRENT_URL_PARAMS.get('p') || '').trim();
+        const VISITOR_SERVER_PARAM = (CURRENT_URL_PARAMS.get('s') || CURRENT_URL_PARAMS.get('srv') || '').trim();
+        const CURRENT_HASH = window.location.hash || '';
+        const HAS_HASH_APP = CURRENT_HASH.startsWith('#app=') || CURRENT_HASH.includes('#app=');
+        const IS_VISITOR_MODE = Boolean(VISITOR_SITE_PARAM || HAS_HASH_APP);
+
+        if (IS_VISITOR_MODE) {
+            document.getElementById('admin-dashboard').style.setProperty('display', 'none', 'important');
+            document.getElementById('admin-dashboard').setAttribute('aria-hidden', 'true');
+            document.getElementById('visitor-loader').style.display = 'flex';
+        }
+
+        /* =========================================================================
+           1. التأسيس السحابي الدائم + قاعدة بيانات IndexedDB + LocalStorage
+           ========================================================================= */
+        const CLOUD_NAMESPACE = 'cloud_os_v8_permanent'; // الحفاظ على نفس النطاق للتوافق التام مع المشاريع السابقة
+        const MQTT_BROKERS = [
+            'wss://broker.emqx.io:8084/mqtt',
+            'wss://broker.hivemq.com:8884/mqtt',
+            'wss://test.mosquitto.org:8081/mqtt'
+        ];
+
+        // معرف السيرفر الشخصي الدائم
         let MY_SERVER_ID = localStorage.getItem('permanent_cloud_server_id');
         if (!MY_SERVER_ID) {
-            MY_SERVER_ID = 'cloud_' + Math.random().toString(36).substring(2, 10);
+            MY_SERVER_ID = 'SRV_' + Math.random().toString(36).substring(2, 10).toUpperCase();
             localStorage.setItem('permanent_cloud_server_id', MY_SERVER_ID);
         }
+        const srvLabelEl = document.getElementById('server-id-label');
+        if (srvLabelEl) srvLabelEl.innerText = MY_SERVER_ID;
 
-        const BROKER_URL = 'wss://broker.emqx.io:8084/mqtt';
-        let mqttClient = null;
+        // الخزنة المحلية للمواقع ومفاتيح الـ API وسجل الرسائل
+        let savedSites = {};
+        let savedApiKeys = {};
+        let savedInboxLogs = [];
 
-        // استرجاع المواقع ومفاتيح الـ API المحفوظة فوراً لضمان عدم حذفها أبداً
-        let savedSites = JSON.parse(localStorage.getItem('permanent_saved_sites') || '{}');
-        let savedApiKeys = JSON.parse(localStorage.getItem('permanent_api_keys') || '{}');
-
-        function announce(msg) {
-            const el = document.getElementById('sr-announcer');
-            el.textContent = '';
-            setTimeout(() => { el.textContent = msg; }, 50);
+        try {
+            savedSites = JSON.parse(localStorage.getItem('permanent_saved_sites') || '{}');
+            savedApiKeys = JSON.parse(localStorage.getItem('permanent_api_keys') || '{}');
+            savedInboxLogs = JSON.parse(localStorage.getItem('permanent_inbox_logs') || '[]');
+        } catch (e) {
+            console.warn('LocalStorage Parse Recovery:', e);
         }
 
-        // =====================================================================
-        // 2. وضع الزائر: تشغيل الموقع المستضاف فوراً وبحرية تامة
-        // =====================================================================
-        const query = new URLSearchParams(window.location.search);
-        const targetSiteName = query.get('site') || query.get('p');
-        const hashPayload = window.location.hash;
-
-        if (hashPayload.startsWith('#app=')) {
-            // فتح فوري من الرابط الخالد المدمج (مستحيل أن يُحذف للأبد ويعمل في 0.1 ثانية)
-            document.getElementById('admin-workspace').style.display = 'none';
-            document.getElementById('visitor-loader').style.display = 'block';
-            const rawHTML = LZString.decompressFromEncodedURIComponent(hashPayload.replace('#app=', ''));
-            if (rawHTML) {
-                document.open(); document.write(rawHTML); document.close();
+        // محرك قاعدة البيانات الدائمة IndexedDB لدعم الأحجام غير المحدودة
+        const PermanentDB = {
+            db: null,
+            init: function() {
+                return new Promise((resolve) => {
+                    if (!window.indexedDB) return resolve(null);
+                    const req = indexedDB.open('CloudOS_PermanentDB_v9', 1);
+                    req.onupgradeneeded = function(e) {
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains('sites')) db.createObjectStore('sites', { keyPath: 'name' });
+                        if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv', { keyPath: 'k' });
+                    };
+                    req.onsuccess = (e) => {
+                        this.db = e.target.result;
+                        resolve(this.db);
+                    };
+                    req.onerror = () => resolve(null);
+                });
+            },
+            saveSite: function(siteObj) {
+                if (!this.db || !siteObj || !siteObj.name) return;
+                try {
+                    const tx = this.db.transaction(['sites'], 'readwrite');
+                    tx.objectStore('sites').put(siteObj);
+                } catch (e) {}
+            },
+            getSite: function(name) {
+                return new Promise((resolve) => {
+                    if (!this.db) return resolve(null);
+                    try {
+                        const tx = this.db.transaction(['sites'], 'readonly');
+                        const req = tx.objectStore('sites').get(name);
+                        req.onsuccess = () => resolve(req.result || null);
+                        req.onerror = () => resolve(null);
+                    } catch (e) { resolve(null); }
+                });
+            },
+            getAllSites: function() {
+                return new Promise((resolve) => {
+                    if (!this.db) return resolve([]);
+                    try {
+                        const tx = this.db.transaction(['sites'], 'readonly');
+                        const req = tx.objectStore('sites').getAll();
+                        req.onsuccess = () => resolve(req.result || []);
+                        req.onerror = () => resolve([]);
+                    } catch (e) { resolve([]); }
+                });
+            },
+            deleteSite: function(name) {
+                if (!this.db) return;
+                try {
+                    const tx = this.db.transaction(['sites'], 'readwrite');
+                    tx.objectStore('sites').delete(name);
+                } catch (e) {}
             }
-        } else if (targetSiteName) {
-            // فتح من السيرفر السحابي المباشر باسم المشروع
-            document.getElementById('admin-workspace').style.display = 'none';
-            document.getElementById('visitor-loader').style.display = 'block';
+        };
 
-            // إذا كان محفوظاً محلياً أو في السحابة يفتحه فوراً
-            const vClient = mqtt.connect(BROKER_URL);
-            const topic = `cloud_os_v8_permanent/sites/${encodeURIComponent(targetSiteName)}`;
+        function speak(msg) {
+            const announcer = document.getElementById('sr-announcer');
+            if (announcer) {
+                announcer.textContent = '';
+                setTimeout(() => { announcer.textContent = msg; }, 40);
+            }
+        }
 
-            vClient.on('connect', () => {
-                vClient.subscribe(topic, { qos: 1 });
+        function saveLocalState() {
+            try {
+                localStorage.setItem('permanent_saved_sites', JSON.stringify(savedSites));
+            } catch (e) {
+                // إذا امتلأت LocalStorage بسبب كود ضخم، نخزن البيانات الأساسية ونعتمد على IndexedDB للكود الكامل
+                console.warn('LocalStorage quota warning, IndexedDB holds full payload.');
+            }
+            try {
+                localStorage.setItem('permanent_api_keys', JSON.stringify(savedApiKeys));
+            } catch (e) {}
+        }
+
+        /* =========================================================================
+           2. محرك فك وضغط الأكواد الذكي (يدعم Base64 الآمن للشبكة + التوافق مع UTF16 و URI)
+           ========================================================================= */
+        function encodeSitePayloadForCloud(finalHtml, rawCode, siteName) {
+            const compressedBase64 = LZString.compressToBase64(finalHtml);
+            const rawBase64 = LZString.compressToBase64(rawCode || finalHtml);
+            return JSON.stringify({
+                v: 9,
+                name: siteName,
+                serverId: MY_SERVER_ID,
+                updatedAt: Date.now(),
+                time: new Date().toLocaleTimeString('ar-EG'),
+                encoding: 'base64',
+                data: compressedBase64,
+                rawCompressed: rawBase64
             });
+        }
 
-            vClient.on('message', (t, msg) => {
-                if (t === topic) {
-                    const html = LZString.decompressFromUTF16(msg.toString());
-                    if (html) {
-                        vClient.end();
-                        document.open(); document.write(html); document.close();
+        function decodeSitePayloadFromCloud(rawMessageString) {
+            if (!rawMessageString) return null;
+            // 1. محاولة قراءة حزمة JSON الإصدار 9 (Base64 الآمن من تلف المحارف)
+            if (rawMessageString.startsWith('{')) {
+                try {
+                    const parsed = JSON.parse(rawMessageString);
+                    if (parsed && parsed.encoding === 'base64' && parsed.data) {
+                        const html = LZString.decompressFromBase64(parsed.data);
+                        const rawCode = parsed.rawCompressed ? LZString.decompressFromBase64(parsed.rawCompressed) : html;
+                        if (html && html.trim().length > 0) {
+                            return {
+                                html: html,
+                                rawCode: rawCode || html,
+                                updatedAt: parsed.updatedAt || Date.now(),
+                                time: parsed.time || new Date().toLocaleTimeString('ar-EG'),
+                                serverId: parsed.serverId || ''
+                            };
+                        }
+                    }
+                } catch (e) {}
+            }
+            // 2. التوافق العكسي مع الإصدار الثامن (UTF16)
+            try {
+                const fromUtf16 = LZString.decompressFromUTF16(rawMessageString);
+                if (fromUtf16 && (fromUtf16.includes('<') || fromUtf16.length > 10)) {
+                    return { html: fromUtf16, rawCode: fromUtf16, updatedAt: 0, time: 'محفوظ سحابياً' };
+                }
+            } catch (e) {}
+            // 3. التوافق الاحتياطي مع Base64 المباشر أو EncodedURIComponent
+            try {
+                const fromB64 = LZString.decompressFromBase64(rawMessageString);
+                if (fromB64 && fromB64.includes('<')) {
+                    return { html: fromB64, rawCode: fromB64, updatedAt: 0, time: 'محفوظ سحابياً' };
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        /* =========================================================================
+           3. حقيبة السيرفر السحابي الاختيارية (injectOptionalCloudHelper)
+           حقن ذكي يحترم بنية <!DOCTYPE html> و <head> ويدعم الجسر المباشر + MQTT
+           ========================================================================= */
+        function injectOptionalCloudHelper(rawHtml, targetServerId) {
+            const activeServerId = targetServerId || MY_SERVER_ID;
+            if (!rawHtml) return '';
+            // تجنب الحقن المزدوج إذا كان الكود محقوناً مسبقاً
+            if (rawHtml.includes('id="cloud-os-sdk-v9"')) return rawHtml;
+
+            const helperScript = `<script id="cloud-os-sdk-v9">
+(function(){
+    if(window.Cloud && window.Cloud.__v9) return;
+    const SRV_ID = "${activeServerId}";
+    const NS = "${CLOUD_NAMESPACE}";
+    const BROKERS = [
+        "wss://broker.emqx.io:8084/mqtt",
+        "wss://broker.hivemq.com:8884/mqtt"
+    ];
+    let sdkClients = [];
+    let pendingActions = [];
+    let isLockedByGuard = false;
+    let activeGuardKeys = {};
+    let seenBroadcasts = new Set();
+
+    function flushPending(client) {
+        while(pendingActions.length > 0) {
+            const fn = pendingActions.shift();
+            try { fn(client); } catch(e){}
+        }
+    }
+
+    function pubToCloud(topic, payload, opts) {
+        // 1. الإرسال الفوري عبر جسر النافذة الأب (إن وجد في المعاينة أو عارض الزوار)
+        try {
+            if(window.parent && window.parent !== window && window.parent.__CLOUD_OS_BRIDGE__) {
+                window.parent.__CLOUD_OS_BRIDGE__.publish(topic, payload, opts);
+            }
+        } catch(e){}
+        // 2. الإرسال عبر اتصالات MQTT المباشرة داخل الصفحة
+        let sent = false;
+        sdkClients.forEach(c => {
+            if(c && c.connected) {
+                c.publish(topic, payload, opts || {});
+                sent = true;
+            }
+        });
+        if(!sent) {
+            pendingActions.push((c) => c.publish(topic, payload, opts || {}));
+        }
+    }
+
+    function handleIncomingGuard(topic, msg) {
+        Object.keys(activeGuardKeys).forEach(k => {
+            if(topic === NS + "/api_guard/" + k && msg === "BLOCKED" && !isLockedByGuard) {
+                isLockedByGuard = true;
+                document.body.innerHTML = '<div dir="rtl" style="background:#450a0a;color:#fff;height:100vh;width:100vw;position:fixed;inset:0;z-index:2147483647;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-family:sans-serif;padding:20px;"><h1>🚫 تم إيقاف هذا التطبيق / الموقع بأمر مباشر من السيرفر</h1><p style="margin-top:12px;color:#fca5a5;font-size:1.1rem;">مفتاح الـ API المستخدم (' + k + ') تم حظره وإلغاء صلاحيته الفورية.</p></div>';
+            }
+        });
+    }
+
+    function showToastBroadcast(msg) {
+        if(!msg || seenBroadcasts.has(msg)) return;
+        seenBroadcasts.add(msg);
+        setTimeout(() => seenBroadcasts.delete(msg), 4000);
+        const bar = document.createElement('div');
+        bar.setAttribute('role', 'alert');
+        bar.dir = 'rtl';
+        bar.style.cssText = 'position:fixed;top:15px;left:50%;transform:translateX(-50%);background:#1d4ed8;color:#fff;padding:12px 24px;border-radius:99px;z-index:2147483646;font-weight:bold;box-shadow:0 8px 25px rgba(0,0,0,0.6);font-family:sans-serif;border:2px solid #93c5fd;';
+        bar.innerText = '📢 إشعار من إدارة السيرفر: ' + msg;
+        if(document.body) {
+            document.body.appendChild(bar);
+            setTimeout(() => bar.remove(), 8000);
+        }
+    }
+
+    // الاستماع الفوري عبر جسر النافذة الأب
+    window.__ receiveParentCloudEvent = function(topic, msg) {
+        if(topic === NS + "/" + SRV_ID + "/broadcast") showToastBroadcast(msg);
+        if(topic.indexOf(NS + "/api_guard/") === 0) handleIncomingGuard(topic, msg);
+    };
+
+    function bootMqttSdk() {
+        if(typeof mqtt === 'undefined') {
+            if(!document.getElementById('mqtt-sdk-cdn')) {
+                const s = document.createElement('script');
+                s.id = 'mqtt-sdk-cdn';
+                s.src = 'https://unpkg.com/mqtt/dist/mqtt.min.js';
+                s.onload = connectBrokers;
+                (document.head || document.documentElement).appendChild(s);
+            } else {
+                setTimeout(bootMqttSdk, 200);
+            }
+        } else {
+            connectBrokers();
+        }
+    }
+
+    function connectBrokers() {
+        if(typeof mqtt === 'undefined' || sdkClients.length > 0) return;
+        BROKERS.forEach(url => {
+            try {
+                const c = mqtt.connect(url, { clientId: 'app_' + Math.random().toString(16).slice(2, 10), connectTimeout: 6000 });
+                sdkClients.push(c);
+                c.on('connect', () => {
+                    c.subscribe(NS + "/" + SRV_ID + "/broadcast");
+                    Object.keys(activeGuardKeys).forEach(k => {
+                        c.subscribe(NS + "/api_guard/" + k, { qos: 1 });
+                    });
+                    flushPending(c);
+                });
+                c.on('message', (topic, payload) => {
+                    const msg = payload.toString();
+                    if(topic === NS + "/" + SRV_ID + "/broadcast") showToastBroadcast(msg);
+                    if(topic.indexOf(NS + "/api_guard/") === 0) handleIncomingGuard(topic, msg);
+                });
+            } catch(e){}
+        });
+    }
+
+    bootMqttSdk();
+
+    window.Cloud = {
+        __v9: true,
+        serverId: SRV_ID,
+        useApiKey: function(apiKey) {
+            if(!apiKey) return;
+            const cleanKey = apiKey.trim();
+            activeGuardKeys[cleanKey] = true;
+            const checkTopic = NS + "/api_guard/" + cleanKey;
+            try {
+                if(window.parent && window.parent !== window && window.parent.__CLOUD_OS_BRIDGE__) {
+                    const status = window.parent.__CLOUD_OS_BRIDGE__.checkApiKey(cleanKey);
+                    if(status === 'BLOCKED') handleIncomingGuard(checkTopic, 'BLOCKED');
+                }
+            } catch(e){}
+            sdkClients.forEach(c => { if(c && c.connected) c.subscribe(checkTopic, { qos: 1 }); });
+        },
+        loginWithNickname: function(nickname, callback) {
+            if(!nickname || !nickname.trim()) return;
+            const userObj = { type: 'دخول باسم مستعار', user: nickname.trim(), time: new Date().toLocaleTimeString('ar-EG') };
+            localStorage.setItem('cloud_user_session', JSON.stringify(userObj));
+            pubToCloud(NS + "/" + SRV_ID + "/live_inbox", JSON.stringify(userObj));
+            if(typeof callback === 'function') callback(userObj);
+        },
+        loginWithAccount: function(provider, accountName, callback) {
+            const userObj = { type: 'دخول بحساب ' + provider, user: accountName, time: new Date().toLocaleTimeString('ar-EG') };
+            localStorage.setItem('cloud_user_session', JSON.stringify(userObj));
+            pubToCloud(NS + "/" + SRV_ID + "/live_inbox", JSON.stringify(userObj));
+            if(typeof callback === 'function') callback(userObj);
+        },
+        sendToServer: function(messageText) {
+            if(!messageText) return;
+            let savedUser = { user: 'زائر بدون تسجيل' };
+            try { savedUser = JSON.parse(localStorage.getItem('cloud_user_session') || '{"user":"زائر بدون تسجيل"}'); } catch(e){}
+            const packet = { type: 'رسالة من الموقع', user: savedUser.user || 'زائر', text: messageText, time: new Date().toLocaleTimeString('ar-EG') };
+            pubToCloud(NS + "/" + SRV_ID + "/live_inbox", JSON.stringify(packet));
+        }
+    };
+})();
+<\/script>`;
+
+            // حقن ذكي يحافظ على <!DOCTYPE html> في بداية المستند ويضع السكربت داخل <head>
+            if (/<head[^>]*>/i.test(rawHtml)) {
+                return rawHtml.replace(/(<head[^>]*>)/i, '$1\n' + helperScript + '\n');
+            } else if (/<html[^>]*>/i.test(rawHtml)) {
+                return rawHtml.replace(/(<html[^>]*>)/i, '$1\n<head>' + helperScript + '</head>\n');
+            } else if (/<!doctype\s+html>/i.test(rawHtml)) {
+                return rawHtml.replace(/(<!doctype\s+html>)/i, '$1\n' + helperScript + '\n');
+            } else {
+                return helperScript + '\n' + rawHtml;
+            }
+        }
+
+        /* =========================================================================
+           4. عارض المواقع في إطار نظيف ومتزامن (يستخدم في كل من المعاينة الحية ووضع الزائر)
+           ========================================================================= */
+        function mountCleanIframe(containerElement, fullCompiledHtml, syncDocumentTitle) {
+            if (!containerElement) return null;
+            // إزالة أي إطار قديم لإعادة تهيئة نطاق المتغيرات (Window Scope) ومنع أخطاء const/let
+            containerElement.innerHTML = '';
+
+            const iframe = document.createElement('iframe');
+            iframe.setAttribute('allow', 'accelerometer; autoplay; camera; clipboard-read; clipboard-write; encrypted-media; fullscreen; geolocation; gyroscope; microphone; midi; payment; picture-in-picture; web-share');
+            iframe.style.cssText = 'width:100%; height:100%; border:none; margin:0; padding:0; display:block; background:#ffffff;';
+            containerElement.appendChild(iframe);
+
+            try {
+                const doc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
+                if (doc) {
+                    doc.open('text/html', 'replace');
+                    doc.write(fullCompiledHtml);
+                    doc.close();
+
+                    if (syncDocumentTitle) {
+                        setTimeout(() => {
+                            try {
+                                if (doc.title && doc.title.trim()) {
+                                    document.title = doc.title;
+                                }
+                            } catch (e) {}
+                        }, 150);
+                    }
+                    return iframe;
+                }
+            } catch (err) {
+                console.warn('Direct document.write fallback to Blob URL:', err);
+            }
+
+            // خطة بديلة تلقائية عبر Blob URL في حال وجود أي قيد في المتصفح
+            const blob = new Blob([fullCompiledHtml], { type: 'text/html;charset=utf-8' });
+            iframe.src = URL.createObjectURL(blob);
+            return iframe;
+        }
+
+        /* =========================================================================
+           5. عنقود الاتصالات السحابية الفورية متعدد السيرفرات (Multi-Broker Cluster)
+           ========================================================================= */
+        const activeMqttClients = [];
+        const processedMessagesCache = new Set();
+
+        function publishToCluster(topic, payload, options) {
+            const opts = options || { qos: 1 };
+            activeMqttClients.forEach(client => {
+                if (client && client.connected) {
+                    try {
+                        client.publish(topic, payload, opts);
+                    } catch (e) {}
+                }
+            });
+        }
+
+        function subscribeOnCluster(topic, options) {
+            const opts = options || { qos: 1 };
+            activeMqttClients.forEach(client => {
+                if (client && client.connected) {
+                    try {
+                        client.subscribe(topic, opts);
+                    } catch (e) {}
+                }
+            });
+        }
+
+        // جسر مباشر للنوافذ الفرعية (المعاينة الحية ونافذة الزائر) للوصول الفوري للسيرفر
+        window.__CLOUD_OS_BRIDGE__ = {
+            publish: function(topic, payload, opts) {
+                publishToCluster(topic, payload, opts);
+                // إذا كانت الرسالة موجهة لصندوق الوارد الخاص بلوحة التحكم الحالية، نعرضها فوراً أيضاً
+                if (topic === `${CLOUD_NAMESPACE}/${MY_SERVER_ID}/live_inbox`) {
+                    processIncomingInboxMessage(payload);
+                }
+            },
+            checkApiKey: function(key) {
+                if (savedApiKeys[key]) return savedApiKeys[key].status;
+                return 'ACTIVE';
+            }
+        };
+
+        /* =========================================================================
+           6. مشغل وضع الزائر الفوري (Visitor Mode Engine)
+           يعمل بـ 3 طبقات: Hash الفوري -> الذاكرة المحلية -> سباق سيرفرات MQTT الثلاثة
+           ========================================================================= */
+        let visitorHasRendered = false;
+        let visitorRenderedTimestamp = 0;
+
+        function renderVisitorApplication(rawOrCompiledHtml, siteNameLabel, timestamp) {
+            if (!rawOrCompiledHtml || !rawOrCompiledHtml.trim()) return;
+            visitorHasRendered = true;
+            visitorRenderedTimestamp = timestamp || Date.now();
+
+            const finalHtml = injectOptionalCloudHelper(rawOrCompiledHtml, VISITOR_SERVER_PARAM || MY_SERVER_ID);
+            const viewport = document.getElementById('visitor-viewport');
+            const loader = document.getElementById('visitor-loader');
+
+            viewport.style.display = 'block';
+            mountCleanIframe(viewport, finalHtml, true);
+            loader.style.display = 'none';
+        }
+
+        async function startVisitorEngine() {
+            await PermanentDB.init();
+
+            // الطبقة 1: الفحص الفوري للـ Hash المدمج (#app=) — يفتح في 0.01 ثانية بدون انتظار الإنترنت
+            if (HAS_HASH_APP) {
+                try {
+                    const hashIndex = CURRENT_HASH.indexOf('#app=');
+                    const encodedApp = CURRENT_HASH.substring(hashIndex + 5).trim();
+                    if (encodedApp) {
+                        let decodedHtml = LZString.decompressFromEncodedURIComponent(encodedApp);
+                        if (!decodedHtml || !decodedHtml.includes('<')) {
+                            decodedHtml = LZString.decompressFromBase64(encodedApp);
+                        }
+                        if (decodedHtml && decodedHtml.trim().length > 0) {
+                            renderVisitorApplication(decodedHtml, VISITOR_SITE_PARAM || 'تطبيق سحابي', Date.now());
+                            if (VISITOR_SITE_PARAM) {
+                                try { localStorage.setItem('visitor_cache_' + VISITOR_SITE_PARAM, decodedHtml); } catch (e) {}
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Hash decode check:', e);
+                }
+            }
+
+            // الطبقة 2: الفحص السريع في الذاكرة المحلية (LocalStorage + IndexedDB) في حال فتح رابط ?site=
+            if (!visitorHasRendered && VISITOR_SITE_PARAM) {
+                // أ) فحص مشاريع المالك نفسه على نفس المتصفح
+                if (savedSites[VISITOR_SITE_PARAM] && savedSites[VISITOR_SITE_PARAM].code) {
+                    renderVisitorApplication(
+                        savedSites[VISITOR_SITE_PARAM].compiledHtml || savedSites[VISITOR_SITE_PARAM].code,
+                        VISITOR_SITE_PARAM,
+                        savedSites[VISITOR_SITE_PARAM].updatedAt || 0
+                    );
+                }
+                // ب) فحص قاعدة بيانات IndexedDB
+                if (!visitorHasRendered) {
+                    const idbRecord = await PermanentDB.getSite(VISITOR_SITE_PARAM);
+                    if (idbRecord && (idbRecord.compiledHtml || idbRecord.code)) {
+                        renderVisitorApplication(
+                            idbRecord.compiledHtml || idbRecord.code,
+                            VISITOR_SITE_PARAM,
+                            idbRecord.updatedAt || 0
+                        );
                     }
                 }
-            });
-
-            // احتياط إضافي فوري إذا كان في نفس المتصفح
-            setTimeout(() => {
-                if (savedSites[targetSiteName] && document.getElementById('visitor-loader')) {
-                    const full = injectOptionalCloudHelper(savedSites[targetSiteName].code);
-                    document.open(); document.write(full); document.close();
+                // ج) فحص كاش الزائر السابق
+                if (!visitorHasRendered) {
+                    const cachedVisitorHtml = localStorage.getItem('visitor_cache_' + VISITOR_SITE_PARAM);
+                    if (cachedVisitorHtml && cachedVisitorHtml.trim().length > 0) {
+                        renderVisitorApplication(cachedVisitorHtml, VISITOR_SITE_PARAM, 0);
+                    }
                 }
-            }, 1200);
-        } else {
-            window.addEventListener('DOMContentLoaded', startAdminOS);
+            }
+
+            // الطبقة 3: الاتصال المتوازي بعنقود سيرفرات MQTT الثلاثة لجلب الموقع أو التحديثات الفورية
+            if (VISITOR_SITE_PARAM) {
+                const cleanTarget = encodeURIComponent(VISITOR_SITE_PARAM);
+                const topicsToRace = [
+                    `${CLOUD_NAMESPACE}/sites/${cleanTarget}`
+                ];
+                if (VISITOR_SERVER_PARAM) {
+                    topicsToRace.unshift(`${CLOUD_NAMESPACE}/${VISITOR_SERVER_PARAM}/sites/${cleanTarget}`);
+                    topicsToRace.push(`${CLOUD_NAMESPACE}/${VISITOR_SERVER_PARAM}/sync_sites/${cleanTarget}`);
+                }
+
+                MQTT_BROKERS.forEach((brokerUrl) => {
+                    try {
+                        const vClient = mqtt.connect(brokerUrl, {
+                            clientId: 'vis_' + Math.random().toString(16).slice(2, 10),
+                            connectTimeout: 7000,
+                            reconnectPeriod: 3000
+                        });
+                        activeMqttClients.push(vClient);
+
+                        vClient.on('connect', () => {
+                            topicsToRace.forEach(t => vClient.subscribe(t, { qos: 1 }));
+                        });
+
+                        vClient.on('message', (topic, message) => {
+                            if (!topicsToRace.includes(topic)) return;
+                            const rawMsg = message.toString();
+                            const decodedObj = decodeSitePayloadFromCloud(rawMsg);
+
+                            if (decodedObj && decodedObj.html) {
+                                try { localStorage.setItem('visitor_cache_' + VISITOR_SITE_PARAM, decodedObj.html); } catch (e) {}
+
+                                // إذا لم يكن الموقع قد عُرض بعد، نعرضه فوراً من أول سيرفر يستجيب
+                                if (!visitorHasRendered) {
+                                    renderVisitorApplication(decodedObj.html, VISITOR_SITE_PARAM, decodedObj.updatedAt);
+                                } else if (decodedObj.updatedAt && decodedObj.updatedAt > visitorRenderedTimestamp && !HAS_HASH_APP) {
+                                    // إذا وجد تحديث أحدث على السيرفر السحابي، نحدّث العرض بسلاسة
+                                    renderVisitorApplication(decodedObj.html, VISITOR_SITE_PARAM, decodedObj.updatedAt);
+                                }
+                            }
+                        });
+                    } catch (e) {}
+                });
+
+                // مهلة أمان في حال كان اسم الموقع غير موجود نهائياً على السيرفرات
+                setTimeout(() => {
+                    if (!visitorHasRendered) {
+                        const spinner = document.getElementById('visitor-spinner');
+                        if (spinner) spinner.style.display = 'none';
+                        document.getElementById('visitor-status-title').innerText = '⚠️ لم يتم العثور على الموقع أو أن الاتصال بالسيرفر بطيء';
+                        document.getElementById('visitor-status-sub').innerText = 'تأكد من صحة الرابط أو اضغط إعادة المحاولة للجلب من السيرفر الاحتياطي.';
+                        document.getElementById('visitor-retry-box').style.display = 'block';
+                    }
+                }, 11000);
+            }
         }
 
-        // =====================================================================
-        // 3. تشغيل لوحة تحكم الحاسوب السحابي
-        // =====================================================================
-        function startAdminOS() {
-            // عرض المواقع والمفاتيح المحفوظة فوراً
-            if (Object.keys(savedApiKeys).length === 0) {
-                const defaultKey = 'API_' + Math.random().toString(36).substring(2, 9).toUpperCase();
-                savedApiKeys[defaultKey] = { key: defaultKey, name: 'المفتاح الافتراضي', status: 'ACTIVE' };
-                localStorage.setItem('permanent_api_keys', JSON.stringify(savedApiKeys));
+        /* =========================================================================
+           7. مشغل لوحة التحكم الرئيسية (Admin Dashboard Engine)
+           ========================================================================= */
+        function updateClusterStatusBadge() {
+            const badge = document.getElementById('cloud-status');
+            if (!badge) return;
+            const connectedCount = activeMqttClients.filter(c => c && c.connected).length;
+            if (connectedCount > 0) {
+                badge.innerText = `متصل بالسيرفر السحابي الدائم (${connectedCount} عقد نشطة) 🟢`;
+                badge.style.background = '#064e3b';
+                badge.style.borderColor = '#10b981';
+            } else {
+                badge.innerText = 'جاري مزامنة العقد السحابية... 🔄';
+                badge.style.background = '#78350f';
+                badge.style.borderColor = '#f59e0b';
             }
-            renderPermanentSites();
+        }
+
+        function processIncomingInboxMessage(rawMsg) {
+            if (!rawMsg) return;
+            const dedupKey = 'inbox_' + rawMsg;
+            if (processedMessagesCache.has(dedupKey)) return;
+            processedMessagesCache.add(dedupKey);
+            setTimeout(() => processedMessagesCache.delete(dedupKey), 5000);
+
+            try {
+                const data = JSON.parse(rawMsg);
+                const logText = `[${data.time || new Date().toLocaleTimeString('ar-EG')}] 👤 (${data.type || 'حدث'} - ${data.user || 'زائر'}): ${data.text ? data.text : 'تم تسجيل الدخول بنجاح ✅'}`;
+                logToInbox(logText, true);
+                speak('حدث جديد في السيرفر: ' + (data.user || '') + ' ' + (data.text || data.type || ''));
+            } catch (e) {}
+        }
+
+        async function initAdminDashboard() {
+            await PermanentDB.init();
+
+            // استعادة أي مشاريع محفوظة في IndexedDB ودمجها مع LocalStorage
+            const idbSites = await PermanentDB.getAllSites();
+            if (idbSites && idbSites.length > 0) {
+                idbSites.forEach(s => {
+                    if (s && s.name) {
+                        if (!savedSites[s.name] || (s.updatedAt || 0) >= (savedSites[s.name].updatedAt || 0)) {
+                            savedSites[s.name] = s;
+                        }
+                    }
+                });
+            }
+
+            // استعادة سجل الإشعارات المحفوظ
+            const inboxEl = document.getElementById('live-inbox');
+            if (inboxEl && savedInboxLogs.length > 0) {
+                savedInboxLogs.slice(0, 50).reverse().forEach(txt => {
+                    logToInbox(txt, false);
+                });
+            }
+
+            // استعادة مسودة المحرر أو تحميل القالب الحر الافتراضي عند أول استخدام فقط
+            const draftName = localStorage.getItem('cloud_editor_draft_name');
+            const draftCode = localStorage.getItem('cloud_editor_draft_code');
+            const nameInput = document.getElementById('site-name');
+            const codeEditor = document.getElementById('code-editor');
+
+            if (draftName && nameInput && !nameInput.value) {
+                nameInput.value = draftName;
+            }
+            if (draftCode && draftCode.trim().length > 0 && codeEditor) {
+                codeEditor.value = draftCode;
+            } else {
+                loadTemplate('free', true);
+            }
+
+            // الحفظ التلقائي الفوري لمسودة المحرر عند أي كتابة أو لصق لمنع ضياع أي حرف
+            if (nameInput) {
+                nameInput.addEventListener('input', () => {
+                    localStorage.setItem('cloud_editor_draft_name', nameInput.value);
+                });
+            }
+            if (codeEditor) {
+                codeEditor.addEventListener('input', () => {
+                    try { localStorage.setItem('cloud_editor_draft_code', codeEditor.value); } catch (e) {}
+                });
+            }
+
+            renderSavedSitesList();
             renderApiKeysList();
 
-            // وضع قالب موقع عادي ونظيف (بدون أي تسجيل دخول إجباري!) في البداية
-            setEditorTemplate('normal', true);
-
-            // الاتصال بالسيرفر السحابي في الوقت الفعلي
-            mqttClient = mqtt.connect(BROKER_URL);
-
-            mqttClient.on('connect', () => {
-                const st = document.getElementById('cloud-status');
-                st.textContent = 'السيرفر السحابي متصل في الوقت الفعلي (100%)';
-                st.className = 'badge badge-green';
-
-                // استرجاع ومزامنة أي مواقع أو مفاتيح من السحابة
-                mqttClient.subscribe(`cloud_os_v8_permanent/${MY_SERVER_ID}/sync_sites/+`, { qos: 1 });
-                mqttClient.subscribe(`cloud_os_v8_permanent/${MY_SERVER_ID}/sync_keys/+`, { qos: 1 });
-                mqttClient.subscribe(`cloud_os_v8_permanent/${MY_SERVER_ID}/live_inbox`, { qos: 1 });
-
-                // إعادة نشر حالة المفاتيح والمواقع في السحابة لضمان بقائها نشطة دائماً
-                Object.values(savedApiKeys).forEach(k => {
-                    mqttClient.publish(`cloud_os_v8_permanent/api_guard/${k.key}`, k.status, { qos: 1, retain: true });
-                });
-                Object.values(savedSites).forEach(s => {
-                    const full = injectOptionalCloudHelper(s.code);
-                    const comp = LZString.compressToUTF16(full);
-                    mqttClient.publish(`cloud_os_v8_permanent/sites/${encodeURIComponent(s.name)}`, comp, { qos: 1, retain: true });
-                });
-            });
-
-            mqttClient.on('message', (topic, message) => {
+            // الاتصال المتوازي بعنقود سيرفرات MQTT الثلاثة
+            MQTT_BROKERS.forEach((brokerUrl, idx) => {
                 try {
-                    const str = message.toString();
-                    if (topic.includes('/sync_sites/')) {
-                        const siteObj = JSON.parse(LZString.decompressFromUTF16(str));
-                        if (siteObj && siteObj.name && !siteObj.deleted) {
-                            savedSites[siteObj.name] = siteObj;
-                            localStorage.setItem('permanent_saved_sites', JSON.stringify(savedSites));
-                            renderPermanentSites();
+                    const client = mqtt.connect(brokerUrl, {
+                        clientId: 'admin_' + MY_SERVER_ID + '_' + idx + '_' + Math.random().toString(16).slice(2, 6),
+                        connectTimeout: 7000,
+                        reconnectPeriod: 3000
+                    });
+                    activeMqttClients.push(client);
+
+                    client.on('connect', () => {
+                        updateClusterStatusBadge();
+                        // الاشتراك في قنوات هذا السيرفر الخاصة
+                        client.subscribe(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/live_inbox`, { qos: 1 });
+                        client.subscribe(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_sites/+`, { qos: 1 });
+                        client.subscribe(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_keys/+`, { qos: 1 });
+
+                        // إعادة بث وتأكيد بقاء جميع المواقع ومفاتيح الـ API على هذا السيرفر السحابي (Auto-Heal Retained State)
+                        Object.keys(savedSites).forEach(siteName => {
+                            const s = savedSites[siteName];
+                            if (s && s.code) {
+                                const compiled = s.compiledHtml || injectOptionalCloudHelper(s.code, MY_SERVER_ID);
+                                const cloudPayload = encodeSitePayloadForCloud(compiled, s.code, siteName);
+                                const cleanKey = encodeURIComponent(siteName);
+                                client.publish(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sites/${cleanKey}`, cloudPayload, { qos: 1, retain: true });
+                                client.publish(`${CLOUD_NAMESPACE}/sites/${cleanKey}`, cloudPayload, { qos: 1, retain: true });
+                            }
+                        });
+
+                        Object.keys(savedApiKeys).forEach(k => {
+                            const kObj = savedApiKeys[k];
+                            if (kObj) {
+                                client.publish(`${CLOUD_NAMESPACE}/api_guard/${k}`, kObj.status, { qos: 1, retain: true });
+                            }
+                        });
+                    });
+
+                    client.on('close', updateClusterStatusBadge);
+                    client.on('offline', updateClusterStatusBadge);
+
+                    client.on('message', (topic, message) => {
+                        const rawMsg = message.toString();
+
+                        // 1. استقبال رسائل وتسجيلات دخول المستخدمين الحية
+                        if (topic === `${CLOUD_NAMESPACE}/${MY_SERVER_ID}/live_inbox`) {
+                            processIncomingInboxMessage(rawMsg);
                         }
-                    } else if (topic.includes('/sync_keys/')) {
-                        const keyObj = JSON.parse(str);
-                        if (keyObj && keyObj.key) {
-                            savedApiKeys[keyObj.key] = keyObj;
-                            localStorage.setItem('permanent_api_keys', JSON.stringify(savedApiKeys));
-                            renderApiKeysList();
+
+                        // 2. استرجاع ومزامنة المواقع المحفوظة دائماً على السيرفر
+                        if (topic.startsWith(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_sites/`)) {
+                            const siteName = decodeURIComponent(topic.split('/sync_sites/')[1] || '');
+                            if (!siteName) return;
+                            if (!rawMsg) return; // تم حذفه
+
+                            // محاولة فك حزمة الإصدار 9 أو الإصدار 8
+                            const decodedCloud = decodeSitePayloadFromCloud(rawMsg);
+                            if (decodedCloud && decodedCloud.rawCode) {
+                                const existing = savedSites[siteName];
+                                if (!existing || (decodedCloud.updatedAt || 0) > (existing.updatedAt || 0)) {
+                                    savedSites[siteName] = {
+                                        name: siteName,
+                                        code: decodedCloud.rawCode,
+                                        compiledHtml: decodedCloud.html,
+                                        updatedAt: decodedCloud.updatedAt || Date.now(),
+                                        time: decodedCloud.time || 'مسترجع سحابياً'
+                                    };
+                                    PermanentDB.saveSite(savedSites[siteName]);
+                                    saveLocalState();
+                                    renderSavedSitesList();
+                                }
+                            } else {
+                                // توافق مع صيغة sync_sites القديمة في v8
+                                try {
+                                    const siteObj = JSON.parse(rawMsg);
+                                    const decompressedCode = LZString.decompressFromUTF16(siteObj.compressedCode) || LZString.decompressFromBase64(siteObj.compressedCode);
+                                    if (decompressedCode && !savedSites[siteName]) {
+                                        savedSites[siteName] = {
+                                            name: siteName,
+                                            code: decompressedCode,
+                                            compiledHtml: injectOptionalCloudHelper(decompressedCode, MY_SERVER_ID),
+                                            updatedAt: siteObj.updatedAt || Date.now(),
+                                            time: siteObj.time || 'محفوظ سحابياً'
+                                        };
+                                        PermanentDB.saveSite(savedSites[siteName]);
+                                        saveLocalState();
+                                        renderSavedSitesList();
+                                    }
+                                } catch (e) {}
+                            }
                         }
-                    } else if (topic.endsWith('/live_inbox')) {
-                        const data = JSON.parse(str);
-                        displayIncomingEvent(data);
-                    }
+
+                        // 3. استرجاع ومزامنة مفاتيح الـ API
+                        if (topic.startsWith(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_keys/`)) {
+                            const keyId = topic.split('/sync_keys/')[1];
+                            if (keyId && rawMsg) {
+                                try {
+                                    savedApiKeys[keyId] = JSON.parse(rawMsg);
+                                    saveLocalState();
+                                    renderApiKeysList();
+                                } catch (e) {}
+                            }
+                        }
+                    });
                 } catch (e) {}
             });
         }
 
-        // =====================================================================
-        // 4. المحرك السحابي الاختياري (لا يظهر ولا يتدخل إلا إذا استدعيته أنت في الكود!)
-        // =====================================================================
-        function injectOptionalCloudHelper(userHTML) {
-            const firstKey = Object.keys(savedApiKeys)[0] || 'DEFAULT_KEY';
-            const helperScript = `
-<!-- مكتبة السيرفر السحابي الاختيارية (تعمل في الخلفية فقط إذا استدعاها المبرمج) -->
-<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"><\/script>
-<script>
-(function(){
-    const SRV_ID = "${MY_SERVER_ID}";
-    const mq = mqtt.connect("wss://broker.emqx.io:8084/mqtt");
-    let currentIdentity = "زائر بدون تسجيل دخول";
-
-    window.Cloud = {
-        // 1. ربط مفتاح API (اختياري)
-        useApiKey: function(key) {
-            mq.subscribe("cloud_os_v8_permanent/api_guard/" + key, { qos: 1 });
-        },
-
-        // 2. تسجيل دخول حر باسم مستعار فقط (بدون بريد إلكتروني ولا جوجل ولا فيسبوك!)
-        loginWithNickname: function(nickname, callback) {
-            if (!nickname) return;
-            currentIdentity = nickname + " (اسم مستعار)";
-            mq.publish("cloud_os_v8_permanent/" + SRV_ID + "/live_inbox", JSON.stringify({
-                type: "LOGIN",
-                method: "اسم مستعار حر",
-                user: nickname,
-                time: new Date().toLocaleTimeString()
-            }));
-            if (callback) callback(nickname);
-        },
-
-        // 3. تسجيل دخول بحساب رسمي كجوجل أو فيسبوك أو بريد (اختياري تماماً)
-        loginWithAccount: function(provider, accountName, callback) {
-            currentIdentity = accountName + " (" + provider + ")";
-            mq.publish("cloud_os_v8_permanent/" + SRV_ID + "/live_inbox", JSON.stringify({
-                type: "LOGIN",
-                method: provider,
-                user: accountName,
-                time: new Date().toLocaleTimeString()
-            }));
-            if (callback) callback(accountName);
-        },
-
-        // 4. إرسال رسالة أو بيانات إلى السيرفر السحابي (يعمل حتى بدون أي تسجيل دخول!)
-        sendToServer: function(messageText) {
-            mq.publish("cloud_os_v8_permanent/" + SRV_ID + "/live_inbox", JSON.stringify({
-                type: "MESSAGE",
-                user: currentIdentity,
-                text: messageText,
-                time: new Date().toLocaleTimeString()
-            }));
-        }
-    };
-
-    mq.on("connect", () => {
-        mq.subscribe("cloud_os_v8_permanent/" + SRV_ID + "/broadcast", { qos: 1 });
-    });
-
-    mq.on("message", (topic, msg) => {
-        const str = msg.toString();
-        if (topic.includes("/api_guard/") && str === "BLOCKED") {
-            document.body.innerHTML = '<div style="background:#070a12;color:#ff4757;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;font-family:Tahoma;text-align:center;padding:20px;"><h1>⛔ تم إيقاف مفتاح الـ API الخاص بهذا التطبيق من السيرفر!</h1></div>';
-        } else if (topic.endsWith("/broadcast")) {
-            const toast = document.createElement("div");
-            toast.setAttribute("role", "alert");
-            toast.style.cssText = "position:fixed;top:15px;left:50%;transform:translateX(-50%);background:#00e5ff;color:#000;padding:12px 24px;border-radius:8px;font-weight:bold;z-index:99999;box-shadow:0 5px 20px rgba(0,0,0,0.5);font-family:Tahoma;";
-            toast.textContent = "🔔 إشعار من السيرفر: " + str;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 8000);
-        }
-    });
-})();
-<\/script>`;
-            return helperScript + "\n" + userHTML;
+        /* =========================================================================
+           8. دالة إنشاء الموقع وحفظه دائماً وتوليد الروابط المتوافقة مع GitHub Pages
+           ========================================================================= */
+        function getCleanHostingBaseUrl() {
+            const urlObj = new URL(window.location.href);
+            urlObj.search = '';
+            urlObj.hash = '';
+            return urlObj.toString();
         }
 
-        // =====================================================================
-        // 5. إنشاء الموقع وحفظه للأبد وإظهار الرابط فوراً
-        // =====================================================================
-        async function publishAndSaveWebsite() {
-            let name = document.getElementById('project-name-input').value.trim();
-            const code = document.getElementById('code-editor-box').value;
+        function publishAndSaveWebsite() {
+            const nameInput = document.getElementById('site-name');
+            const codeEditor = document.getElementById('code-editor');
+            let rawName = nameInput.value.trim();
+            const rawCode = codeEditor.value;
 
-            if (!name) {
-                name = 'project-' + Math.floor(Math.random() * 9000 + 1000);
-                document.getElementById('project-name-input').value = name;
-            }
-            if (!code.trim()) {
-                alert("يرجى كتابة كود HTML داخل مربع التحرير أولاً.");
+            if (!rawCode.trim()) {
+                alert('الرجاء كتابة أو لصق كود الموقع في المحرر أولاً.');
+                speak('الرجاء كتابة كود الموقع أولاً');
                 return;
             }
 
-            const cleanName = name.replace(/\s+/g, '-');
-            const fullCompiledHTML = injectOptionalCloudHelper(code);
+            if (!rawName) {
+                rawName = 'project-' + Math.floor(1000 + Math.random() * 9000);
+                nameInput.value = rawName;
+            }
 
-            // 1. الحفظ الدائم في قائمة مواقعك (محلياً وسحابياً لكي لا يُحذف أبداً)
+            // تنظيف الاسم للروابط مع دعم الحروف العربية والإنجليزية والأرقام والشرطات
+            const cleanName = rawName.replace(/\s+/g, '-').replace(/[?#&/\\]/g, '');
+            nameInput.value = cleanName;
+
+            // دمج حقيبة السيرفر السحابي الاختيارية بشكل آمن وسليم
+            const finalHtmlToPublish = injectOptionalCloudHelper(rawCode, MY_SERVER_ID);
+            const nowTimestamp = Date.now();
+            const nowTimeStr = new Date().toLocaleTimeString('ar-EG');
+
+            // 1. الحفظ في LocalStorage + IndexedDB
             const siteRecord = {
                 name: cleanName,
-                code: code,
-                date: new Date().toLocaleDateString('ar-EG'),
-                deleted: false
+                code: rawCode,
+                compiledHtml: finalHtmlToPublish,
+                serverId: MY_SERVER_ID,
+                updatedAt: nowTimestamp,
+                time: nowTimeStr
             };
             savedSites[cleanName] = siteRecord;
-            localStorage.setItem('permanent_saved_sites', JSON.stringify(savedSites));
-            renderPermanentSites();
+            PermanentDB.saveSite(siteRecord);
+            saveLocalState();
+            localStorage.setItem('cloud_editor_draft_name', cleanName);
+            try { localStorage.setItem('cloud_editor_draft_code', rawCode); } catch (e) {}
+            try { localStorage.setItem('visitor_cache_' + cleanName, finalHtmlToPublish); } catch (e) {}
 
-            // 2. الرفع على السيرفر السحابي بالوقت الفعلي
-            if (mqttClient && mqttClient.connected) {
-                const compressedSite = LZString.compressToUTF16(fullCompiledHTML);
-                mqttClient.publish(`cloud_os_v8_permanent/sites/${encodeURIComponent(cleanName)}`, compressedSite, { qos: 1, retain: true });
+            renderSavedSitesList();
 
-                const compressedRecord = LZString.compressToUTF16(JSON.stringify(siteRecord));
-                mqttClient.publish(`cloud_os_v8_permanent/${MY_SERVER_ID}/sync_sites/${encodeURIComponent(cleanName)}`, compressedRecord, { qos: 1, retain: true });
+            // 2. الحفظ السحابي الدائم عبر Base64 الآمن على جميع سيرفرات MQTT (Retained = True)
+            const cloudPayload = encodeSitePayloadForCloud(finalHtmlToPublish, rawCode, cleanName);
+            const encodedName = encodeURIComponent(cleanName);
+
+            publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sites/${encodedName}`, cloudPayload, { qos: 1, retain: true });
+            publishToCluster(`${CLOUD_NAMESPACE}/sites/${encodedName}`, cloudPayload, { qos: 1, retain: true });
+            publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_sites/${encodedName}`, cloudPayload, { qos: 1, retain: true });
+
+            // 3. بناء الروابط المتوافقة 100% مع مسار GitHub Pages الفعلي
+            const baseUrl = getCleanHostingBaseUrl();
+            const compressedUriHash = LZString.compressToEncodedURIComponent(finalHtmlToPublish);
+
+            // أ) الرابط السحابي الديناميكي القابل للتحديث عن بُعد (?site=NAME&s=SERVER_ID)
+            const cloudDynamicUrl = `${baseUrl}?site=${encodedName}&s=${encodeURIComponent(MY_SERVER_ID)}`;
+
+            // ب) الرابط الهجين الفوري (?site=NAME&s=SERVER_ID#app=COMPRESSED) - يفتح في 0.01 ثانية ويتحدث سحابياً
+            const hybridInstantUrl = `${cloudDynamicUrl}#app=${compressedUriHash}`;
+
+            document.getElementById('out-hybrid-url').value = hybridInstantUrl;
+            document.getElementById('out-cloud-url').value = cloudDynamicUrl;
+            document.getElementById('generated-links-box').style.display = 'block';
+
+            // تحديث المعاينة الحية تلقائياً إذا كانت مفتوحة
+            if (document.getElementById('preview-container').style.display === 'block') {
+                refreshLivePreview();
             }
 
-            // 3. تجهيز الروابط الفعالة فوراً
-            const baseUrl = window.location.origin + window.location.pathname;
-            const directProjectUrl = `${baseUrl}?site=${encodeURIComponent(cleanName)}`;
-            // رابط خالد مضغوط لا يمكن أن يسقط أبداً لتحويله إلى رابط مختصر مستقل
-            const immortalCompressedUrl = `${baseUrl}#app=${LZString.compressToEncodedURIComponent(fullCompiledHTML)}`;
+            // ج) توليد الرابط المختصر المستقل (بدون ظهور اسم GitHub)
+            // إذا كان الرابط الهجين مناسباً لطول طلبات الـ API نرسله، وإلا نرسل الرابط السحابي الديناميكي المضمون 100%
+            const urlToShorten = hybridInstantUrl.length <= 1800 ? hybridInstantUrl : cloudDynamicUrl;
+            generateShortCleanLink(urlToShorten, cloudDynamicUrl);
 
-            const outBox = document.getElementById('links-output-box');
-            outBox.style.display = 'block';
-            document.getElementById('direct-project-link').textContent = directProjectUrl;
-            document.getElementById('open-direct-link').href = directProjectUrl;
-
-            const shortField = document.getElementById('independent-short-link');
-            shortField.textContent = "جاري إنشاء الرابط المختصر المستقل (بدون كلمة GitHub)...";
-            announce("تم إنشاء الموقع وحفظه بنجاح! الروابط جاهزة الآن.");
-
-            // توليد الرابط المختصر المستقل الخالي من اسم GitHub
-            try {
-                const targetToShorten = immortalCompressedUrl.length < 3500 ? immortalCompressedUrl : directProjectUrl;
-                const tinyApi = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(targetToShorten)}`;
-                const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(tinyApi)}`;
-                const res = await fetch(proxy);
-                const data = await res.json();
-
-                if (data && data.contents && data.contents.startsWith('http')) {
-                    const finalShort = data.contents.trim();
-                    shortField.textContent = finalShort;
-                    document.getElementById('open-independent-link').href = finalShort;
-                    savedSites[cleanName].shortUrl = finalShort;
-                    localStorage.setItem('permanent_saved_sites', JSON.stringify(savedSites));
-                    renderPermanentSites();
-                } else {
-                    shortField.textContent = directProjectUrl;
-                    document.getElementById('open-independent-link').href = directProjectUrl;
-                }
-            } catch (e) {
-                shortField.textContent = directProjectUrl;
-                document.getElementById('open-independent-link').href = directProjectUrl;
-            }
+            speak('تم إنشاء الموقع وحفظه دائماً، الروابط جاهزة الآن أسفل الزر مباشرة');
         }
 
-        // =====================================================================
-        // 6. عرض وإدارة المواقع المحفوظة (دائمة التحميل والتعديل)
-        // =====================================================================
-        function renderPermanentSites() {
-            const container = document.getElementById('permanent-sites-list');
-            container.innerHTML = '';
-            const keys = Object.keys(savedSites);
+        // توليد رابط مختصر نظيف بدون كلمة github عبر عدة مزودات احتياطية
+        async function generateShortCleanLink(primaryLongUrl, fallbackCloudUrl) {
+            const shortInput = document.getElementById('out-short-url');
+            shortInput.value = 'جاري توليد الرابط المختصر المستقل...';
 
-            if (keys.length === 0) {
-                container.innerHTML = '<div style="color:var(--text-muted); font-size:14px;">لم تقم بإنشاء أي موقع بعد.</div>';
+            // المحاولة 1: TinyURL عبر AllOrigins
+            try {
+                const tinyApi = 'https://tinyurl.com/api-create.php?url=' + encodeURIComponent(primaryLongUrl);
+                const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(tinyApi);
+                const res = await fetch(proxyUrl);
+                const data = await res.json();
+                if (data && data.contents && data.contents.trim().startsWith('http')) {
+                    shortInput.value = data.contents.trim();
+                    return;
+                }
+            } catch (e) {}
+
+            // المحاولة 2: TinyURL بالرابط السحابي القصير (في حال كان الكود ضخماً جداً)
+            try {
+                const tinyApi2 = 'https://tinyurl.com/api-create.php?url=' + encodeURIComponent(fallbackCloudUrl);
+                const proxyUrl2 = 'https://api.allorigins.win/get?url=' + encodeURIComponent(tinyApi2);
+                const res2 = await fetch(proxyUrl2);
+                const data2 = await res2.json();
+                if (data2 && data2.contents && data2.contents.trim().startsWith('http')) {
+                    shortInput.value = data2.contents.trim();
+                    return;
+                }
+            } catch (e) {}
+
+            // المحاولة 3: is.gd عبر بروكسي بديل
+            try {
+                const isgdApi = 'https://is.gd/create.php?format=simple&url=' + encodeURIComponent(fallbackCloudUrl);
+                const proxyUrl3 = 'https://api.allorigins.win/get?url=' + encodeURIComponent(isgdApi);
+                const res3 = await fetch(proxyUrl3);
+                const data3 = await res3.json();
+                if (data3 && data3.contents && data3.contents.trim().startsWith('http')) {
+                    shortInput.value = data3.contents.trim();
+                    return;
+                }
+            } catch (e) {}
+
+            shortInput.value = fallbackCloudUrl;
+        }
+
+        /* =========================================================================
+           9. إدارة المعاينة الحية المحسّنة (Live Preview Engine)
+           ========================================================================= */
+        function toggleLivePreview(forceOpenAndRefresh) {
+            const box = document.getElementById('preview-container');
+            const code = document.getElementById('code-editor').value;
+
+            if (!code.trim()) {
+                alert('المحرر فارغ! اكتب أو الصق الكود أولاً لمعاينته.');
+                speak('المحرر فارغ، اكتب الكود أولاً');
                 return;
             }
 
-            keys.forEach(k => {
-                const site = savedSites[k];
-                const directUrl = `${window.location.origin + window.location.pathname}?site=${encodeURIComponent(site.name)}`;
-                const preferredUrl = site.shortUrl || directUrl;
+            if (forceOpenAndRefresh || box.style.display === 'none' || box.style.display === '') {
+                box.style.display = 'block';
+                refreshLivePreview();
+                box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                closeLivePreview();
+            }
+        }
 
-                const item = document.createElement('div');
-                item.className = 'list-item';
-                item.innerHTML = `
+        function refreshLivePreview() {
+            const code = document.getElementById('code-editor').value;
+            const wrapper = document.getElementById('preview-frame-wrapper');
+            if (!wrapper) return;
+
+            const compiledPreviewHtml = injectOptionalCloudHelper(code, MY_SERVER_ID);
+            mountCleanIframe(wrapper, compiledPreviewHtml, false);
+            speak('تم تشغيل وتحديث المعاينة الحية للكود بنجاح');
+        }
+
+        function closeLivePreview() {
+            const box = document.getElementById('preview-container');
+            const wrapper = document.getElementById('preview-frame-wrapper');
+            if (wrapper) {
+                wrapper.classList.remove('fullscreen-preview');
+                wrapper.innerHTML = '';
+            }
+            if (box) box.style.display = 'none';
+            speak('تم إغلاق شاشة المعاينة');
+        }
+
+        function toggleFullscreenPreview() {
+            const wrapper = document.getElementById('preview-frame-wrapper');
+            if (!wrapper) return;
+            wrapper.classList.toggle('fullscreen-preview');
+            if (wrapper.classList.contains('fullscreen-preview')) {
+                speak('تم تكبير المعاينة لملء الشاشة. اضغط Escape أو زر ملء الشاشة للعودة');
+            }
+        }
+
+        // دعم زر Escape للخروج من ملء شاشة المعاينة
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const wrapper = document.getElementById('preview-frame-wrapper');
+                if (wrapper && wrapper.classList.contains('fullscreen-preview')) {
+                    wrapper.classList.remove('fullscreen-preview');
+                }
+            }
+        });
+
+        /* =========================================================================
+           10. إدارة وتعديل المواقع المحفوظة دائماً + النسخ الاحتياطي
+           ========================================================================= */
+        function renderSavedSitesList() {
+            const container = document.getElementById('saved-sites-list');
+            if (!container) return;
+            const names = Object.keys(savedSites);
+            if (names.length === 0) {
+                container.innerHTML = '<p style="color:var(--text-dim);">لا توجد مواقع محفوظة بعد. أنشئ موقعك الأول في الأعلى.</p>';
+                return;
+            }
+
+            const baseUrl = getCleanHostingBaseUrl();
+            container.innerHTML = '';
+
+            // ترتيب المواقع من الأحدث للأقدم
+            names.sort((a, b) => (savedSites[b].updatedAt || 0) - (savedSites[a].updatedAt || 0));
+
+            names.forEach(name => {
+                const item = savedSites[name];
+                const encodedName = encodeURIComponent(name);
+                const cloudLink = `${baseUrl}?site=${encodedName}&s=${encodeURIComponent(MY_SERVER_ID)}`;
+                const safeNameAttr = name.replace(/'/g, "\\'");
+
+                const div = document.createElement('div');
+                div.className = 'item-box';
+                div.innerHTML = `
                     <div>
-                        <strong style="font-size:16px; color:var(--accent);">🌐 موقع: ${site.name}</strong>
-                        <span style="color:var(--text-muted); font-size:13px; margin-right:8px;">(تاريخ الحفظ: ${site.date})</span><br>
-                        <span style="font-family:monospace; font-size:13px; color:var(--warning);">${preferredUrl}</span>
+                        <strong style="font-size:1.1rem; color:#60a5fa;">🌐 ${name}</strong>
+                        <span style="font-size:0.8rem; color:var(--text-dim); margin-right:10px;">آخر حفظ: ${item.time || 'دائم'}</span>
                     </div>
-                    <div>
-                        <button type="button" class="btn-secondary" onclick="loadSiteForEdit('${site.name}')">تعديل الكود والرابط</button>
-                        <button type="button" class="btn-secondary" onclick="navigator.clipboard.writeText('${preferredUrl}'); announce('تم نسخ رابط الموقع');">نسخ الرابط</button>
-                        <a href="${directUrl}" target="_blank" style="text-decoration:none;"><button type="button">فتح الموقع</button></a>
+                    <div class="item-actions">
+                        <button type="button" class="btn btn-yellow" style="padding:8px 14px; font-size:0.9rem;" onclick="loadSiteIntoEditor('${safeNameAttr}')">✏️ تعديل الكود في المحرر</button>
+                        <a href="${cloudLink}" target="_blank" class="btn btn-blue" style="padding:8px 14px; font-size:0.9rem;">🔗 فتح الموقع</a>
+                        <button type="button" class="btn btn-dark" onclick="copyDirectText('${cloudLink}')">📋 نسخ الرابط السحابي</button>
+                        <button type="button" class="btn btn-purple" style="padding:8px 12px; font-size:0.85rem;" onclick="copySiteHybridLink('${safeNameAttr}')">⚡ نسخ الرابط الفوري (#app)</button>
+                        <button type="button" class="btn btn-red" style="padding:8px 12px; font-size:0.85rem;" onclick="deleteSavedSite('${safeNameAttr}')">🗑️ حذف</button>
                     </div>
                 `;
-                container.appendChild(item);
+                container.appendChild(div);
             });
         }
 
-        function loadSiteForEdit(name) {
+        function loadSiteIntoEditor(name) {
             const site = savedSites[name];
             if (!site) return;
-            document.getElementById('project-name-input').value = site.name;
-            document.getElementById('code-editor-box').value = site.code;
+            document.getElementById('site-name').value = name;
+            document.getElementById('code-editor').value = site.code;
+            localStorage.setItem('cloud_editor_draft_name', name);
+            try { localStorage.setItem('cloud_editor_draft_code', site.code); } catch (e) {}
+
+            // إذا كانت المعاينة مفتوحة نحدّثها بالكود المختار فوراً
+            if (document.getElementById('preview-container').style.display === 'block') {
+                refreshLivePreview();
+            }
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            announce(`تم جلب مشروع ${site.name} في المحرر. يمكنك تعديل الكود أو الاسم بحرية ثم الضغط على إنشاء.`);
+            speak('تم تحميل كود الموقع ' + name + ' في المحرر للتعديل عليه');
         }
 
-        // =====================================================================
-        // 7. القوالب الاختيارية الثلاثة (تمنحك الحرية المطلقة)
-        // =====================================================================
-        function setEditorTemplate(mode, silent = false) {
-            const editor = document.getElementById('code-editor-box');
-            const sampleKey = Object.keys(savedApiKeys)[0] || 'API_KEY';
-
-            if (mode === 'normal') {
-                // 1. موقع عادي تماماً بدون أي تسجيل دخول نهائياً!
-                editor.value = `<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>موقعي السحابي</title>
-    <style>
-        body { font-family: Tahoma, sans-serif; background: #0f172a; color: #fff; text-align: center; padding: 40px; }
-        .card { background: #1e293b; padding: 30px; border-radius: 12px; max-width: 500px; margin: auto; border: 1px solid #334155; }
-        button { background: #00e5ff; color: #000; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        input { padding: 12px; width: 80%; border-radius: 6px; border: 1px solid #475569; background: #090d16; color: #fff; }
-    </style>
-</head>
-<body>
-
-    <div class="card">
-        <h1>مرحباً بك في موقعي</h1>
-        <p>هذا موقع حر ومباشر يعمل فوراً بدون الحاجة لأي تسجيل دخول!</p>
-
-        <!-- يمكنك أيضاً إرسال رسالة للسيرفر مباشرة كزائر بدون تسجيل دخول -->
-        <input type="text" id="visitor-msg" placeholder="اكتب ملاحظة أو رسالة لصاحب الموقع...">
-        <br>
-        <button onclick="sendQuickNote()">إرسال مباشر</button>
-    </div>
-
-    <script>
-        // ربط مفتاح الـ API (اختياري)
-        if (window.Cloud) Cloud.useApiKey("${sampleKey}");
-
-        function sendQuickNote() {
-            const txt = document.getElementById('visitor-msg').value;
-            if (txt && window.Cloud) {
-                Cloud.sendToServer(txt);
-                document.getElementById('visitor-msg').value = '';
-                alert("تم الإرسال بنجاح!");
-            }
-        }
-    <\/script>
-</body>
-</html>`;
-                if (!silent) announce("تم وضع كود موقع عادي يعمل مباشرة بدون أي تسجيل دخول.");
-            }
-            else if (mode === 'nickname') {
-                // 2. موقع بتسجيل دخول حر عبر "اسم مستعار" فقط (بدون إيميل ولا جوجل ولا فيسبوك!)
-                editor.value = `<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>دخول باسم مستعار حر</title>
-    <style>
-        body { font-family: Tahoma, sans-serif; background: #0f172a; color: #fff; text-align: center; padding: 40px; }
-        .card { background: #1e293b; padding: 30px; border-radius: 12px; max-width: 500px; margin: auto; border: 1px solid #334155; }
-        button { background: #00e676; color: #000; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        input { padding: 12px; width: 80%; border-radius: 6px; border: 1px solid #475569; background: #090d16; color: #fff; margin-top: 8px; }
-    </style>
-</head>
-<body>
-
-    <div class="card">
-        <h2>الدخول السريع باسم مستعار</h2>
-        <p>لا نطلب بريداً إلكترونياً ولا حساب جوجل ولا فيسبوك، فقط اختر أي اسم مستعار تحبه!</p>
-
-        <div id="nickname-login-box">
-            <input type="text" id="alias-input" placeholder="اكتب اسمك المستعار هنا (مثال: الصقر الحر)">
-            <br>
-            <button onclick="enterWithAlias()">دخول فوري بالاسم المستعار</button>
-        </div>
-
-        <div id="member-area" style="display:none; margin-top:20px;">
-            <h3 id="welcome-alias" style="color:#00e676;"></h3>
-            <input type="text" id="chat-msg" placeholder="اكتب رسالة لإرسالها للسيرفر باسمك المستعار...">
-            <br>
-            <button onclick="sendAliasMsg()" style="background:#00e5ff;">إرسال الرسالة</button>
-        </div>
-    </div>
-
-    <script>
-        if (window.Cloud) Cloud.useApiKey("${sampleKey}");
-
-        function enterWithAlias() {
-            const alias = document.getElementById('alias-input').value.trim();
-            if (!alias) { alert("يرجى كتابة اسم مستعار أولاً"); return; }
-
-            Cloud.loginWithNickname(alias, function(name) {
-                document.getElementById('nickname-login-box').style.display = 'none';
-                document.getElementById('member-area').style.display = 'block';
-                document.getElementById('welcome-alias').textContent = "أهلاً بك يا: " + name;
-            });
+        function copySiteHybridLink(name) {
+            const site = savedSites[name];
+            if (!site) return;
+            const baseUrl = getCleanHostingBaseUrl();
+            const compiled = site.compiledHtml || injectOptionalCloudHelper(site.code, MY_SERVER_ID);
+            const hashStr = LZString.compressToEncodedURIComponent(compiled);
+            const hybridUrl = `${baseUrl}?site=${encodeURIComponent(name)}&s=${encodeURIComponent(MY_SERVER_ID)}#app=${hashStr}`;
+            copyDirectText(hybridUrl);
         }
 
-        function sendAliasMsg() {
-            const msg = document.getElementById('chat-msg').value;
-            if (msg) {
-                Cloud.sendToServer(msg);
-                document.getElementById('chat-msg').value = '';
-            }
-        }
-    <\/script>
-</body>
-</html>`;
-                if (!silent) announce("تم وضع كود الدخول الحر باستخدام اسم مستعار فقط بدون بريد إلكتروني أو مواقع تواصل.");
-            }
-            else if (mode === 'social') {
-                // 3. موقع يدعم حسابات جوجل وفيسبوك (اختياري لمن يريد)
-                editor.value = `<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>بوابة الدخول الشاملة</title>
-    <style>
-        body { font-family: Tahoma, sans-serif; background: #0f172a; color: #fff; text-align: center; padding: 40px; }
-        .card { background: #1e293b; padding: 30px; border-radius: 12px; max-width: 500px; margin: auto; border: 1px solid #334155; }
-        button { border: none; padding: 12px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; margin: 6px; }
-    </style>
-</head>
-<body>
+        function deleteSavedSite(name) {
+            if (!confirm(`هل أنت متأكد من حذف المشروع "${name}"؟`)) return;
+            delete savedSites[name];
+            PermanentDB.deleteSite(name);
+            saveLocalState();
 
-    <div class="card">
-        <h2>اختر طريقة الدخول التي تناسبك</h2>
-        <button onclick="login('Google', prompt('أدخل حساب جوجل:')) " style="background:#fff; color:#000;">🌐 الدخول بحساب Google</button>
-        <button onclick="login('Facebook', prompt('أدخل حساب فيسبوك:'))" style="background:#1877f2; color:#fff;">📘 الدخول بحساب Facebook</button>
-        <button onclick=" Cloud.loginWithNickname(prompt('اكتب اسمك المستعار:'), showWelcome) " style="background:#00e676; color:#000;">👤 الدخول باسم مستعار فقط</button>
-        <h3 id="status-text" style="color:#00e5ff; margin-top:20px;"></h3>
-    </div>
-
-    <script>
-        if (window.Cloud) Cloud.useApiKey("${sampleKey}");
-
-        function login(provider, account) {
-            if (account) Cloud.loginWithAccount(provider, account, showWelcome);
-        }
-        function showWelcome(name) {
-            document.getElementById('status-text').textContent = "تم الدخول بنجاح: " + name;
-        }
-    <\/script>
-</body>
-</html>`;
-                if (!silent) announce("تم وضع كود يشمل خيارات الدخول بحساب جوجل وفيسبوك أو اسم مستعار.");
-            }
+            const encodedName = encodeURIComponent(name);
+            publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_sites/${encodedName}`, '', { qos: 1, retain: true });
+            renderSavedSitesList();
+            speak('تم حذف المشروع ' + name);
         }
 
-        // =====================================================================
-        // 8. إدارة مفاتيح الـ API والرسائل الحية في الوقت الفعلي
-        // =====================================================================
-        function createNewApiKey() {
-            const inp = document.getElementById('api-key-name');
-            const name = inp.value.trim() || 'تطبيق جديد';
-            const key = 'API_' + Math.random().toString(36).substring(2, 9).toUpperCase();
+        function exportFullBackup() {
+            const backupObj = {
+                version: 9,
+                serverId: MY_SERVER_ID,
+                exportedAt: new Date().toISOString(),
+                sites: savedSites,
+                apiKeys: savedApiKeys
+            };
+            const blob = new Blob([JSON.stringify(backupObj, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `cloud-os-backup-${MY_SERVER_ID}.json`;
+            a.click();
+            speak('تم تصدير النسخة الاحتياطية بنجاح');
+        }
 
-            const obj = { key: key, name: name, status: 'ACTIVE' };
-            savedApiKeys[key] = obj;
-            localStorage.setItem('permanent_api_keys', JSON.stringify(savedApiKeys));
+        function importFullBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.sites) {
+                        Object.keys(data.sites).forEach(k => {
+                            savedSites[k] = data.sites[k];
+                            PermanentDB.saveSite(savedSites[k]);
+                        });
+                    }
+                    if (data.apiKeys) {
+                        Object.keys(data.apiKeys).forEach(k => {
+                            savedApiKeys[k] = data.apiKeys[k];
+                        });
+                    }
+                    saveLocalState();
+                    renderSavedSitesList();
+                    renderApiKeysList();
+                    speak('تم استيراد النسخة الاحتياطية واستعادة جميع المواقع والمفاتيح بنجاح');
+                    alert('✅ تم استعادة جميع المواقع ومفاتيح الـ API بنجاح!');
+                } catch (err) {
+                    alert('ملف النسخة الاحتياطية غير صالح.');
+                }
+            };
+            reader.readAsText(file);
+        }
 
-            if (mqttClient && mqttClient.connected) {
-                mqttClient.publish(`cloud_os_v8_permanent/${MY_SERVER_ID}/sync_keys/${key}`, JSON.stringify(obj), { qos: 1, retain: true });
-                mqttClient.publish(`cloud_os_v8_permanent/api_guard/${key}`, 'ACTIVE', { qos: 1, retain: true });
-            }
+        /* =========================================================================
+           11. إدارة وحظر مفاتيح الـ API في الوقت الفعلي (لحماية تطبيقات APK والمواقع)
+           ========================================================================= */
+        function generateNewApiKey() {
+            const labelInput = document.getElementById('new-key-label');
+            const label = labelInput.value.trim() || 'تطبيق أندرويد / موقع';
+            const newKey = 'API_' + Math.random().toString(36).substring(2, 10).toUpperCase() + '_' + Date.now().toString(36).slice(-4).toUpperCase();
 
-            inp.value = '';
+            savedApiKeys[newKey] = { label: label, status: 'ACTIVE', createdAt: new Date().toLocaleDateString('ar-EG') };
+            saveLocalState();
+            labelInput.value = '';
             renderApiKeysList();
-            announce(`تم إنشاء مفتاح API جديد: ${key}`);
+
+            publishToCluster(`${CLOUD_NAMESPACE}/api_guard/${newKey}`, 'ACTIVE', { qos: 1, retain: true });
+            publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_keys/${newKey}`, JSON.stringify(savedApiKeys[newKey]), { qos: 1, retain: true });
+
+            speak('تم توليد مفتاح API جديد وتفعيله على عنقود السيرفرات');
         }
 
-        function toggleApiKey(key) {
-            const item = savedApiKeys[key];
-            if (!item) return;
-            item.status = item.status === 'ACTIVE' ? 'BLOCKED' : 'ACTIVE';
-            localStorage.setItem('permanent_api_keys', JSON.stringify(savedApiKeys));
-
-            if (mqttClient && mqttClient.connected) {
-                mqttClient.publish(`cloud_os_v8_permanent/${MY_SERVER_ID}/sync_keys/${key}`, JSON.stringify(item), { qos: 1, retain: true });
-                mqttClient.publish(`cloud_os_v8_permanent/api_guard/${key}`, item.status, { qos: 1, retain: true });
-            }
-
+        function toggleApiKeyStatus(key) {
+            if (!savedApiKeys[key]) return;
+            const current = savedApiKeys[key].status;
+            const nextStatus = current === 'ACTIVE' ? 'BLOCKED' : 'ACTIVE';
+            savedApiKeys[key].status = nextStatus;
+            saveLocalState();
             renderApiKeysList();
-            announce(item.status === 'BLOCKED' ? `تم إيقاف وحظر المفتاح ${key} فوراً.` : `تم تفعيل المفتاح ${key}.`);
+
+            // إرسال الأمر الفوري لجميع التطبيقات والمواقع التي تستخدم هذا المفتاح في الوقت الفعلي
+            publishToCluster(`${CLOUD_NAMESPACE}/api_guard/${key}`, nextStatus, { qos: 1, retain: true });
+            publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_keys/${key}`, JSON.stringify(savedApiKeys[key]), { qos: 1, retain: true });
+
+            if (nextStatus === 'BLOCKED') {
+                speak('تم حظر مفتاح الـ API وإيقاف جميع التطبيقات والمواقع المرتبطة به فوراً');
+            } else {
+                speak('تم إعادة تفعيل مفتاح الـ API بنجاح');
+            }
         }
 
         function renderApiKeysList() {
-            const box = document.getElementById('api-keys-container');
-            box.innerHTML = '';
-            Object.values(savedApiKeys).forEach(k => {
-                const blocked = k.status === 'BLOCKED';
+            const container = document.getElementById('api-keys-list');
+            if (!container) return;
+            const keys = Object.keys(savedApiKeys);
+            if (keys.length === 0) {
+                container.innerHTML = '<p style="color:var(--text-dim);">لا توجد مفاتيح API حالياً. ولّد مفتاحاً لربط تطبيقاتك ومواقعك.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            keys.forEach(k => {
+                const info = savedApiKeys[k];
+                const isBlocked = info.status === 'BLOCKED';
                 const div = document.createElement('div');
-                div.className = 'list-item';
+                div.className = 'item-box';
+                div.style.borderColor = isBlocked ? 'var(--danger)' : 'var(--success)';
                 div.innerHTML = `
                     <div>
-                        <strong>${k.name}</strong>: <code style="color:var(--warning); font-size:15px;">${k.key}</code>
-                        <span class="badge ${blocked ? 'badge-red' : 'badge-green'}" style="margin-right:8px;">
-                            ${blocked ? '⛔ موقوف' : '🟢 نشط'}
+                        <strong style="color:#fde047; font-family:monospace; font-size:1.05rem;">${k}</strong>
+                        <span style="margin-right:10px; font-size:0.9rem;">(${info.label})</span>
+                        <span style="margin-right:10px; padding:3px 10px; border-radius:99px; font-size:0.8rem; background:${isBlocked ? '#7f1d1d' : '#064e3b'};">
+                            ${isBlocked ? 'محظور وموقوف فوراً 🚫' : 'نشط ويعمل ✅'}
                         </span>
                     </div>
-                    <div>
-                        <button type="button" class="btn-secondary" onclick="navigator.clipboard.writeText('${k.key}'); announce('تم نسخ المفتاح');">نسخ المفتاح</button>
-                        <button type="button" class="${blocked ? '' : 'btn-danger'}" onclick="toggleApiKey('${k.key}')">
-                            ${blocked ? 'إعادة تفعيل المفتاح' : 'إيقاف المفتاح فوراً'}
+                    <div class="item-actions">
+                        <button type="button" class="btn btn-dark" onclick="copyDirectText('Cloud.useApiKey(\\'${k}\\');')">📋 نسخ كود الحماية للكود</button>
+                        <button type="button" class="btn ${isBlocked ? 'btn-blue' : 'btn-red'}" style="padding:8px 14px; font-size:0.9rem;" onclick="toggleApiKeyStatus('${k}')">
+                            ${isBlocked ? '✅ إعادة تفعيل المفتاح' : '🛑 حظر وإيقاف التطبيق فوراً'}
                         </button>
                     </div>
                 `;
-                box.appendChild(div);
+                container.appendChild(div);
             });
         }
 
-        function displayIncomingEvent(data) {
-            const log = document.getElementById('live-events-log');
-            if (log.innerText.includes('سجل الاتصالات')) log.innerHTML = '';
+        /* =========================================================================
+           12. البث الفوري وسجل الرسائل الحية
+           ========================================================================= */
+        function sendBroadcastNow() {
+            const input = document.getElementById('broadcast-input');
+            const msg = input.value.trim();
+            if (!msg) return;
 
-            const row = document.createElement('div');
-            row.className = 'list-item';
-            if (data.type === 'LOGIN') {
-                row.innerHTML = `<div><strong style="color:var(--success);">👤 دخول مستخدم: ${data.user}</strong> (طريقة الدخول: ${data.method})</div><span>${data.time}</span>`;
-                announce(`دخل المستخدم ${data.user} عبر ${data.method}`);
-            } else {
-                row.innerHTML = `<div><strong style="color:var(--accent);">💬 رسالة من (${data.user}):</strong> ${data.text}</div><span>${data.time}</span>`;
-                announce(`رسالة جديدة من ${data.user}: ${data.text}`);
+            publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/broadcast`, msg, { qos: 1 });
+
+            // إرسال للمعاينة الحية أيضاً إذا كانت مفتوحة
+            const previewIframe = document.querySelector('#preview-frame-wrapper iframe');
+            if (previewIframe && previewIframe.contentWindow && previewIframe.contentWindow.__receiveParentCloudEvent) {
+                try {
+                    previewIframe.contentWindow.__receiveParentCloudEvent(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/broadcast`, msg);
+                } catch (e) {}
             }
-            log.prepend(row);
+
+            logToInbox(`📢 [بث من الإدارة للجميع]: ${msg}`, true);
+            input.value = '';
+            speak('تم إرسال الإشعار الفوري لجميع الزوار والتطبيقات المفتوحة');
         }
 
-        function broadcastToAllSites() {
-            const inp = document.getElementById('live-admin-msg');
-            const txt = inp.value.trim();
-            if (!txt || !mqttClient) return;
-            mqttClient.publish(`cloud_os_v8_permanent/${MY_SERVER_ID}/broadcast`, txt, { qos: 1 });
-            inp.value = '';
-            announce("تم إرسال الإشعار الفوري إلى جميع مواقعك المفتوحة الآن.");
+        function logToInbox(text, persist) {
+            const inbox = document.getElementById('live-inbox');
+            if (!inbox) return;
+            const div = document.createElement('div');
+            div.className = 'log-line';
+            div.innerText = text;
+            inbox.prepend(div);
+
+            if (persist) {
+                savedInboxLogs.unshift(text);
+                if (savedInboxLogs.length > 100) savedInboxLogs.pop();
+                try { localStorage.setItem('permanent_inbox_logs', JSON.stringify(savedInboxLogs)); } catch (e) {}
+            }
         }
 
-        function toggleLivePreview() {
-            const wrap = document.getElementById('preview-wrapper');
-            wrap.style.display = 'block';
-            const frame = document.getElementById('preview-iframe');
-            const doc = frame.contentDocument || frame.contentWindow.document;
-            doc.open();
-            doc.write(injectOptionalCloudHelper(document.getElementById('code-editor-box').value));
-            doc.close();
-            announce("تم تحديث شاشة المعاينة.");
+        function clearLiveInbox() {
+            savedInboxLogs = [];
+            try { localStorage.removeItem('permanent_inbox_logs'); } catch (e) {}
+            const inbox = document.getElementById('live-inbox');
+            if (inbox) {
+                inbox.innerHTML = '<div class="log-line">📡 تم مسح السجل. السيرفر السحابي يستمع للأحداث الجديدة...</div>';
+            }
+            speak('تم مسح سجل الأحداث');
         }
 
-        function copyText(id) {
-            navigator.clipboard.writeText(document.getElementById(id).textContent);
-            announce("تم نسخ الرابط بنجاح.");
+        /* =========================================================================
+           13. القوالب الثلاثة الاختيارية + أدوات المحرر المساعدة
+           ========================================================================= */
+        function loadTemplate(type, silent) {
+            const editor = document.getElementById('code-editor');
+            if (!editor) return;
+
+            if (type === 'free') {
+                editor.value = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>موقعي السحابي الحر</title>
+    <style>
+        body { background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; padding: 40px 20px; }
+        .box { max-width: 550px; margin: 0 auto; background: #1e293b; padding: 30px; border-radius: 14px; border: 1px solid #334155; }
+        input, button { width: 100%; padding: 12px; margin-top: 12px; border-radius: 8px; border: none; font-size: 1rem; box-sizing: border-box; }
+        input { background: #090d16; color: #fff; border: 1px solid #475569; }
+        button { background: #10b981; color: #fff; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>🚀 مرحباً بك في موقعي</h1>
+        <p style="color:#94a3b8;">هذا موقع حر يعمل مباشرة بدون طلب أي تسجيل دخول من الزائر.</p>
+        
+        <input type="text" id="msg" placeholder="أرسل رسالة فورية إلى صاحب الموقع...">
+        <button onclick="sendMsg()">إرسال للسيرفر الآن</button>
+        <p id="status" style="color:#34d399; margin-top:12px;"></p>
+    </div>
+
+    <script>
+        // اختياري: إذا أردت حماية الموقع أو التطبيق بمفتاح API يمكنك تفعيل السطر التالي:
+        // Cloud.useApiKey("ضع_مفتاح_API_هنا");
+
+        function sendMsg() {
+            const val = document.getElementById('msg').value;
+            if(!val) return;
+            Cloud.sendToServer(val);
+            document.getElementById('status').innerText = "✅ وصلت رسالتك إلى السيرفر في الوقت الفعلي!";
+            document.getElementById('msg').value = "";
+        }
+    <\/script>
+</body>
+</html>`;
+                if (!silent) speak('تم إدراج قالب موقع حر بدون تسجيل دخول');
+            }
+
+            else if (type === 'nickname') {
+                editor.value = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>موقع الدخول بالاسم المستعار</title>
+    <style>
+        body { background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; padding: 40px 20px; }
+        .box { max-width: 500px; margin: 0 auto; background: #1e293b; padding: 30px; border-radius: 14px; }
+        input, button { width: 100%; padding: 12px; margin-top: 12px; border-radius: 8px; border: none; font-size: 1rem; box-sizing: border-box; }
+        input { background: #090d16; color: #fff; border: 1px solid #475569; }
+        button { background: #3b82f6; color: #fff; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <!-- شاشة الدخول بالاسم المستعار فقط بدون بريد ولا جوجل -->
+    <div class="box" id="login-screen">
+        <h2>👤 دخول سريع بالاسم المستعار</h2>
+        <p style="color:#94a3b8;">لا نطلب بريد إلكتروني ولا حسابات تواصل، اكتب لقباً فقط:</p>
+        <input type="text" id="nick-input" placeholder="اكتب اسمك المستعار هنا...">
+        <button onclick="enterSite()">دخول للموقع</button>
+    </div>
+
+    <!-- محتوى الموقع بعد الدخول -->
+    <div class="box" id="app-screen" style="display:none;">
+        <h2 id="welcome-title" style="color:#34d399;"></h2>
+        <input type="text" id="chat-msg" placeholder="اكتب رسالة لإدارة السيرفر...">
+        <button onclick="sendChat()" style="background:#10b981;">إرسال الرسالة</button>
+    </div>
+
+    <script>
+        function enterSite() {
+            const nick = document.getElementById('nick-input').value.trim();
+            if(!nick) return alert("اكتب اسماً مستعاراً أولاً");
+            
+            Cloud.loginWithNickname(nick, function(user) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-screen').style.display = 'block';
+                document.getElementById('welcome-title').innerText = "أهلاً بك يا " + user.user;
+            });
+        }
+
+        function sendChat() {
+            const txt = document.getElementById('chat-msg').value;
+            if(!txt) return;
+            Cloud.sendToServer(txt);
+            alert("تم الإرسال للسيرفر بنجاح!");
+            document.getElementById('chat-msg').value = "";
+        }
+    <\/script>
+</body>
+</html>`;
+                if (!silent) speak('تم إدراج قالب الدخول بالاسم المستعار فقط');
+            }
+
+            else if (type === 'social') {
+                editor.value = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>بوابة الدخول بالحسابات الرسمية</title>
+    <style>
+        body { background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; padding: 40px 20px; }
+        .box { max-width: 480px; margin: 0 auto; background: #1e293b; padding: 30px; border-radius: 14px; }
+        input, button { width: 100%; padding: 13px; margin-top: 10px; border-radius: 8px; border: none; font-size: 1rem; font-weight: bold; cursor: pointer; box-sizing: border-box; }
+        input { background: #090d16; color: #fff; border: 1px solid #475569; }
+        .btn-google { background: #ea4335; color: #fff; }
+        .btn-fb { background: #1877f2; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="box" id="auth-box">
+        <h2>🌐 تسجيل الدخول للمنصة</h2>
+        <input type="text" id="acc-email" placeholder="البريد الإلكتروني أو اسم الحساب...">
+        <button class="btn-google" onclick="socialLogin('Google')">🔴 المتابعة باستخدام حساب Google</button>
+        <button class="btn-fb" onclick="socialLogin('Facebook')">🔵 المتابعة باستخدام حساب Facebook</button>
+    </div>
+
+    <div class="box" id="home-box" style="display:none;">
+        <h2 id="user-badge" style="color:#60a5fa;"></h2>
+        <input type="text" id="user-note" placeholder="أرسل طلباً أو رسالة للسيرفر...">
+        <button style="background:#10b981; color:#fff;" onclick="sendNote()">إرسال للسيرفر</button>
+    </div>
+
+    <script>
+        function socialLogin(provider) {
+            const account = document.getElementById('acc-email').value.trim() || ("مستخدم_" + provider);
+            Cloud.loginWithAccount(provider, account, function(res) {
+                document.getElementById('auth-box').style.display = 'none';
+                document.getElementById('home-box').style.display = 'block';
+                document.getElementById('user-badge').innerText = "✅ متصل عبر " + provider + " (" + res.user + ")";
+            });
+        }
+
+        function sendNote() {
+            const val = document.getElementById('user-note').value;
+            if(val) { Cloud.sendToServer(val); alert("تم الإرسال للسيرفر!"); }
+        }
+    <\/script>
+</body>
+</html>`;
+                if (!silent) speak('تم إدراج قالب الدخول بحسابات جوجل وفيسبوك');
+            }
+
+            try { localStorage.setItem('cloud_editor_draft_code', editor.value); } catch (e) {}
+            if (document.getElementById('preview-container').style.display === 'block') {
+                refreshLivePreview();
+            }
+        }
+
+        async function pasteCodeFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text) {
+                    const editor = document.getElementById('code-editor');
+                    editor.value = text;
+                    try { localStorage.setItem('cloud_editor_draft_code', text); } catch (e) {}
+                    speak('تم لصق الكود من الحافظة في المحرر بنجاح');
+                    if (document.getElementById('preview-container').style.display === 'block') {
+                        refreshLivePreview();
+                    }
+                }
+            } catch (e) {
+                alert('يمكنك اللصق مباشرة داخل مربع المحرر بالضغط المطول ثم لصق أو Ctrl+V.');
+            }
+        }
+
+        function clearEditorCode() {
+            const editor = document.getElementById('code-editor');
+            if (!editor) return;
+            editor.value = '';
+            localStorage.removeItem('cloud_editor_draft_code');
+            editor.focus();
+            speak('تم تفريغ المحرر، يمكنك الآن كتابة أو لصق الكود الخاص بك من الصفر');
+        }
+
+        // دوال مساعدة للنسخ والفتح
+        function copyInput(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.select();
+            navigator.clipboard.writeText(el.value);
+            speak('تم نسخ الرابط إلى الحافظة');
+        }
+
+        function openInputUrl(id) {
+            const el = document.getElementById(id);
+            if (el && el.value && el.value.startsWith('http')) {
+                window.open(el.value, '_blank');
+            }
+        }
+
+        function copyDirectText(txt) {
+            navigator.clipboard.writeText(txt);
+            speak('تم النسخ إلى الحافظة بنجاح');
+        }
+
+        /* =========================================================================
+           14. نقطة الانطلاق الرئيسية (Bootloader)
+           ========================================================================= */
+        if (IS_VISITOR_MODE) {
+            startVisitorEngine();
+        } else {
+            initAdminDashboard();
         }
     </script>
 </body>
