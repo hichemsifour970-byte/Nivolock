@@ -1,9 +1,10 @@
+     * أصبح **الرابط الأول والأساسي** هو **الرابط السحابي القصير والنظيف** (`https://hichemsifour970-byte.github.io/Nivolock/?site=Nivolock-التجريبية&s=...`) بدون ذيل `#app=` العملاق.
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الحاسوب السحابي الشخصي | منصة الاستضافة والسيرفر الدائم v9</title>
+    <title>الحاسوب السحابي الشخصي | منصة الاستضافة والسيرفر الدائم</title>
 
     <!-- مكتبة ضغط الأكواد البرمجية غير المحدودة LZ-String -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
@@ -120,7 +121,7 @@
         }
         .log-line { padding: 8px 10px; border-bottom: 1px solid #1f2937; border-right: 3px solid var(--accent); margin-bottom: 6px; background: rgba(255,255,255,0.02); border-radius: 4px; }
 
-        /* شاشة المعاينة الحية المحسّنة */
+        /* شاشة المعاينة الحية المعزولة داخل لوحة التحكم */
         #preview-container {
             display: none; margin-top: 16px; border: 2px solid var(--accent); border-radius: 10px; overflow: hidden;
             background: #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -129,18 +130,9 @@
             background: #0f172a; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
             border-bottom: 1px solid var(--border-clr);
         }
-        #preview-frame-wrapper { width: 100%; height: 480px; background: #ffffff; position: relative; }
+        #preview-frame-wrapper { width: 100%; height: 500px; background: #ffffff; position: relative; }
         #preview-frame-wrapper.fullscreen-preview { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 999990; }
         #preview-frame-wrapper iframe { width: 100%; height: 100%; border: none; display: block; background: #ffffff; }
-
-        /* شاشة عرض الموقع المستضاف للزوار بملء الشاشة */
-        #visitor-viewport {
-            display: none; position: fixed; inset: 0; width: 100vw; height: 100vh;
-            background: #ffffff; z-index: 999995; margin: 0; padding: 0; border: none; overflow: hidden;
-        }
-        #visitor-viewport iframe {
-            width: 100%; height: 100%; border: none; margin: 0; padding: 0; display: block;
-        }
 
         /* شاشة تحميل الزائر */
         #visitor-loader {
@@ -160,14 +152,11 @@
     <!-- ناطق قارئ الشاشة الفوري -->
     <div id="sr-announcer" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
 
-    <!-- حاوية عرض موقع الزائر بملء الشاشة (مفصولة تماماً عن لوحة التحكم) -->
-    <div id="visitor-viewport"></div>
-
     <!-- شاشة التحميل الخاصة بالزوار عند فتح رابط موقع مستضاف -->
     <div id="visitor-loader">
         <div class="spinner" id="visitor-spinner"></div>
         <h2 id="visitor-status-title">جاري فتح الموقع السحابي...</h2>
-        <p id="visitor-status-sub" style="color:#9ca3af; margin-top:8px;">يتم الجلب الفوري عبر عنقود السيرفرات السحابية المشفرة</p>
+        <p id="visitor-status-sub" style="color:#9ca3af; margin-top:8px;">يتم الاتصال المباشر بالسيرفر السحابي المشفر</p>
         <div id="visitor-retry-box" style="display:none; margin-top:20px;">
             <button class="btn btn-blue" onclick="window.location.reload()">🔄 إعادة المحاولة الآن</button>
         </div>
@@ -178,7 +167,7 @@
         
         <header role="banner">
             <div>
-                <h1>☁️ الحاسوب السحابي والاستضافة الدائمة (v9 Enterprise)</h1>
+                <h1>☁️ الحاسوب السحابي والاستضافة الدائمة (v10 Pro)</h1>
                 <p style="font-size:0.85rem; color:var(--text-dim);">معرف السيرفر الدائم: <strong id="server-id-label" style="color:#fde047; font-family:monospace;">...</strong></p>
             </div>
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
@@ -191,12 +180,12 @@
             <section class="section-card" aria-labelledby="editor-heading">
                 <div class="section-title">
                     <span id="editor-heading">1. إنشاء موقع جديد أو تعديل مشروع</span>
-                    <span style="font-size:0.82rem; color:#10b981;">حفظ رباعي دائم (LocalStorage + IndexedDB + Multi-MQTT + Hash)</span>
+                    <span style="font-size:0.82rem; color:#10b981;">حفظ دائم 100% + روابط قصيرة ونظيفة</span>
                 </div>
 
                 <!-- حقل اسم المشروع في الأعلى -->
                 <label for="site-name">اسم المشروع أو الموقع (بالحروف الإنجليزية أو العربية أو الأرقام):</label>
-                <input type="text" id="site-name" placeholder="مثال: my-awesome-app أو متجري-السحابي" autocomplete="off">
+                <input type="text" id="site-name" placeholder="مثال: Nivolock-التجريبية أو my-app" autocomplete="off">
 
                 <!-- قوالب مساعدة اختيارية لتسهيل البداية + أدوات التحكم السريع بالمحرر -->
                 <div class="templates-bar" role="toolbar" aria-label="قوالب وأدوات المحرر السريعة">
@@ -217,10 +206,10 @@
                     🚀 إنشاء الموقع وحفظه دائماً وإظهار الرابط
                 </button>
 
-                <!-- أزرار المعاينة الحية المحسّنة -->
+                <!-- زر المعاينة الحية المحسّنة -->
                 <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
                     <button type="button" class="btn btn-blue" style="flex:1;" onclick="toggleLivePreview(true)">
-                        👁️ معاينة الكود الحيّة الآن (تشغيل / تحديث المعاينة)
+                        👁️ معاينة الكود الحيّة الآن داخل اللوحة (تشغيل / تحديث المعاينة)
                     </button>
                 </div>
 
@@ -239,27 +228,27 @@
 
                 <!-- صندوق الروابط الذي يظهر فوراً بعد الضغط على الزر -->
                 <div id="generated-links-box" role="region" aria-label="روابط الموقع الجاهزة للمشاركة">
-                    <h3 style="color:#34d399; margin-bottom:10px;">✅ تم إنشاء وحفظ موقعك بنجاح! إليك الروابط الفعالة:</h3>
+                    <h3 id="publish-sync-status" style="color:#34d399; margin-bottom:12px;">✅ تم إنشاء وحفظ موقعك بنجاح! إليك الروابط الفعالة:</h3>
 
-                    <label for="out-hybrid-url">1. الرابط الهجين الفوري للموقع (يفتح في 0.01 ثانية من الـ Hash ويتحدث سحابياً):</label>
-                    <div class="link-row">
-                        <input type="text" id="out-hybrid-url" readonly>
-                        <button type="button" class="btn btn-blue" onclick="copyInput('out-hybrid-url')">📋 نسخ الرابط</button>
-                        <button type="button" class="btn btn-dark" onclick="openInputUrl('out-hybrid-url')">🌐 فتح الموقع</button>
-                    </div>
-
-                    <label for="out-cloud-url">2. الرابط السحابي الديناميكي القصير للمشروع (يتحدث تلقائياً عند أي تعديل مستقبلي):</label>
+                    <label for="out-cloud-url">1. الرابط السحابي الأساسي للموقع (رابط قصير ونظيف يتحدث تلقائياً عند أي تعديل):</label>
                     <div class="link-row">
                         <input type="text" id="out-cloud-url" readonly>
                         <button type="button" class="btn btn-blue" onclick="copyInput('out-cloud-url')">📋 نسخ الرابط</button>
                         <button type="button" class="btn btn-dark" onclick="openInputUrl('out-cloud-url')">🌐 فتح الموقع</button>
                     </div>
 
-                    <label for="out-short-url">3. الرابط المختصر المستقل (بدون ظهور اسم GitHub نهائياً):</label>
+                    <label for="out-short-url">2. الرابط المختصر المستقل (قصير جداً وبدون ظهور اسم GitHub نهائياً):</label>
                     <div class="link-row">
                         <input type="text" id="out-short-url" readonly value="جاري توليد الرابط المختصر...">
                         <button type="button" class="btn btn-purple" onclick="copyInput('out-short-url')">📋 نسخ الرابط المختصر</button>
                         <button type="button" class="btn btn-dark" onclick="openInputUrl('out-short-url')">🌐 فتح المختصر</button>
+                    </div>
+
+                    <label for="out-hash-url">3. الرابط المحمول المشفر (يحتوي على الكود الصافي بداخله ويعمل فوراً بدون انتظار):</label>
+                    <div class="link-row">
+                        <input type="text" id="out-hash-url" readonly>
+                        <button type="button" class="btn btn-yellow" onclick="copyInput('out-hash-url')">📋 نسخ الرابط المشفر</button>
+                        <button type="button" class="btn btn-dark" onclick="openInputUrl('out-hash-url')">🌐 فتح المشفر</button>
                     </div>
                 </div>
             </section>
@@ -289,7 +278,7 @@
                 </p>
 
                 <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px;">
-                    <input type="text" id="new-key-label" placeholder="اسم التطبيق أو الموقع (مثال: تطبيق الأندرويد الإصدار 1)" style="flex:1; margin-bottom:0;">
+                    <input type="text" id="new-key-label" placeholder="اسم التطبيق أو الموقع (مثال: تطبيق Nivolock أندرويد)" style="flex:1; margin-bottom:0;">
                     <button type="button" class="btn btn-yellow" onclick="generateNewApiKey()">🔑 توليد مفتاح API جديد</button>
                 </div>
 
@@ -320,7 +309,7 @@
     <script>
         /* =========================================================================
            المرحلة 0: الفحص الفوري لوضع الزائر (Pre-Init Route Interception)
-           يعمل في الجزء الأول من الثانية قبل تهيئة لوحة التحكم لمنع ظهور القالب الافتراضي
+           يعمل في الجزء الأول من الثانية قبل تهيئة لوحة التحكم
            ========================================================================= */
         const CURRENT_URL_PARAMS = new URLSearchParams(window.location.search);
         const VISITOR_SITE_PARAM = (CURRENT_URL_PARAMS.get('site') || CURRENT_URL_PARAMS.get('p') || '').trim();
@@ -338,7 +327,7 @@
         /* =========================================================================
            1. التأسيس السحابي الدائم + قاعدة بيانات IndexedDB + LocalStorage
            ========================================================================= */
-        const CLOUD_NAMESPACE = 'cloud_os_v8_permanent'; // الحفاظ على نفس النطاق للتوافق التام مع المشاريع السابقة
+        const CLOUD_NAMESPACE = 'cloud_os_v8_permanent';
         const MQTT_BROKERS = [
             'wss://broker.emqx.io:8084/mqtt',
             'wss://broker.hivemq.com:8884/mqtt',
@@ -363,9 +352,7 @@
             savedSites = JSON.parse(localStorage.getItem('permanent_saved_sites') || '{}');
             savedApiKeys = JSON.parse(localStorage.getItem('permanent_api_keys') || '{}');
             savedInboxLogs = JSON.parse(localStorage.getItem('permanent_inbox_logs') || '[]');
-        } catch (e) {
-            console.warn('LocalStorage Parse Recovery:', e);
-        }
+        } catch (e) {}
 
         // محرك قاعدة البيانات الدائمة IndexedDB لدعم الأحجام غير المحدودة
         const PermanentDB = {
@@ -373,11 +360,10 @@
             init: function() {
                 return new Promise((resolve) => {
                     if (!window.indexedDB) return resolve(null);
-                    const req = indexedDB.open('CloudOS_PermanentDB_v9', 1);
+                    const req = indexedDB.open('CloudOS_PermanentDB_v10', 1);
                     req.onupgradeneeded = function(e) {
                         const db = e.target.result;
                         if (!db.objectStoreNames.contains('sites')) db.createObjectStore('sites', { keyPath: 'name' });
-                        if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv', { keyPath: 'k' });
                     };
                     req.onsuccess = (e) => {
                         this.db = e.target.result;
@@ -433,91 +419,105 @@
         }
 
         function saveLocalState() {
-            try {
-                localStorage.setItem('permanent_saved_sites', JSON.stringify(savedSites));
-            } catch (e) {
-                // إذا امتلأت LocalStorage بسبب كود ضخم، نخزن البيانات الأساسية ونعتمد على IndexedDB للكود الكامل
-                console.warn('LocalStorage quota warning, IndexedDB holds full payload.');
-            }
-            try {
-                localStorage.setItem('permanent_api_keys', JSON.stringify(savedApiKeys));
-            } catch (e) {}
+            try { localStorage.setItem('permanent_saved_sites', JSON.stringify(savedSites)); } catch (e) {}
+            try { localStorage.setItem('permanent_api_keys', JSON.stringify(savedApiKeys)); } catch (e) {}
         }
 
         /* =========================================================================
-           2. محرك فك وضغط الأكواد الذكي (يدعم Base64 الآمن للشبكة + التوافق مع UTF16 و URI)
+           2. محرك ضغط وفك ضغط الكود الصافي (خفيف وسريع جداً بدون تكرار المكتبة)
            ========================================================================= */
-        function encodeSitePayloadForCloud(finalHtml, rawCode, siteName) {
-            const compressedBase64 = LZString.compressToBase64(finalHtml);
-            const rawBase64 = LZString.compressToBase64(rawCode || finalHtml);
+        function stripInjectedSdk(htmlCode) {
+            if (!htmlCode) return '';
+            return htmlCode
+                .replace(/<script id="cloud-os-sdk-v\d+">[\s\S]*?<\/script>\s*/gi, '')
+                .replace(/window\.__\s+receiveParentCloudEvent/g, 'window.__receiveParentCloudEvent');
+        }
+
+        function encodeSitePayloadForCloud(rawCleanCode, siteName, updatedAtTime) {
+            const cleanCode = stripInjectedSdk(rawCleanCode);
+            const compressedBase64 = LZString.compressToBase64(cleanCode);
             return JSON.stringify({
-                v: 9,
+                v: 10,
                 name: siteName,
                 serverId: MY_SERVER_ID,
-                updatedAt: Date.now(),
+                updatedAt: updatedAtTime || Date.now(),
                 time: new Date().toLocaleTimeString('ar-EG'),
                 encoding: 'base64',
-                data: compressedBase64,
-                rawCompressed: rawBase64
+                data: compressedBase64
             });
         }
 
         function decodeSitePayloadFromCloud(rawMessageString) {
             if (!rawMessageString) return null;
-            // 1. محاولة قراءة حزمة JSON الإصدار 9 (Base64 الآمن من تلف المحارف)
+            // 1. فك حزمة JSON الإصدار 10 أو 9 (Base64 الآمن للشبكة)
             if (rawMessageString.startsWith('{')) {
                 try {
                     const parsed = JSON.parse(rawMessageString);
                     if (parsed && parsed.encoding === 'base64' && parsed.data) {
-                        const html = LZString.decompressFromBase64(parsed.data);
-                        const rawCode = parsed.rawCompressed ? LZString.decompressFromBase64(parsed.rawCompressed) : html;
-                        if (html && html.trim().length > 0) {
+                        const rawHtml = LZString.decompressFromBase64(parsed.data);
+                        if (rawHtml && rawHtml.trim().length > 0) {
+                            const cleaned = stripInjectedSdk(rawHtml);
                             return {
-                                html: html,
-                                rawCode: rawCode || html,
+                                rawCode: cleaned,
                                 updatedAt: parsed.updatedAt || Date.now(),
                                 time: parsed.time || new Date().toLocaleTimeString('ar-EG'),
                                 serverId: parsed.serverId || ''
                             };
                         }
                     }
+                    // توافق مع sync_sites القديم في v8
+                    if (parsed && parsed.compressedCode) {
+                        const dec = LZString.decompressFromUTF16(parsed.compressedCode) || LZString.decompressFromBase64(parsed.compressedCode);
+                        if (dec) {
+                            return {
+                                rawCode: stripInjectedSdk(dec),
+                                updatedAt: parsed.updatedAt || 0,
+                                time: parsed.time || 'محفوظ سحابياً',
+                                serverId: ''
+                            };
+                        }
+                    }
                 } catch (e) {}
             }
-            // 2. التوافق العكسي مع الإصدار الثامن (UTF16)
+            // 2. التوافق العكسي مع الإصدار الثامن (UTF16) أو EncodedURIComponent
             try {
                 const fromUtf16 = LZString.decompressFromUTF16(rawMessageString);
                 if (fromUtf16 && (fromUtf16.includes('<') || fromUtf16.length > 10)) {
-                    return { html: fromUtf16, rawCode: fromUtf16, updatedAt: 0, time: 'محفوظ سحابياً' };
+                    return { rawCode: stripInjectedSdk(fromUtf16), updatedAt: 0, time: 'محفوظ سحابياً' };
                 }
             } catch (e) {}
-            // 3. التوافق الاحتياطي مع Base64 المباشر أو EncodedURIComponent
             try {
                 const fromB64 = LZString.decompressFromBase64(rawMessageString);
                 if (fromB64 && fromB64.includes('<')) {
-                    return { html: fromB64, rawCode: fromB64, updatedAt: 0, time: 'محفوظ سحابياً' };
+                    return { rawCode: stripInjectedSdk(fromB64), updatedAt: 0, time: 'محفوظ سحابياً' };
                 }
             } catch (e) {}
             return null;
         }
 
         /* =========================================================================
-           3. حقيبة السيرفر السحابي الاختيارية (injectOptionalCloudHelper)
-           حقن ذكي يحترم بنية <!DOCTYPE html> و <head> ويدعم الجسر المباشر + MQTT
+           3. حقيبة السيرفر السحابي الاختيارية (injectOptionalCloudHelper v10)
+           خالٍ تماماً من الأخطاء النحوية، ويُحقن فقط وقت العرض (Runtime)
            ========================================================================= */
-        function injectOptionalCloudHelper(rawHtml, targetServerId) {
+        function injectOptionalCloudHelper(rawHtml, targetServerId, siteName, currentUpdatedAt) {
             const activeServerId = targetServerId || MY_SERVER_ID;
-            if (!rawHtml) return '';
-            // تجنب الحقن المزدوج إذا كان الكود محقوناً مسبقاً
-            if (rawHtml.includes('id="cloud-os-sdk-v9"')) return rawHtml;
+            const activeSiteName = siteName || VISITOR_SITE_PARAM || '';
+            const activeTimestamp = currentUpdatedAt || 0;
 
-            const helperScript = `<script id="cloud-os-sdk-v9">
+            const cleanUserHtml = stripInjectedSdk(rawHtml || '');
+            if (!cleanUserHtml.trim()) return '';
+
+            const helperScript = `<script id="cloud-os-sdk-v10">
 (function(){
-    if(window.Cloud && window.Cloud.__v9) return;
-    const SRV_ID = "${activeServerId}";
-    const NS = "${CLOUD_NAMESPACE}";
+    if(window.Cloud && window.Cloud.__v10) return;
+    const SRV_ID = ${JSON.stringify(activeServerId)};
+    const SITE_NAME = ${JSON.stringify(activeSiteName)};
+    const LOADED_TS = ${Number(activeTimestamp) || 0};
+    const NS = ${JSON.stringify(CLOUD_NAMESPACE)};
     const BROKERS = [
         "wss://broker.emqx.io:8084/mqtt",
-        "wss://broker.hivemq.com:8884/mqtt"
+        "wss://broker.hivemq.com:8884/mqtt",
+        "wss://test.mosquitto.org:8081/mqtt"
     ];
     let sdkClients = [];
     let pendingActions = [];
@@ -533,27 +533,26 @@
     }
 
     function pubToCloud(topic, payload, opts) {
-        // 1. الإرسال الفوري عبر جسر النافذة الأب (إن وجد في المعاينة أو عارض الزوار)
         try {
             if(window.parent && window.parent !== window && window.parent.__CLOUD_OS_BRIDGE__) {
                 window.parent.__CLOUD_OS_BRIDGE__.publish(topic, payload, opts);
             }
         } catch(e){}
-        // 2. الإرسال عبر اتصالات MQTT المباشرة داخل الصفحة
         let sent = false;
-        sdkClients.forEach(c => {
+        sdkClients.forEach(function(c) {
             if(c && c.connected) {
-                c.publish(topic, payload, opts || {});
-                sent = true;
+                try { c.publish(topic, payload, opts || { qos: 1 }); sent = true; } catch(e){}
             }
         });
         if(!sent) {
-            pendingActions.push((c) => c.publish(topic, payload, opts || {}));
+            pendingActions.push(function(c) {
+                try { c.publish(topic, payload, opts || { qos: 1 }); } catch(e){}
+            });
         }
     }
 
     function handleIncomingGuard(topic, msg) {
-        Object.keys(activeGuardKeys).forEach(k => {
+        Object.keys(activeGuardKeys).forEach(function(k) {
             if(topic === NS + "/api_guard/" + k && msg === "BLOCKED" && !isLockedByGuard) {
                 isLockedByGuard = true;
                 document.body.innerHTML = '<div dir="rtl" style="background:#450a0a;color:#fff;height:100vh;width:100vw;position:fixed;inset:0;z-index:2147483647;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-family:sans-serif;padding:20px;"><h1>🚫 تم إيقاف هذا التطبيق / الموقع بأمر مباشر من السيرفر</h1><p style="margin-top:12px;color:#fca5a5;font-size:1.1rem;">مفتاح الـ API المستخدم (' + k + ') تم حظره وإلغاء صلاحيته الفورية.</p></div>';
@@ -564,7 +563,7 @@
     function showToastBroadcast(msg) {
         if(!msg || seenBroadcasts.has(msg)) return;
         seenBroadcasts.add(msg);
-        setTimeout(() => seenBroadcasts.delete(msg), 4000);
+        setTimeout(function() { seenBroadcasts.delete(msg); }, 4000);
         const bar = document.createElement('div');
         bar.setAttribute('role', 'alert');
         bar.dir = 'rtl';
@@ -572,12 +571,11 @@
         bar.innerText = '📢 إشعار من إدارة السيرفر: ' + msg;
         if(document.body) {
             document.body.appendChild(bar);
-            setTimeout(() => bar.remove(), 8000);
+            setTimeout(function() { bar.remove(); }, 8000);
         }
     }
 
-    // الاستماع الفوري عبر جسر النافذة الأب
-    window.__ receiveParentCloudEvent = function(topic, msg) {
+    window.__receiveParentCloudEvent = function(topic, msg) {
         if(topic === NS + "/" + SRV_ID + "/broadcast") showToastBroadcast(msg);
         if(topic.indexOf(NS + "/api_guard/") === 0) handleIncomingGuard(topic, msg);
     };
@@ -600,18 +598,18 @@
 
     function connectBrokers() {
         if(typeof mqtt === 'undefined' || sdkClients.length > 0) return;
-        BROKERS.forEach(url => {
+        BROKERS.forEach(function(url) {
             try {
                 const c = mqtt.connect(url, { clientId: 'app_' + Math.random().toString(16).slice(2, 10), connectTimeout: 6000 });
                 sdkClients.push(c);
-                c.on('connect', () => {
+                c.on('connect', function() {
                     c.subscribe(NS + "/" + SRV_ID + "/broadcast");
-                    Object.keys(activeGuardKeys).forEach(k => {
+                    Object.keys(activeGuardKeys).forEach(function(k) {
                         c.subscribe(NS + "/api_guard/" + k, { qos: 1 });
                     });
                     flushPending(c);
                 });
-                c.on('message', (topic, payload) => {
+                c.on('message', function(topic, payload) {
                     const msg = payload.toString();
                     if(topic === NS + "/" + SRV_ID + "/broadcast") showToastBroadcast(msg);
                     if(topic.indexOf(NS + "/api_guard/") === 0) handleIncomingGuard(topic, msg);
@@ -623,7 +621,7 @@
     bootMqttSdk();
 
     window.Cloud = {
-        __v9: true,
+        __v10: true,
         serverId: SRV_ID,
         useApiKey: function(apiKey) {
             if(!apiKey) return;
@@ -636,7 +634,7 @@
                     if(status === 'BLOCKED') handleIncomingGuard(checkTopic, 'BLOCKED');
                 }
             } catch(e){}
-            sdkClients.forEach(c => { if(c && c.connected) c.subscribe(checkTopic, { qos: 1 }); });
+            sdkClients.forEach(function(c) { if(c && c.connected) c.subscribe(checkTopic, { qos: 1 }); });
         },
         loginWithNickname: function(nickname, callback) {
             if(!nickname || !nickname.trim()) return;
@@ -662,92 +660,44 @@
 })();
 <\/script>`;
 
-            // حقن ذكي يحافظ على <!DOCTYPE html> في بداية المستند ويضع السكربت داخل <head>
-            if (/<head[^>]*>/i.test(rawHtml)) {
-                return rawHtml.replace(/(<head[^>]*>)/i, '$1\n' + helperScript + '\n');
-            } else if (/<html[^>]*>/i.test(rawHtml)) {
-                return rawHtml.replace(/(<html[^>]*>)/i, '$1\n<head>' + helperScript + '</head>\n');
-            } else if (/<!doctype\s+html>/i.test(rawHtml)) {
-                return rawHtml.replace(/(<!doctype\s+html>)/i, '$1\n' + helperScript + '\n');
+            if (/<head[^>]*>/i.test(cleanUserHtml)) {
+                return cleanUserHtml.replace(/(<head[^>]*>)/i, '$1\n' + helperScript + '\n');
+            } else if (/<html[^>]*>/i.test(cleanUserHtml)) {
+                return cleanUserHtml.replace(/(<html[^>]*>)/i, '$1\n<head>' + helperScript + '</head>\n');
+            } else if (/<!doctype\s+html>/i.test(cleanUserHtml)) {
+                return cleanUserHtml.replace(/(<!doctype\s+html>)/i, '$1\n' + helperScript + '\n');
             } else {
-                return helperScript + '\n' + rawHtml;
+                return `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">${helperScript}</head><body>${cleanUserHtml}</body></html>`;
             }
         }
 
         /* =========================================================================
-           4. عارض المواقع في إطار نظيف ومتزامن (يستخدم في كل من المعاينة الحية ووضع الزائر)
-           ========================================================================= */
-        function mountCleanIframe(containerElement, fullCompiledHtml, syncDocumentTitle) {
-            if (!containerElement) return null;
-            // إزالة أي إطار قديم لإعادة تهيئة نطاق المتغيرات (Window Scope) ومنع أخطاء const/let
-            containerElement.innerHTML = '';
-
-            const iframe = document.createElement('iframe');
-            iframe.setAttribute('allow', 'accelerometer; autoplay; camera; clipboard-read; clipboard-write; encrypted-media; fullscreen; geolocation; gyroscope; microphone; midi; payment; picture-in-picture; web-share');
-            iframe.style.cssText = 'width:100%; height:100%; border:none; margin:0; padding:0; display:block; background:#ffffff;';
-            containerElement.appendChild(iframe);
-
-            try {
-                const doc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
-                if (doc) {
-                    doc.open('text/html', 'replace');
-                    doc.write(fullCompiledHtml);
-                    doc.close();
-
-                    if (syncDocumentTitle) {
-                        setTimeout(() => {
-                            try {
-                                if (doc.title && doc.title.trim()) {
-                                    document.title = doc.title;
-                                }
-                            } catch (e) {}
-                        }, 150);
-                    }
-                    return iframe;
-                }
-            } catch (err) {
-                console.warn('Direct document.write fallback to Blob URL:', err);
-            }
-
-            // خطة بديلة تلقائية عبر Blob URL في حال وجود أي قيد في المتصفح
-            const blob = new Blob([fullCompiledHtml], { type: 'text/html;charset=utf-8' });
-            iframe.src = URL.createObjectURL(blob);
-            return iframe;
-        }
-
-        /* =========================================================================
-           5. عنقود الاتصالات السحابية الفورية متعدد السيرفرات (Multi-Broker Cluster)
+           4. عنقود الاتصالات السحابية الفورية متعدد السيرفرات (Multi-Broker Cluster)
            ========================================================================= */
         const activeMqttClients = [];
         const processedMessagesCache = new Set();
 
-        function publishToCluster(topic, payload, options) {
+        function publishToCluster(topic, payload, options, onFirstAck) {
             const opts = options || { qos: 1 };
+            let acked = false;
             activeMqttClients.forEach(client => {
                 if (client && client.connected) {
                     try {
-                        client.publish(topic, payload, opts);
+                        client.publish(topic, payload, opts, () => {
+                            if (!acked && typeof onFirstAck === 'function') {
+                                acked = true;
+                                onFirstAck();
+                            }
+                        });
                     } catch (e) {}
                 }
             });
         }
 
-        function subscribeOnCluster(topic, options) {
-            const opts = options || { qos: 1 };
-            activeMqttClients.forEach(client => {
-                if (client && client.connected) {
-                    try {
-                        client.subscribe(topic, opts);
-                    } catch (e) {}
-                }
-            });
-        }
-
-        // جسر مباشر للنوافذ الفرعية (المعاينة الحية ونافذة الزائر) للوصول الفوري للسيرفر
+        // جسر مباشر لنافذة المعاينة الحية داخل لوحة التحكم
         window.__CLOUD_OS_BRIDGE__ = {
             publish: function(topic, payload, opts) {
                 publishToCluster(topic, payload, opts);
-                // إذا كانت الرسالة موجهة لصندوق الوارد الخاص بلوحة التحكم الحالية، نعرضها فوراً أيضاً
                 if (topic === `${CLOUD_NAMESPACE}/${MY_SERVER_ID}/live_inbox`) {
                     processIncomingInboxMessage(payload);
                 }
@@ -759,30 +709,38 @@
         };
 
         /* =========================================================================
-           6. مشغل وضع الزائر الفوري (Visitor Mode Engine)
-           يعمل بـ 3 طبقات: Hash الفوري -> الذاكرة المحلية -> سباق سيرفرات MQTT الثلاثة
+           5. مشغل وضع الزائر الأصلي بملء المستند (Native Full-Document Visitor Engine)
+           يعرض موقعك أو تطبيقك (مثل Nivolock) كموقع مستقل أصلي 100%
            ========================================================================= */
         let visitorHasRendered = false;
-        let visitorRenderedTimestamp = 0;
 
-        function renderVisitorApplication(rawOrCompiledHtml, siteNameLabel, timestamp) {
-            if (!rawOrCompiledHtml || !rawOrCompiledHtml.trim()) return;
+        function renderVisitorApplicationNative(rawCodeString, siteNameLabel, timestamp) {
+            if (visitorHasRendered || !rawCodeString || !rawCodeString.trim()) return;
             visitorHasRendered = true;
-            visitorRenderedTimestamp = timestamp || Date.now();
 
-            const finalHtml = injectOptionalCloudHelper(rawOrCompiledHtml, VISITOR_SERVER_PARAM || MY_SERVER_ID);
-            const viewport = document.getElementById('visitor-viewport');
-            const loader = document.getElementById('visitor-loader');
+            // إغلاق اتصالات شاشة التحميل المؤقتة قبل استبدال المستند
+            activeMqttClients.forEach(c => {
+                try { c.end(true); } catch (e) {}
+            });
+            activeMqttClients.length = 0;
 
-            viewport.style.display = 'block';
-            mountCleanIframe(viewport, finalHtml, true);
-            loader.style.display = 'none';
+            const finalHtml = injectOptionalCloudHelper(
+                rawCodeString,
+                VISITOR_SERVER_PARAM || MY_SERVER_ID,
+                siteNameLabel,
+                timestamp
+            );
+
+            // استبدال المستند بالكامل ليعمل تطبيق المستخدم بكامل صلاحيات المتصفح والهاتف
+            document.open('text/html', 'replace');
+            document.write(finalHtml);
+            document.close();
         }
 
         async function startVisitorEngine() {
             await PermanentDB.init();
 
-            // الطبقة 1: الفحص الفوري للـ Hash المدمج (#app=) — يفتح في 0.01 ثانية بدون انتظار الإنترنت
+            // 1. إذا كان الرابط يحتوي على الكود المشفر المحمول (#app=...) نفكه ونعرضه في 0.01 ثانية
             if (HAS_HASH_APP) {
                 try {
                     const hashIndex = CURRENT_HASH.indexOf('#app=');
@@ -793,49 +751,70 @@
                             decodedHtml = LZString.decompressFromBase64(encodedApp);
                         }
                         if (decodedHtml && decodedHtml.trim().length > 0) {
-                            renderVisitorApplication(decodedHtml, VISITOR_SITE_PARAM || 'تطبيق سحابي', Date.now());
+                            const cleanCode = stripInjectedSdk(decodedHtml);
                             if (VISITOR_SITE_PARAM) {
-                                try { localStorage.setItem('visitor_cache_' + VISITOR_SITE_PARAM, decodedHtml); } catch (e) {}
+                                try {
+                                    localStorage.setItem('visitor_cache_' + VISITOR_SITE_PARAM, JSON.stringify({
+                                        rawCode: cleanCode,
+                                        updatedAt: Date.now()
+                                    }));
+                                } catch (e) {}
                             }
+                            renderVisitorApplicationNative(cleanCode, VISITOR_SITE_PARAM || 'app', Date.now());
+                            return;
                         }
                     }
-                } catch (e) {
-                    console.warn('Hash decode check:', e);
-                }
+                } catch (e) {}
             }
 
-            // الطبقة 2: الفحص السريع في الذاكرة المحلية (LocalStorage + IndexedDB) في حال فتح رابط ?site=
-            if (!visitorHasRendered && VISITOR_SITE_PARAM) {
-                // أ) فحص مشاريع المالك نفسه على نفس المتصفح
-                if (savedSites[VISITOR_SITE_PARAM] && savedSites[VISITOR_SITE_PARAM].code) {
-                    renderVisitorApplication(
-                        savedSites[VISITOR_SITE_PARAM].compiledHtml || savedSites[VISITOR_SITE_PARAM].code,
-                        VISITOR_SITE_PARAM,
-                        savedSites[VISITOR_SITE_PARAM].updatedAt || 0
-                    );
-                }
-                // ب) فحص قاعدة بيانات IndexedDB
-                if (!visitorHasRendered) {
-                    const idbRecord = await PermanentDB.getSite(VISITOR_SITE_PARAM);
-                    if (idbRecord && (idbRecord.compiledHtml || idbRecord.code)) {
-                        renderVisitorApplication(
-                            idbRecord.compiledHtml || idbRecord.code,
-                            VISITOR_SITE_PARAM,
-                            idbRecord.updatedAt || 0
-                        );
-                    }
-                }
-                // ج) فحص كاش الزائر السابق
-                if (!visitorHasRendered) {
-                    const cachedVisitorHtml = localStorage.getItem('visitor_cache_' + VISITOR_SITE_PARAM);
-                    if (cachedVisitorHtml && cachedVisitorHtml.trim().length > 0) {
-                        renderVisitorApplication(cachedVisitorHtml, VISITOR_SITE_PARAM, 0);
-                    }
-                }
-            }
-
-            // الطبقة 3: الاتصال المتوازي بعنقود سيرفرات MQTT الثلاثة لجلب الموقع أو التحديثات الفورية
+            // 2. إذا كان الرابط سحابياً (?site=NAME):
             if (VISITOR_SITE_PARAM) {
+                // أ) فحص ما إذا كان المالك نفسه يفتح الرابط على نفس المتصفح (يفتح في 0.01 ثانية بأحدث نسخة)
+                if (savedSites[VISITOR_SITE_PARAM] && savedSites[VISITOR_SITE_PARAM].code) {
+                    renderVisitorApplicationNative(
+                        savedSites[VISITOR_SITE_PARAM].code,
+                        VISITOR_SITE_PARAM,
+                        savedSites[VISITOR_SITE_PARAM].updatedAt || Date.now()
+                    );
+                    return;
+                }
+
+                const idbRecord = await PermanentDB.getSite(VISITOR_SITE_PARAM);
+                if (idbRecord && idbRecord.code) {
+                    renderVisitorApplicationNative(
+                        idbRecord.code,
+                        VISITOR_SITE_PARAM,
+                        idbRecord.updatedAt || Date.now()
+                    );
+                    return;
+                }
+
+                // ب) فحص الكاش المحلي للزائر كخطة طوارئ سريعة إذا تأخر السيرفر
+                let localCachedCode = null;
+                let localCachedTs = 0;
+                try {
+                    const rawCache = localStorage.getItem('visitor_cache_' + VISITOR_SITE_PARAM);
+                    if (rawCache) {
+                        if (rawCache.startsWith('{')) {
+                            const parsedCache = JSON.parse(rawCache);
+                            localCachedCode = parsedCache.rawCode;
+                            localCachedTs = parsedCache.updatedAt || 0;
+                        } else {
+                            localCachedCode = stripInjectedSdk(rawCache);
+                        }
+                    }
+                } catch (e) {}
+
+                // إذا وُجد كاش سابق لدى الزائر، ننتظر 1.2 ثانية فقط لجلب أي تحديث جديد من السيرفر وإلا نعرض الكاش فوراً
+                if (localCachedCode) {
+                    setTimeout(() => {
+                        if (!visitorHasRendered) {
+                            renderVisitorApplicationNative(localCachedCode, VISITOR_SITE_PARAM, localCachedTs);
+                        }
+                    }, 1200);
+                }
+
+                // ج) الاتصال المتوازي بعنقود سيرفرات MQTT الثلاثة + إرسال طلب سحب حي (Live Pull Request)
                 const cleanTarget = encodeURIComponent(VISITOR_SITE_PARAM);
                 const topicsToRace = [
                     `${CLOUD_NAMESPACE}/sites/${cleanTarget}`
@@ -849,50 +828,50 @@
                     try {
                         const vClient = mqtt.connect(brokerUrl, {
                             clientId: 'vis_' + Math.random().toString(16).slice(2, 10),
-                            connectTimeout: 7000,
-                            reconnectPeriod: 3000
+                            connectTimeout: 6000,
+                            reconnectPeriod: 2500
                         });
                         activeMqttClients.push(vClient);
 
                         vClient.on('connect', () => {
                             topicsToRace.forEach(t => vClient.subscribe(t, { qos: 1 }));
+                            // إرسال إشارة طلب حية للسيرفر ليرد فوراً إذا كان متصلاً
+                            vClient.publish(`${CLOUD_NAMESPACE}/pull_req/${cleanTarget}`, VISITOR_SITE_PARAM, { qos: 0 });
                         });
 
                         vClient.on('message', (topic, message) => {
-                            if (!topicsToRace.includes(topic)) return;
+                            if (visitorHasRendered || !topicsToRace.includes(topic)) return;
                             const rawMsg = message.toString();
                             const decodedObj = decodeSitePayloadFromCloud(rawMsg);
 
-                            if (decodedObj && decodedObj.html) {
-                                try { localStorage.setItem('visitor_cache_' + VISITOR_SITE_PARAM, decodedObj.html); } catch (e) {}
-
-                                // إذا لم يكن الموقع قد عُرض بعد، نعرضه فوراً من أول سيرفر يستجيب
-                                if (!visitorHasRendered) {
-                                    renderVisitorApplication(decodedObj.html, VISITOR_SITE_PARAM, decodedObj.updatedAt);
-                                } else if (decodedObj.updatedAt && decodedObj.updatedAt > visitorRenderedTimestamp && !HAS_HASH_APP) {
-                                    // إذا وجد تحديث أحدث على السيرفر السحابي، نحدّث العرض بسلاسة
-                                    renderVisitorApplication(decodedObj.html, VISITOR_SITE_PARAM, decodedObj.updatedAt);
-                                }
+                            if (decodedObj && decodedObj.rawCode) {
+                                try {
+                                    localStorage.setItem('visitor_cache_' + VISITOR_SITE_PARAM, JSON.stringify({
+                                        rawCode: decodedObj.rawCode,
+                                        updatedAt: decodedObj.updatedAt || Date.now()
+                                    }));
+                                } catch (e) {}
+                                renderVisitorApplicationNative(decodedObj.rawCode, VISITOR_SITE_PARAM, decodedObj.updatedAt);
                             }
                         });
                     } catch (e) {}
                 });
 
-                // مهلة أمان في حال كان اسم الموقع غير موجود نهائياً على السيرفرات
+                // مهلة أمان في حال كان اسم الموقع غير موجود نهائياً
                 setTimeout(() => {
                     if (!visitorHasRendered) {
                         const spinner = document.getElementById('visitor-spinner');
                         if (spinner) spinner.style.display = 'none';
                         document.getElementById('visitor-status-title').innerText = '⚠️ لم يتم العثور على الموقع أو أن الاتصال بالسيرفر بطيء';
-                        document.getElementById('visitor-status-sub').innerText = 'تأكد من صحة الرابط أو اضغط إعادة المحاولة للجلب من السيرفر الاحتياطي.';
+                        document.getElementById('visitor-status-sub').innerText = 'تأكد من حفظ الموقع في لوحة التحكم أو اضغط إعادة المحاولة.';
                         document.getElementById('visitor-retry-box').style.display = 'block';
                     }
-                }, 11000);
+                }, 10000);
             }
         }
 
         /* =========================================================================
-           7. مشغل لوحة التحكم الرئيسية (Admin Dashboard Engine)
+           6. مشغل لوحة التحكم الرئيسية (Admin Dashboard Engine)
            ========================================================================= */
         function updateClusterStatusBadge() {
             const badge = document.getElementById('cloud-status');
@@ -931,13 +910,21 @@
             const idbSites = await PermanentDB.getAllSites();
             if (idbSites && idbSites.length > 0) {
                 idbSites.forEach(s => {
-                    if (s && s.name) {
+                    if (s && s.name && s.code) {
+                        s.code = stripInjectedSdk(s.code);
                         if (!savedSites[s.name] || (s.updatedAt || 0) >= (savedSites[s.name].updatedAt || 0)) {
                             savedSites[s.name] = s;
                         }
                     }
                 });
             }
+
+            // تنظيف أي كود قديم في savedSites من السكربت المحقون القديم
+            Object.keys(savedSites).forEach(k => {
+                if (savedSites[k] && savedSites[k].code) {
+                    savedSites[k].code = stripInjectedSdk(savedSites[k].code);
+                }
+            });
 
             // استعادة سجل الإشعارات المحفوظ
             const inboxEl = document.getElementById('live-inbox');
@@ -957,12 +944,11 @@
                 nameInput.value = draftName;
             }
             if (draftCode && draftCode.trim().length > 0 && codeEditor) {
-                codeEditor.value = draftCode;
+                codeEditor.value = stripInjectedSdk(draftCode);
             } else {
                 loadTemplate('free', true);
             }
 
-            // الحفظ التلقائي الفوري لمسودة المحرر عند أي كتابة أو لصق لمنع ضياع أي حرف
             if (nameInput) {
                 nameInput.addEventListener('input', () => {
                     localStorage.setItem('cloud_editor_draft_name', nameInput.value);
@@ -989,17 +975,16 @@
 
                     client.on('connect', () => {
                         updateClusterStatusBadge();
-                        // الاشتراك في قنوات هذا السيرفر الخاصة
                         client.subscribe(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/live_inbox`, { qos: 1 });
                         client.subscribe(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_sites/+`, { qos: 1 });
                         client.subscribe(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_keys/+`, { qos: 1 });
+                        client.subscribe(`${CLOUD_NAMESPACE}/pull_req/+`, { qos: 0 });
 
-                        // إعادة بث وتأكيد بقاء جميع المواقع ومفاتيح الـ API على هذا السيرفر السحابي (Auto-Heal Retained State)
+                        // تثبيت وإعادة بث جميع المواقع المحفوظة ومفاتيح الـ API على العقد السحابية
                         Object.keys(savedSites).forEach(siteName => {
                             const s = savedSites[siteName];
                             if (s && s.code) {
-                                const compiled = s.compiledHtml || injectOptionalCloudHelper(s.code, MY_SERVER_ID);
-                                const cloudPayload = encodeSitePayloadForCloud(compiled, s.code, siteName);
+                                const cloudPayload = encodeSitePayloadForCloud(s.code, siteName, s.updatedAt);
                                 const cleanKey = encodeURIComponent(siteName);
                                 client.publish(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sites/${cleanKey}`, cloudPayload, { qos: 1, retain: true });
                                 client.publish(`${CLOUD_NAMESPACE}/sites/${cleanKey}`, cloudPayload, { qos: 1, retain: true });
@@ -1020,18 +1005,28 @@
                     client.on('message', (topic, message) => {
                         const rawMsg = message.toString();
 
-                        // 1. استقبال رسائل وتسجيلات دخول المستخدمين الحية
+                        // 1. الرد الفوري على أي زائر يطلب موقعاً من هذا السيرفر (Live Pull Response)
+                        if (topic.startsWith(`${CLOUD_NAMESPACE}/pull_req/`)) {
+                            const reqSiteName = decodeURIComponent(topic.split('/pull_req/')[1] || '');
+                            if (reqSiteName && savedSites[reqSiteName] && savedSites[reqSiteName].code) {
+                                const s = savedSites[reqSiteName];
+                                const payload = encodeSitePayloadForCloud(s.code, reqSiteName, s.updatedAt);
+                                const enc = encodeURIComponent(reqSiteName);
+                                client.publish(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sites/${enc}`, payload, { qos: 1, retain: true });
+                                client.publish(`${CLOUD_NAMESPACE}/sites/${enc}`, payload, { qos: 1, retain: true });
+                            }
+                        }
+
+                        // 2. استقبال رسائل وتسجيلات دخول المستخدمين الحية
                         if (topic === `${CLOUD_NAMESPACE}/${MY_SERVER_ID}/live_inbox`) {
                             processIncomingInboxMessage(rawMsg);
                         }
 
-                        // 2. استرجاع ومزامنة المواقع المحفوظة دائماً على السيرفر
+                        // 3. استرجاع ومزامنة المواقع المحفوظة دائماً على السيرفر
                         if (topic.startsWith(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_sites/`)) {
                             const siteName = decodeURIComponent(topic.split('/sync_sites/')[1] || '');
-                            if (!siteName) return;
-                            if (!rawMsg) return; // تم حذفه
+                            if (!siteName || !rawMsg) return;
 
-                            // محاولة فك حزمة الإصدار 9 أو الإصدار 8
                             const decodedCloud = decodeSitePayloadFromCloud(rawMsg);
                             if (decodedCloud && decodedCloud.rawCode) {
                                 const existing = savedSites[siteName];
@@ -1039,7 +1034,6 @@
                                     savedSites[siteName] = {
                                         name: siteName,
                                         code: decodedCloud.rawCode,
-                                        compiledHtml: decodedCloud.html,
                                         updatedAt: decodedCloud.updatedAt || Date.now(),
                                         time: decodedCloud.time || 'مسترجع سحابياً'
                                     };
@@ -1047,28 +1041,10 @@
                                     saveLocalState();
                                     renderSavedSitesList();
                                 }
-                            } else {
-                                // توافق مع صيغة sync_sites القديمة في v8
-                                try {
-                                    const siteObj = JSON.parse(rawMsg);
-                                    const decompressedCode = LZString.decompressFromUTF16(siteObj.compressedCode) || LZString.decompressFromBase64(siteObj.compressedCode);
-                                    if (decompressedCode && !savedSites[siteName]) {
-                                        savedSites[siteName] = {
-                                            name: siteName,
-                                            code: decompressedCode,
-                                            compiledHtml: injectOptionalCloudHelper(decompressedCode, MY_SERVER_ID),
-                                            updatedAt: siteObj.updatedAt || Date.now(),
-                                            time: siteObj.time || 'محفوظ سحابياً'
-                                        };
-                                        PermanentDB.saveSite(savedSites[siteName]);
-                                        saveLocalState();
-                                        renderSavedSitesList();
-                                    }
-                                } catch (e) {}
                             }
                         }
 
-                        // 3. استرجاع ومزامنة مفاتيح الـ API
+                        // 4. استرجاع ومزامنة مفاتيح الـ API
                         if (topic.startsWith(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_keys/`)) {
                             const keyId = topic.split('/sync_keys/')[1];
                             if (keyId && rawMsg) {
@@ -1085,7 +1061,7 @@
         }
 
         /* =========================================================================
-           8. دالة إنشاء الموقع وحفظه دائماً وتوليد الروابط المتوافقة مع GitHub Pages
+           7. دالة إنشاء الموقع وحفظه دائماً وتوليد الروابط النظيفة والفعالة
            ========================================================================= */
         function getCleanHostingBaseUrl() {
             const urlObj = new URL(window.location.href);
@@ -1098,7 +1074,7 @@
             const nameInput = document.getElementById('site-name');
             const codeEditor = document.getElementById('code-editor');
             let rawName = nameInput.value.trim();
-            const rawCode = codeEditor.value;
+            const rawCode = stripInjectedSdk(codeEditor.value);
 
             if (!rawCode.trim()) {
                 alert('الرجاء كتابة أو لصق كود الموقع في المحرر أولاً.');
@@ -1111,20 +1087,16 @@
                 nameInput.value = rawName;
             }
 
-            // تنظيف الاسم للروابط مع دعم الحروف العربية والإنجليزية والأرقام والشرطات
             const cleanName = rawName.replace(/\s+/g, '-').replace(/[?#&/\\]/g, '');
             nameInput.value = cleanName;
 
-            // دمج حقيبة السيرفر السحابي الاختيارية بشكل آمن وسليم
-            const finalHtmlToPublish = injectOptionalCloudHelper(rawCode, MY_SERVER_ID);
             const nowTimestamp = Date.now();
             const nowTimeStr = new Date().toLocaleTimeString('ar-EG');
 
-            // 1. الحفظ في LocalStorage + IndexedDB
+            // 1. الحفظ المحلي الدائم (LocalStorage + IndexedDB + Visitor Cache)
             const siteRecord = {
                 name: cleanName,
                 code: rawCode,
-                compiledHtml: finalHtmlToPublish,
                 serverId: MY_SERVER_ID,
                 updatedAt: nowTimestamp,
                 time: nowTimeStr
@@ -1134,53 +1106,62 @@
             saveLocalState();
             localStorage.setItem('cloud_editor_draft_name', cleanName);
             try { localStorage.setItem('cloud_editor_draft_code', rawCode); } catch (e) {}
-            try { localStorage.setItem('visitor_cache_' + cleanName, finalHtmlToPublish); } catch (e) {}
+            try {
+                localStorage.setItem('visitor_cache_' + cleanName, JSON.stringify({
+                    rawCode: rawCode,
+                    updatedAt: nowTimestamp
+                }));
+            } catch (e) {}
 
             renderSavedSitesList();
 
-            // 2. الحفظ السحابي الدائم عبر Base64 الآمن على جميع سيرفرات MQTT (Retained = True)
-            const cloudPayload = encodeSitePayloadForCloud(finalHtmlToPublish, rawCode, cleanName);
+            // 2. الحفظ السحابي الدائم عبر Base64 الخفيف والآمن على جميع سيرفرات MQTT (Retained = True)
+            const cloudPayload = encodeSitePayloadForCloud(rawCode, cleanName, nowTimestamp);
             const encodedName = encodeURIComponent(cleanName);
+            const syncTitleEl = document.getElementById('publish-sync-status');
+            if (syncTitleEl) {
+                syncTitleEl.innerText = '⏳ جاري تثبيت الموقع على السيرفرات السحابية...';
+            }
 
-            publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sites/${encodedName}`, cloudPayload, { qos: 1, retain: true });
+            publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sites/${encodedName}`, cloudPayload, { qos: 1, retain: true }, () => {
+                if (syncTitleEl) {
+                    syncTitleEl.innerText = '✅ تم إنشاء وحفظ وتثبيت موقعك على السيرفر السحابي بنجاح! إليك الروابط الفعالة:';
+                }
+            });
             publishToCluster(`${CLOUD_NAMESPACE}/sites/${encodedName}`, cloudPayload, { qos: 1, retain: true });
             publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_sites/${encodedName}`, cloudPayload, { qos: 1, retain: true });
 
-            // 3. بناء الروابط المتوافقة 100% مع مسار GitHub Pages الفعلي
+            // 3. بناء الروابط النظيفة والفعالة 100%
             const baseUrl = getCleanHostingBaseUrl();
-            const compressedUriHash = LZString.compressToEncodedURIComponent(finalHtmlToPublish);
 
-            // أ) الرابط السحابي الديناميكي القابل للتحديث عن بُعد (?site=NAME&s=SERVER_ID)
+            // أ) الرابط السحابي الأساسي القصير والنظيف (بدون ذيل #app الطويل)
             const cloudDynamicUrl = `${baseUrl}?site=${encodedName}&s=${encodeURIComponent(MY_SERVER_ID)}`;
 
-            // ب) الرابط الهجين الفوري (?site=NAME&s=SERVER_ID#app=COMPRESSED) - يفتح في 0.01 ثانية ويتحدث سحابياً
-            const hybridInstantUrl = `${cloudDynamicUrl}#app=${compressedUriHash}`;
+            // ب) الرابط المحمول المشفر (يضغط الكود الصافي فقط بدون تكرار مكتبة الـ SDK)
+            const cleanCompressedHash = LZString.compressToEncodedURIComponent(rawCode);
+            const portableHashUrl = `${baseUrl}#app=${cleanCompressedHash}`;
 
-            document.getElementById('out-hybrid-url').value = hybridInstantUrl;
             document.getElementById('out-cloud-url').value = cloudDynamicUrl;
+            document.getElementById('out-hash-url').value = portableHashUrl;
             document.getElementById('generated-links-box').style.display = 'block';
 
-            // تحديث المعاينة الحية تلقائياً إذا كانت مفتوحة
             if (document.getElementById('preview-container').style.display === 'block') {
                 refreshLivePreview();
             }
 
-            // ج) توليد الرابط المختصر المستقل (بدون ظهور اسم GitHub)
-            // إذا كان الرابط الهجين مناسباً لطول طلبات الـ API نرسله، وإلا نرسل الرابط السحابي الديناميكي المضمون 100%
-            const urlToShorten = hybridInstantUrl.length <= 1800 ? hybridInstantUrl : cloudDynamicUrl;
-            generateShortCleanLink(urlToShorten, cloudDynamicUrl);
+            // ج) توليد الرابط المختصر المستقل (بدون ظهور اسم GitHub) من الرابط السحابي القصير المضمون
+            generateShortCleanLink(cloudDynamicUrl);
 
-            speak('تم إنشاء الموقع وحفظه دائماً، الروابط جاهزة الآن أسفل الزر مباشرة');
+            speak('تم إنشاء الموقع وحفظه دائماً، الرابط القصير والرابط المختصر جاهزان الآن');
         }
 
-        // توليد رابط مختصر نظيف بدون كلمة github عبر عدة مزودات احتياطية
-        async function generateShortCleanLink(primaryLongUrl, fallbackCloudUrl) {
+        async function generateShortCleanLink(cleanCloudUrl) {
             const shortInput = document.getElementById('out-short-url');
             shortInput.value = 'جاري توليد الرابط المختصر المستقل...';
 
             // المحاولة 1: TinyURL عبر AllOrigins
             try {
-                const tinyApi = 'https://tinyurl.com/api-create.php?url=' + encodeURIComponent(primaryLongUrl);
+                const tinyApi = 'https://tinyurl.com/api-create.php?url=' + encodeURIComponent(cleanCloudUrl);
                 const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(tinyApi);
                 const res = await fetch(proxyUrl);
                 const data = await res.json();
@@ -1190,10 +1171,10 @@
                 }
             } catch (e) {}
 
-            // المحاولة 2: TinyURL بالرابط السحابي القصير (في حال كان الكود ضخماً جداً)
+            // المحاولة 2: is.gd عبر AllOrigins
             try {
-                const tinyApi2 = 'https://tinyurl.com/api-create.php?url=' + encodeURIComponent(fallbackCloudUrl);
-                const proxyUrl2 = 'https://api.allorigins.win/get?url=' + encodeURIComponent(tinyApi2);
+                const isgdApi = 'https://is.gd/create.php?format=simple&url=' + encodeURIComponent(cleanCloudUrl);
+                const proxyUrl2 = 'https://api.allorigins.win/get?url=' + encodeURIComponent(isgdApi);
                 const res2 = await fetch(proxyUrl2);
                 const data2 = await res2.json();
                 if (data2 && data2.contents && data2.contents.trim().startsWith('http')) {
@@ -1202,23 +1183,11 @@
                 }
             } catch (e) {}
 
-            // المحاولة 3: is.gd عبر بروكسي بديل
-            try {
-                const isgdApi = 'https://is.gd/create.php?format=simple&url=' + encodeURIComponent(fallbackCloudUrl);
-                const proxyUrl3 = 'https://api.allorigins.win/get?url=' + encodeURIComponent(isgdApi);
-                const res3 = await fetch(proxyUrl3);
-                const data3 = await res3.json();
-                if (data3 && data3.contents && data3.contents.trim().startsWith('http')) {
-                    shortInput.value = data3.contents.trim();
-                    return;
-                }
-            } catch (e) {}
-
-            shortInput.value = fallbackCloudUrl;
+            shortInput.value = cleanCloudUrl;
         }
 
         /* =========================================================================
-           9. إدارة المعاينة الحية المحسّنة (Live Preview Engine)
+           8. إدارة المعاينة الحية المحسّنة داخل لوحة التحكم (Live Preview Engine)
            ========================================================================= */
         function toggleLivePreview(forceOpenAndRefresh) {
             const box = document.getElementById('preview-container');
@@ -1244,8 +1213,27 @@
             const wrapper = document.getElementById('preview-frame-wrapper');
             if (!wrapper) return;
 
-            const compiledPreviewHtml = injectOptionalCloudHelper(code, MY_SERVER_ID);
-            mountCleanIframe(wrapper, compiledPreviewHtml, false);
+            const compiledPreviewHtml = injectOptionalCloudHelper(code, MY_SERVER_ID, 'preview', Date.now());
+            wrapper.innerHTML = '';
+
+            const iframe = document.createElement('iframe');
+            iframe.setAttribute('allow', 'accelerometer; autoplay; camera; clipboard-read; clipboard-write; encrypted-media; fullscreen; geolocation; gyroscope; microphone; midi; payment; picture-in-picture; web-share');
+            iframe.style.cssText = 'width:100%; height:100%; border:none; margin:0; padding:0; display:block; background:#ffffff;';
+            wrapper.appendChild(iframe);
+
+            try {
+                const doc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
+                if (doc) {
+                    doc.open('text/html', 'replace');
+                    doc.write(compiledPreviewHtml);
+                    doc.close();
+                    speak('تم تشغيل وتحديث المعاينة الحية للكود بنجاح');
+                    return;
+                }
+            } catch (e) {}
+
+            const blob = new Blob([compiledPreviewHtml], { type: 'text/html;charset=utf-8' });
+            iframe.src = URL.createObjectURL(blob);
             speak('تم تشغيل وتحديث المعاينة الحية للكود بنجاح');
         }
 
@@ -1269,7 +1257,6 @@
             }
         }
 
-        // دعم زر Escape للخروج من ملء شاشة المعاينة
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 const wrapper = document.getElementById('preview-frame-wrapper');
@@ -1280,7 +1267,7 @@
         });
 
         /* =========================================================================
-           10. إدارة وتعديل المواقع المحفوظة دائماً + النسخ الاحتياطي
+           9. إدارة وتعديل المواقع المحفوظة دائماً + النسخ الاحتياطي
            ========================================================================= */
         function renderSavedSitesList() {
             const container = document.getElementById('saved-sites-list');
@@ -1294,7 +1281,6 @@
             const baseUrl = getCleanHostingBaseUrl();
             container.innerHTML = '';
 
-            // ترتيب المواقع من الأحدث للأقدم
             names.sort((a, b) => (savedSites[b].updatedAt || 0) - (savedSites[a].updatedAt || 0));
 
             names.forEach(name => {
@@ -1313,8 +1299,7 @@
                     <div class="item-actions">
                         <button type="button" class="btn btn-yellow" style="padding:8px 14px; font-size:0.9rem;" onclick="loadSiteIntoEditor('${safeNameAttr}')">✏️ تعديل الكود في المحرر</button>
                         <a href="${cloudLink}" target="_blank" class="btn btn-blue" style="padding:8px 14px; font-size:0.9rem;">🔗 فتح الموقع</a>
-                        <button type="button" class="btn btn-dark" onclick="copyDirectText('${cloudLink}')">📋 نسخ الرابط السحابي</button>
-                        <button type="button" class="btn btn-purple" style="padding:8px 12px; font-size:0.85rem;" onclick="copySiteHybridLink('${safeNameAttr}')">⚡ نسخ الرابط الفوري (#app)</button>
+                        <button type="button" class="btn btn-dark" onclick="copyDirectText('${cloudLink}')">📋 نسخ الرابط السحابي القصير</button>
                         <button type="button" class="btn btn-red" style="padding:8px 12px; font-size:0.85rem;" onclick="deleteSavedSite('${safeNameAttr}')">🗑️ حذف</button>
                     </div>
                 `;
@@ -1325,12 +1310,12 @@
         function loadSiteIntoEditor(name) {
             const site = savedSites[name];
             if (!site) return;
+            const cleanCode = stripInjectedSdk(site.code);
             document.getElementById('site-name').value = name;
-            document.getElementById('code-editor').value = site.code;
+            document.getElementById('code-editor').value = cleanCode;
             localStorage.setItem('cloud_editor_draft_name', name);
-            try { localStorage.setItem('cloud_editor_draft_code', site.code); } catch (e) {}
+            try { localStorage.setItem('cloud_editor_draft_code', cleanCode); } catch (e) {}
 
-            // إذا كانت المعاينة مفتوحة نحدّثها بالكود المختار فوراً
             if (document.getElementById('preview-container').style.display === 'block') {
                 refreshLivePreview();
             }
@@ -1339,21 +1324,12 @@
             speak('تم تحميل كود الموقع ' + name + ' في المحرر للتعديل عليه');
         }
 
-        function copySiteHybridLink(name) {
-            const site = savedSites[name];
-            if (!site) return;
-            const baseUrl = getCleanHostingBaseUrl();
-            const compiled = site.compiledHtml || injectOptionalCloudHelper(site.code, MY_SERVER_ID);
-            const hashStr = LZString.compressToEncodedURIComponent(compiled);
-            const hybridUrl = `${baseUrl}?site=${encodeURIComponent(name)}&s=${encodeURIComponent(MY_SERVER_ID)}#app=${hashStr}`;
-            copyDirectText(hybridUrl);
-        }
-
         function deleteSavedSite(name) {
             if (!confirm(`هل أنت متأكد من حذف المشروع "${name}"؟`)) return;
             delete savedSites[name];
             PermanentDB.deleteSite(name);
             saveLocalState();
+            try { localStorage.removeItem('visitor_cache_' + name); } catch (e) {}
 
             const encodedName = encodeURIComponent(name);
             publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_sites/${encodedName}`, '', { qos: 1, retain: true });
@@ -1363,7 +1339,7 @@
 
         function exportFullBackup() {
             const backupObj = {
-                version: 9,
+                version: 10,
                 serverId: MY_SERVER_ID,
                 exportedAt: new Date().toISOString(),
                 sites: savedSites,
@@ -1386,6 +1362,9 @@
                     const data = JSON.parse(e.target.result);
                     if (data.sites) {
                         Object.keys(data.sites).forEach(k => {
+                            if (data.sites[k] && data.sites[k].code) {
+                                data.sites[k].code = stripInjectedSdk(data.sites[k].code);
+                            }
                             savedSites[k] = data.sites[k];
                             PermanentDB.saveSite(savedSites[k]);
                         });
@@ -1408,7 +1387,7 @@
         }
 
         /* =========================================================================
-           11. إدارة وحظر مفاتيح الـ API في الوقت الفعلي (لحماية تطبيقات APK والمواقع)
+           10. إدارة وحظر مفاتيح الـ API في الوقت الفعلي (لحماية تطبيقات APK والمواقع)
            ========================================================================= */
         function generateNewApiKey() {
             const labelInput = document.getElementById('new-key-label');
@@ -1434,9 +1413,16 @@
             saveLocalState();
             renderApiKeysList();
 
-            // إرسال الأمر الفوري لجميع التطبيقات والمواقع التي تستخدم هذا المفتاح في الوقت الفعلي
             publishToCluster(`${CLOUD_NAMESPACE}/api_guard/${key}`, nextStatus, { qos: 1, retain: true });
             publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_keys/${key}`, JSON.stringify(savedApiKeys[key]), { qos: 1, retain: true });
+
+            // إرسال فوري لنافذة المعاينة الحية إذا كانت مفتوحة
+            const previewIframe = document.querySelector('#preview-frame-wrapper iframe');
+            if (previewIframe && previewIframe.contentWindow && previewIframe.contentWindow.__receiveParentCloudEvent) {
+                try {
+                    previewIframe.contentWindow.__receiveParentCloudEvent(`${CLOUD_NAMESPACE}/api_guard/${key}`, nextStatus);
+                } catch (e) {}
+            }
 
             if (nextStatus === 'BLOCKED') {
                 speak('تم حظر مفتاح الـ API وإيقاف جميع التطبيقات والمواقع المرتبطة به فوراً');
@@ -1481,7 +1467,7 @@
         }
 
         /* =========================================================================
-           12. البث الفوري وسجل الرسائل الحية
+           11. البث الفوري وسجل الرسائل الحية
            ========================================================================= */
         function sendBroadcastNow() {
             const input = document.getElementById('broadcast-input');
@@ -1490,7 +1476,6 @@
 
             publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/broadcast`, msg, { qos: 1 });
 
-            // إرسال للمعاينة الحية أيضاً إذا كانت مفتوحة
             const previewIframe = document.querySelector('#preview-frame-wrapper iframe');
             if (previewIframe && previewIframe.contentWindow && previewIframe.contentWindow.__receiveParentCloudEvent) {
                 try {
@@ -1529,7 +1514,7 @@
         }
 
         /* =========================================================================
-           13. القوالب الثلاثة الاختيارية + أدوات المحرر المساعدة
+           12. القوالب الثلاثة الاختيارية + أدوات المحرر المساعدة
            ========================================================================= */
         function loadTemplate(type, silent) {
             const editor = document.getElementById('code-editor');
@@ -1540,6 +1525,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>موقعي السحابي الحر</title>
     <style>
         body { background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; padding: 40px 20px; }
@@ -1581,6 +1567,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>موقع الدخول بالاسم المستعار</title>
     <style>
         body { background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; padding: 40px 20px; }
@@ -1636,6 +1623,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>بوابة الدخول بالحسابات الرسمية</title>
     <style>
         body { background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; padding: 40px 20px; }
@@ -1690,9 +1678,10 @@
             try {
                 const text = await navigator.clipboard.readText();
                 if (text) {
+                    const cleanText = stripInjectedSdk(text);
                     const editor = document.getElementById('code-editor');
-                    editor.value = text;
-                    try { localStorage.setItem('cloud_editor_draft_code', text); } catch (e) {}
+                    editor.value = cleanText;
+                    try { localStorage.setItem('cloud_editor_draft_code', cleanText); } catch (e) {}
                     speak('تم لصق الكود من الحافظة في المحرر بنجاح');
                     if (document.getElementById('preview-container').style.display === 'block') {
                         refreshLivePreview();
@@ -1712,7 +1701,6 @@
             speak('تم تفريغ المحرر، يمكنك الآن كتابة أو لصق الكود الخاص بك من الصفر');
         }
 
-        // دوال مساعدة للنسخ والفتح
         function copyInput(id) {
             const el = document.getElementById(id);
             if (!el) return;
@@ -1734,7 +1722,7 @@
         }
 
         /* =========================================================================
-           14. نقطة الانطلاق الرئيسية (Bootloader)
+           13. نقطة الانطلاق الرئيسية (Bootloader)
            ========================================================================= */
         if (IS_VISITOR_MODE) {
             startVisitorEngine();
