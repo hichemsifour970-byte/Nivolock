@@ -2,23 +2,27 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الحاسوب السحابي الشخصي | منصة الاستضافة والسيرفر الدائم v9.5</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>الحاسوب السحابي الشخصي | استضافة بوت وقناة تيليجرام الذكية v10.5</title>
 
-    <!-- مكتبة ضغط الأكواد البرمجية غير المحدودة LZ-String -->
+    <!-- 1. مكتبة تيليجرام الرسمية لتحويل البوت نفسه إلى منصة الاستضافة والسحابة -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- 2. مكتبة ضغط الأكواد البرمجية غير المحدودة LZ-String -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
-    <!-- مكتبة الاتصالات السحابية الفورية والدائمة MQTT WebSockets -->
+    <!-- 3. مكتبة الخوادم اللامركزية للإشارات الفورية وتجاوز الحماية MQTT WebSockets -->
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-    <!-- مكتبة الاتصالات المباشرة PeerJS WebRTC -->
+    <!-- 4. مكتبة الاتصالات اللامركزية المباشرة PeerJS WebRTC -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
     <style>
         :root {
-            --bg-main: #090d16;
+            --bg-main: #070b12;
             --bg-card: #111827;
-            --bg-input: #060911;
+            --bg-input: #05080f;
+            --bg-nav: #0f172a;
             --border-clr: #1f2937;
             --accent: #3b82f6;
+            --tg-blue: #2481cc;
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
@@ -28,99 +32,119 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, system-ui, sans-serif; }
-        body { background-color: var(--bg-main); color: var(--text-light); line-height: 1.6; padding: 15px; overflow-x: hidden; }
-        .container { max-width: 980px; margin: 0 auto; }
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-light);
+            line-height: 1.6;
+            padding: 12px 12px 95px 12px;
+            overflow-x: hidden;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
 
         /* قارئ الشاشة للمكفوفين */
         .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
 
-        /* شريط حالة السيرفر العلوي */
+        /* الرأس العلوي */
         header {
-            background: var(--bg-card); border: 1px solid var(--border-clr);
-            border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            background: linear-gradient(135deg, #111827 0%, #0f172a 100%);
+            border: 1px solid var(--border-clr);
+            border-radius: 14px; padding: 14px 18px; margin-bottom: 18px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.45);
         }
-        header h1 { font-size: 1.35rem; color: #60a5fa; display: flex; align-items: center; gap: 8px; }
+        header h1 { font-size: 1.22rem; color: #60a5fa; display: flex; align-items: center; gap: 8px; }
+        .badge-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
         .status-badge {
-            background: #064e3b; color: #a7f3d0; padding: 6px 14px;
-            border-radius: 99px; font-size: 0.85rem; font-weight: bold; border: 1px solid var(--success);
-            transition: all 0.3s ease;
+            background: #064e3b; color: #a7f3d0; padding: 5px 12px;
+            border-radius: 99px; font-size: 0.8rem; font-weight: bold; border: 1px solid var(--success);
+        }
+        .tg-badge {
+            background: #0c4a6e; color: #bae6fd; padding: 5px 12px;
+            border-radius: 99px; font-size: 0.8rem; font-weight: bold; border: 1px solid var(--tg-blue);
         }
 
-        /* البطاقات والأقسام */
+        /* نظام الأقسام المقسمة (Tabs Views) */
+        .app-section { display: none; animation: fadeIn 0.2s ease-in-out; }
+        .app-section.active-section { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* البطاقات */
         .section-card {
             background: var(--bg-card); border: 1px solid var(--border-clr);
-            border-radius: 12px; padding: 22px; margin-bottom: 22px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+            border-radius: 12px; padding: 20px; margin-bottom: 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         .section-title {
-            font-size: 1.2rem; color: #93c5fd; margin-bottom: 16px;
+            font-size: 1.12rem; color: #93c5fd; margin-bottom: 15px;
             padding-bottom: 10px; border-bottom: 1px solid var(--border-clr);
             display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
         }
 
-        /* الحقول والأزرار */
-        label { display: block; font-weight: bold; margin-bottom: 8px; color: #e5e7eb; font-size: 0.95rem; }
-        input[type="text"], textarea {
+        /* الحقول والمدخلات */
+        label { display: block; font-weight: bold; margin-bottom: 7px; color: #e5e7eb; font-size: 0.93rem; }
+        input[type="text"], input[type="password"], select, textarea {
             width: 100%; background: var(--bg-input); color: #fff;
-            border: 2px solid var(--border-clr); border-radius: 8px; padding: 12px 15px;
-            font-size: 1rem; margin-bottom: 15px; transition: border-color 0.2s;
+            border: 2px solid var(--border-clr); border-radius: 8px; padding: 11px 14px;
+            font-size: 0.98rem; margin-bottom: 14px; transition: border-color 0.2s;
         }
-        input[type="text"]:focus, textarea:focus { outline: none; border-color: var(--accent); }
-        
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+
         /* مربع تحرير الكود الواحد غير المحدود */
         textarea#code-editor {
             font-family: 'Courier New', Consolas, monospace; direction: ltr; text-align: left;
-            min-height: 400px; color: #34d399; line-height: 1.5; resize: vertical;
-            tab-size: 2;
+            min-height: 380px; color: #34d399; line-height: 1.5; resize: vertical; tab-size: 2;
         }
 
+        /* الأزرار */
         .btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            border: none; border-radius: 8px; padding: 13px 20px; font-size: 1rem;
+            display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+            border: none; border-radius: 8px; padding: 12px 18px; font-size: 0.95rem;
             font-weight: bold; cursor: pointer; color: #fff; transition: 0.2s; text-decoration: none;
         }
-        .btn:hover { filter: brightness(1.1); }
+        .btn:hover { filter: brightness(1.12); }
         .btn:active { transform: scale(0.99); }
-        .btn-create { background: var(--success); width: 100%; font-size: 1.15rem; padding: 16px; box-shadow: 0 4px 14px rgba(16,185,129,0.25); }
+        .btn-create { background: linear-gradient(135deg, #10b981 0%, #059669 100%); width: 100%; font-size: 1.1rem; padding: 15px; box-shadow: 0 4px 14px rgba(16,185,129,0.3); }
+        .btn-tg { background: var(--tg-blue); }
         .btn-blue { background: var(--accent); }
         .btn-red { background: var(--danger); }
         .btn-yellow { background: #d97706; }
         .btn-purple { background: var(--purple); }
-        .btn-dark { background: #374151; font-size: 0.85rem; padding: 8px 14px; }
+        .btn-dark { background: #374151; font-size: 0.84rem; padding: 8px 13px; }
 
         .templates-bar {
             display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;
             background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid var(--border-clr);
         }
 
-        /* صندوق إظهار الروابط الفوري */
+        /* صندوق الروابط الفورية */
         #generated-links-box {
             display: none; background: #06281e; border: 2px solid var(--success);
-            border-radius: 10px; padding: 18px; margin-top: 18px;
+            border-radius: 10px; padding: 16px; margin-top: 16px;
         }
-        .link-row {
-            display: flex; gap: 8px; align-items: center; margin-top: 8px; margin-bottom: 14px; flex-wrap: wrap;
-        }
-        .link-row input { margin-bottom: 0; flex: 1; min-width: 220px; direction: ltr; color: #fde047; font-weight: bold; font-size: 0.95rem; }
+        .link-row { display: flex; gap: 8px; align-items: center; margin-top: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+        .link-row input { margin-bottom: 0; flex: 1; min-width: 210px; direction: ltr; color: #fde047; font-weight: bold; font-size: 0.92rem; }
 
-        /* قوائم المشاريع ومفاتيح الـ API */
+        /* بطاقات المشاريع ومفاتيح API/IP */
         .item-box {
             background: var(--bg-input); border: 1px solid var(--border-clr);
-            border-radius: 8px; padding: 14px; margin-bottom: 10px;
+            border-radius: 10px; padding: 14px; margin-bottom: 12px;
             display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
         }
-        .item-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .item-meta { display: flex; flex-direction: column; gap: 4px; }
+        .key-pill {
+            display: inline-block; background: #1e293b; color: #fde047; border: 1px solid #475569;
+            padding: 2px 10px; border-radius: 6px; font-family: monospace; font-size: 0.85rem;
+        }
+        .item-actions { display: flex; gap: 7px; flex-wrap: wrap; }
 
-        /* سجل الرسائل والإشعارات الحية */
+        /* سجل الإشارات والرسائل */
         #live-inbox {
             background: var(--bg-input); border: 1px solid var(--border-clr);
-            border-radius: 8px; padding: 12px; height: 240px; overflow-y: auto; font-size: 0.9rem;
+            border-radius: 8px; padding: 12px; height: 260px; overflow-y: auto; font-size: 0.9rem;
         }
         .log-line { padding: 8px 10px; border-bottom: 1px solid #1f2937; border-right: 3px solid var(--accent); margin-bottom: 6px; background: rgba(255,255,255,0.02); border-radius: 4px; }
 
-        /* شاشة المعاينة الحية المحسّنة */
+        /* شاشة المعاينة الحية */
         #preview-container {
             display: none; margin-top: 16px; border: 2px solid var(--accent); border-radius: 10px; overflow: hidden;
             background: #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -129,27 +153,48 @@
             background: #0f172a; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
             border-bottom: 1px solid var(--border-clr);
         }
-        #preview-frame-wrapper { width: 100%; height: 480px; background: #ffffff; position: relative; }
+        #preview-frame-wrapper { width: 100%; height: 460px; background: #ffffff; position: relative; }
         #preview-frame-wrapper.fullscreen-preview { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 999990; }
         #preview-frame-wrapper iframe { width: 100%; height: 100%; border: none; display: block; background: #ffffff; }
 
-        /* شاشة عرض الموقع المستضاف للزوار بملء الشاشة */
+        /* الشريط السفلي الثابت (Bottom Navigation Bar) */
+        nav.bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; height: 74px;
+            background: rgba(15, 23, 42, 0.97); backdrop-filter: blur(12px);
+            border-top: 2px solid var(--border-clr); z-index: 99990;
+            display: flex; justify-content: space-around; align-items: center;
+            padding: 0 8px; box-shadow: 0 -5px 25px rgba(0,0,0,0.6);
+        }
+        .nav-tab-btn {
+            flex: 1; max-width: 240px; height: 58px; background: transparent; color: var(--text-dim);
+            border: 1px solid transparent; border-radius: 10px; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-size: 0.82rem; font-weight: bold; gap: 3px; transition: all 0.2s;
+        }
+        .nav-tab-btn span.nav-icon { font-size: 1.2rem; }
+        .nav-tab-btn.active-tab {
+            background: rgba(59, 130, 246, 0.15); color: #60a5fa;
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+        .nav-badge-count {
+            background: var(--success); color: #fff; font-size: 0.72rem;
+            padding: 1px 6px; border-radius: 99px; margin-right: 4px;
+        }
+
+        /* شاشة الزائر بملء الشاشة */
         #visitor-viewport {
             display: none; position: fixed; inset: 0; width: 100vw; height: 100vh;
             background: #ffffff; z-index: 999995; margin: 0; padding: 0; border: none; overflow: hidden;
         }
-        #visitor-viewport iframe {
-            width: 100%; height: 100%; border: none; margin: 0; padding: 0; display: block;
-        }
+        #visitor-viewport iframe { width: 100%; height: 100%; border: none; display: block; }
 
-        /* شاشة تحميل الزائر */
         #visitor-loader {
-            display: none; position: fixed; inset: 0; background: #090d16; color: #fff;
+            display: none; position: fixed; inset: 0; background: #070b12; color: #fff;
             z-index: 999999; flex-direction: column; align-items: center; justify-content: center;
             text-align: center; padding: 20px;
         }
         .spinner {
-            width: 48px; height: 48px; border: 5px solid #1f2937; border-top-color: var(--success);
+            width: 48px; height: 48px; border: 5px solid #1f2937; border-top-color: var(--tg-blue);
             border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 18px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -157,173 +202,347 @@
 </head>
 <body>
 
-    <!-- ناطق قارئ الشاشة الفوري -->
+    <!-- ناطق قارئ الشاشة للمكفوفين -->
     <div id="sr-announcer" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
 
-    <!-- حاوية عرض موقع الزائر بملء الشاشة (مفصولة تماماً عن لوحة التحكم) -->
+    <!-- شاشة عرض الموقع المستضاف للزوار بملء الشاشة -->
     <div id="visitor-viewport"></div>
 
-    <!-- شاشة التحميل الخاصة بالزوار عند فتح رابط موقع مستضاف -->
+    <!-- شاشة التحميل للزائر -->
     <div id="visitor-loader">
         <div class="spinner" id="visitor-spinner"></div>
-        <h2 id="visitor-status-title">جاري فتح الموقع السحابي...</h2>
-        <p id="visitor-status-sub" style="color:#9ca3af; margin-top:8px;">يتم الجلب الفوري عبر السيرفر السحابي المشفر</p>
+        <h2 id="visitor-status-title">جاري فتح الموقع السحابي من البوت...</h2>
+        <p id="visitor-status-sub" style="color:#9ca3af; margin-top:8px;">يتم الجلب الفوري عبر سحابة تيليجرام وخوادم الإشارات</p>
         <div id="visitor-retry-box" style="display:none; margin-top:20px;">
             <button class="btn btn-blue" onclick="window.location.reload()">🔄 إعادة المحاولة الآن</button>
         </div>
     </div>
 
-    <!-- لوحة تحكم السيرفر والاستضافة الرئيسية -->
+    <!-- لوحة التحكم السحابية المقسمة (تعمل مباشرة داخل بوت تيليجرام) -->
     <div class="container" id="admin-dashboard">
-        
+
         <header role="banner">
             <div>
-                <h1>☁️ الحاسوب السحابي والاستضافة الدائمة (v9.5 Clean Links)</h1>
-                <p style="font-size:0.85rem; color:var(--text-dim);">معرف السيرفر الدائم: <strong id="server-id-label" style="color:#fde047; font-family:monospace;">...</strong></p>
+                <h1>☁️ استضافة البوت السحابية | Telegram Bot Cloud OS v10.5</h1>
+                <p style="font-size:0.82rem; color:var(--text-dim);">
+                    بيئة التشغيل: <strong id="env-mode-label" style="color:#38bdf8;">...</strong> |
+                    القناة المكتشفة تلقائياً: <strong id="auto-channel-label" style="color:#fde047;">سحابة البوت المدمجة</strong>
+                </p>
             </div>
-            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                <div id="cloud-status" class="status-badge" role="status">جاري الاتصال بعنقود السيرفرات...</div>
+            <div class="badge-row">
+                <div id="tg-cloud-badge" class="tg-badge" role="status">🤖 سحابة البوت: نشطة تلقائياً</div>
+                <div id="cloud-status" class="status-badge" role="status">📡 جاري فتح قنوات الإشارة...</div>
             </div>
         </header>
 
-        <!-- 1. قسم إنشاء وتعديل المواقع (التصميم البسيط والمباشر) -->
         <main>
-            <section class="section-card" aria-labelledby="editor-heading">
-                <div class="section-title">
-                    <span id="editor-heading">1. إنشاء موقع جديد أو تعديل مشروع</span>
-                    <span style="font-size:0.82rem; color:#10b981;">روابط سحابية نظيفة ومختصرة باسم مشروعك بدون حروف طويلة</span>
-                </div>
+            <!-- ===================================================================
+                 القسم 1: إنشاء مشروع ومحرر الأكواد + شريط المشاريع ومفاتيح API/IP السريع
+                 =================================================================== -->
+            <section id="sec-create" class="app-section active-section" role="tabpanel" aria-labelledby="tab-btn-create">
+                <div class="section-card">
+                    <div class="section-title">
+                        <span>🚀 إنشاء مشروع جديد أو تحديث موقع داخل البوت</span>
+                        <span style="font-size:0.8rem; color:#34d399;">عند التحديث: يحذف البوت الملف القديم من القناة ويستبدله بالأحدث تلقائياً!</span>
+                    </div>
 
-                <!-- حقل اسم المشروع في الأعلى -->
-                <label for="site-name">اسم المشروع أو الموقع (سيظهر هذا الاسم في الرابط المخصص لموقعك):</label>
-                <input type="text" id="site-name" placeholder="مثال: algeria-shop أو my-app" autocomplete="off">
-
-                <!-- قوالب مساعدة اختيارية لتسهيل البداية + أدوات التحكم السريع بالمحرر -->
-                <div class="templates-bar" role="toolbar" aria-label="قوالب وأدوات المحرر السريعة">
-                    <span style="font-size:0.85rem; color:var(--text-dim); align-self:center; margin-left:4px;">قوالب جاهزة (اختياري):</span>
-                    <button type="button" class="btn btn-dark" onclick="loadTemplate('free')">📄 قالب 1: موقع حر (بدون تسجيل دخول)</button>
-                    <button type="button" class="btn btn-dark" onclick="loadTemplate('nickname')">👤 قالب 2: موقع بدخول (اسم مستعار فقط)</button>
-                    <button type="button" class="btn btn-dark" onclick="loadTemplate('social')">🌐 قالب 3: موقع بدخول (حساب جوجل وفيسبوك)</button>
-                    <button type="button" class="btn btn-dark" style="background:#1e3a8a;" onclick="pasteCodeFromClipboard()">📋 لصق الكود من الحافظة</button>
-                    <button type="button" class="btn btn-dark" style="background:#7f1d1d;" onclick="clearEditorCode()">🗑️ تفريغ المحرر للكتابة من الصفر</button>
-                </div>
-
-                <!-- مربع تحرير النصوص الواحد غير المحدود للكود تحت الاسم مباشرة -->
-                <label for="code-editor">كود الموقع الكامل (HTML / CSS / JavaScript في مربع واحد غير محدود):</label>
-                <textarea id="code-editor" spellcheck="false" placeholder="اكتب أو الصق كود موقعك الكامل هنا بدون أي قيود..."></textarea>
-
-                <!-- زر إنشاء الموقع وحفظه وإظهار الرابط تحت المحرر مباشرة -->
-                <button type="button" class="btn btn-create" onclick="publishAndSaveWebsite()">
-                    🚀 إنشاء الموقع وحفظه دائماً وإظهار الرابط النظيف
-                </button>
-
-                <!-- أزرار المعاينة الحية المحسّنة -->
-                <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
-                    <button type="button" class="btn btn-blue" style="flex:1;" onclick="toggleLivePreview(true)">
-                        👁️ معاينة الكود الحيّة الآن (تشغيل / تحديث المعاينة)
-                    </button>
-                </div>
-
-                <!-- نافذة المعاينة الحية المعزولة والآمنة -->
-                <div id="preview-container" role="region" aria-label="نافذة المعاينة الحية للكود">
-                    <div id="preview-header">
-                        <span style="font-weight:bold; font-size:0.92rem; color:#93c5fd;">⚡ المعاينة الحية الفورية للموقع (تعمل بكامل خصائص السيرفر السحابي):</span>
-                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                            <button type="button" class="btn btn-blue" style="padding:5px 12px; font-size:0.82rem;" onclick="refreshLivePreview()">🔄 تحديث الكود المعروض</button>
-                            <button type="button" class="btn btn-purple" style="padding:5px 12px; font-size:0.82rem;" onclick="toggleFullscreenPreview()">🖥️ ملء الشاشة</button>
-                            <button type="button" class="btn btn-red" style="padding:5px 12px; font-size:0.82rem;" onclick="closeLivePreview()">✖ إغلاق المعاينة</button>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:12px;">
+                        <div>
+                            <label for="site-name">اسم المشروع أو الموقع (يُنشئ به رابط تيليجرام الرسمي):</label>
+                            <input type="text" id="site-name" placeholder="مثال: Nivolock أو متجري" autocomplete="off">
+                        </div>
+                        <div>
+                            <label for="site-api-key-select">مفتاح API / IP المرتبط بحماية هذا المشروع:</label>
+                            <select id="site-api-key-select" aria-label="اختر مفتاح API أو IP للمشروع">
+                                <option value="AUTO">🔑 توليد مفتاح API/IP تلقائي خاص بهذا المشروع</option>
+                            </select>
                         </div>
                     </div>
-                    <div id="preview-frame-wrapper"></div>
-                </div>
 
-                <!-- صندوق الروابط النظيفة الذي يظهر فوراً بعد الضغط على الزر -->
-                <div id="generated-links-box" role="region" aria-label="روابط الموقع الجاهزة للمشاركة">
-                    <h3 style="color:#34d399; margin-bottom:12px;">✅ تم إنشاء وحفظ موقعك بنجاح! إليك الروابط النظيفة والفعالة:</h3>
-
-                    <label for="out-short-url">1. 🌟 الرابط الرسمي المختصر باسم مشروعك (بدون كلمة GitHub وبدون اسم حسابك - جاهز للنشر والمشاركة):</label>
-                    <div class="link-row">
-                        <input type="text" id="out-short-url" readonly value="جاري صناعة الرابط المخصص باسم مشروعك...">
-                        <button type="button" class="btn btn-purple" onclick="copyInput('out-short-url')">📋 نسخ الرابط المختصر</button>
-                        <button type="button" class="btn btn-dark" onclick="openInputUrl('out-short-url')">🌐 فتح الموقع</button>
+                    <!-- القوالب الجاهزة وأدوات المحرر -->
+                    <div class="templates-bar" role="toolbar" aria-label="قوالب وأدوات المحرر السريعة">
+                        <span style="font-size:0.84rem; color:var(--text-dim); align-self:center;">قوالب جاهزة:</span>
+                        <button type="button" class="btn btn-dark" onclick="loadTemplate('free')">📄 1: موقع حر (بدون دخول)</button>
+                        <button type="button" class="btn btn-dark" onclick="loadTemplate('nickname')">👤 2: دخول باسم مستعار</button>
+                        <button type="button" class="btn btn-dark" onclick="loadTemplate('social')">🌐 3: دخول جوجل وفيسبوك</button>
+                        <button type="button" class="btn btn-dark" style="background:#1e3a8a;" onclick="pasteCodeFromClipboard()">📋 لصق الكود</button>
+                        <button type="button" class="btn btn-dark" style="background:#7f1d1d;" onclick="clearEditorCode()">🗑️ تفريغ المحرر</button>
                     </div>
 
-                    <label for="out-cloud-url">2. 🔗 الرابط السحابي المباشر والقصير للمشروع (خالٍ تماماً من الحروف الطويلة ويتحدث تلقائياً عند أي تعديل):</label>
-                    <div class="link-row">
-                        <input type="text" id="out-cloud-url" readonly>
-                        <button type="button" class="btn btn-blue" onclick="copyInput('out-cloud-url')">📋 نسخ الرابط السحابي</button>
-                        <button type="button" class="btn btn-dark" onclick="openInputUrl('out-cloud-url')">🌐 فتح الموقع</button>
+                    <!-- مربع التحرير الواحد غير المحدود -->
+                    <label for="code-editor">الكود الكامل للمشروع (HTML / CSS / JS في محرر واحد غير محدود):</label>
+                    <textarea id="code-editor" spellcheck="false" placeholder="اكتب أو الصق كود موقعك أو تطبيقك الكامل هنا..."></textarea>
+
+                    <!-- زر الإنشاء والحفظ في البوت والقناة وإظهار الروابط -->
+                    <button type="button" class="btn btn-create" onclick="publishAndSaveWebsite()">
+                        🚀 استضافة المشروع في البوت والقناة (أو استبدال القديم بالأحدث) وإظهار الروابط
+                    </button>
+
+                    <!-- زر المعاينة الحية -->
+                    <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
+                        <button type="button" class="btn btn-blue" style="flex:1;" onclick="toggleLivePreview(true)">
+                            👁️ معاينة الكود الحيّة الآن (تشغيل / تحديث المعاينة)
+                        </button>
+                    </div>
+
+                    <!-- شاشة المعاينة الحية -->
+                    <div id="preview-container" role="region" aria-label="نافذة المعاينة الحية للكود">
+                        <div id="preview-header">
+                            <span style="font-weight:bold; font-size:0.9rem; color:#93c5fd;">⚡ المعاينة الحية للمشروع:</span>
+                            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <button type="button" class="btn btn-blue" style="padding:5px 12px; font-size:0.82rem;" onclick="refreshLivePreview()">🔄 تحديث</button>
+                                <button type="button" class="btn btn-purple" style="padding:5px 12px; font-size:0.82rem;" onclick="toggleFullscreenPreview()">🖥️ ملء الشاشة</button>
+                                <button type="button" class="btn btn-red" style="padding:5px 12px; font-size:0.82rem;" onclick="closeLivePreview()">✖ إغلاق</button>
+                            </div>
+                        </div>
+                        <div id="preview-frame-wrapper"></div>
+                    </div>
+
+                    <!-- صندوق الروابط الرسمية الذي يظهر فور الإنشاء -->
+                    <div id="generated-links-box" role="region" aria-label="روابط المشروع الجاهزة">
+                        <h3 id="publish-result-heading" style="color:#34d399; margin-bottom:12px;">✅ تمت الاستضافة في سحابة البوت والقناة بنجاح! إليك الروابط:</h3>
+
+                        <label for="out-tg-url">1. ✈️ رابط البوت الرسمي على تيليجرام باسم مشروعك (يفتح موقعك مباشرة من تيليجرام):</label>
+                        <div class="link-row">
+                            <input type="text" id="out-tg-url" readonly>
+                            <button type="button" class="btn btn-tg" onclick="copyInput('out-tg-url')">📋 نسخ رابط تيليجرام</button>
+                            <button type="button" class="btn btn-dark" onclick="openInputUrl('out-tg-url')">✈️ فتح</button>
+                        </div>
+
+                        <label for="out-short-url">2. 🌟 الرابط المختصر المستقل باسم مشروعك (بدون كلمة GitHub نهائياً):</label>
+                        <div class="link-row">
+                            <input type="text" id="out-short-url" readonly value="جاري صناعة الرابط المختصر باسم مشروعك...">
+                            <button type="button" class="btn btn-purple" onclick="copyInput('out-short-url')">📋 نسخ المختصر</button>
+                            <button type="button" class="btn btn-dark" onclick="openInputUrl('out-short-url')">🌐 فتح</button>
+                        </div>
+
+                        <label for="out-cloud-url">3. 🔗 رابط الإشارة السحابي المباشر للمشروع:</label>
+                        <div class="link-row">
+                            <input type="text" id="out-cloud-url" readonly>
+                            <button type="button" class="btn btn-blue" onclick="copyInput('out-cloud-url')">📋 نسخ الرابط</button>
+                            <button type="button" class="btn btn-dark" onclick="openInputUrl('out-cloud-url')">🌐 فتح</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- قائمة سفلية مباشرة داخل قسم الإنشاء تعرض المواقع والمشاريع بأسمائها ومفاتيح API/IP الخاصة بها -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <span>📋 مشاريعك المستضافة ومفاتيح API / IP الخاصة بها</span>
+                        <button type="button" class="btn btn-dark" onclick="switchSection('sec-projects')">📂 عرض الإدارة الكاملة</button>
+                    </div>
+                    <div id="quick-bottom-projects-list">
+                        <p style="color:var(--text-dim);">لا توجد مشاريع منشأة بعد.</p>
                     </div>
                 </div>
             </section>
 
-            <!-- 2. قائمة المواقع والمشاريع المحفوظة دائماً (قابلة للتعديل في أي وقت) -->
-            <section class="section-card" aria-labelledby="saved-sites-heading">
-                <div class="section-title">
-                    <span id="saved-sites-heading">2. مواقعك ومشاريعك المحفوظة دائماً (تعديل / فتح / نسخ الرابط المختصر)</span>
-                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <button type="button" class="btn btn-dark" onclick="exportFullBackup()">💾 تصدير نسخة احتياطية (JSON)</button>
-                        <button type="button" class="btn btn-dark" onclick="document.getElementById('backup-file-input').click()">📂 استيراد نسخة احتياطية</button>
-                        <input type="file" id="backup-file-input" accept=".json" style="display:none;" onchange="importFullBackup(event)">
+            <!-- ===================================================================
+                 القسم 2: إدارة المواقع والمشاريع ومفاتيح API / IP
+                 =================================================================== -->
+            <section id="sec-projects" class="app-section" role="tabpanel" aria-labelledby="tab-btn-projects">
+                <div class="section-card">
+                    <div class="section-title">
+                        <span>📂 المواقع والمشاريع المستضافة (التعديل يستبدل القديم في القناة، والحذف يمسحه نهائياً من القناة)</span>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button type="button" class="btn btn-dark" onclick="exportFullBackup()">💾 تصدير نسخة (JSON)</button>
+                            <button type="button" class="btn btn-dark" onclick="document.getElementById('backup-file-input').click()">📂 استيراد نسخة</button>
+                            <input type="file" id="backup-file-input" accept=".json" style="display:none;" onchange="importFullBackup(event)">
+                        </div>
+                    </div>
+                    <div id="saved-sites-list">
+                        <p style="color:var(--text-dim);">لا توجد مواقع حالياً. اضغط "إنشاء مشروع" في الشريط السفلي للبدء.</p>
                     </div>
                 </div>
-                <div id="saved-sites-list">
-                    <p style="color:var(--text-dim);">لا توجد مواقع محفوظة بعد. أنشئ موقعك الأول في الأعلى.</p>
+
+                <div class="section-card">
+                    <div class="section-title">
+                        <span>🔑 مفاتيح API / IP الفعالة للمشاريع والتطبيقات (إيقاف وحظر فوري)</span>
+                    </div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px;">
+                        <input type="text" id="new-key-label" placeholder="اسم المشروع أو تطبيق الـ APK المرتبط بالمفتاح..." style="flex:1; margin-bottom:0;">
+                        <button type="button" class="btn btn-yellow" onclick="generateNewApiKey()">➕ توليد مفتاح API / IP جديد</button>
+                    </div>
+                    <div id="api-keys-list"></div>
                 </div>
             </section>
 
-            <!-- 3. نظام مفاتيح API الفعالة لحماية تطبيقات الأندرويد APK والمواقع في الوقت الفعلي -->
-            <section class="section-card" aria-labelledby="api-heading">
-                <div class="section-title">
-                    <span id="api-heading">3. مفاتيح الـ API الفعالة (ربط وحماية تطبيقات الأندرويد APK والمواقع)</span>
-                </div>
-                <p style="font-size:0.9rem; color:var(--text-dim); margin-bottom:14px;">
-                    إذا قام أي شخص بكسر تطبيقك (الهندسة العكسية) وسرقة مفتاح الـ API، اضغط "حظر وإيقاف المفتاح" هنا، وسيتوقف التطبيق أو الموقع المسروق عن العمل في نفس اللحظة لدى الجميع!
-                </p>
+            <!-- ===================================================================
+                 القسم 3: محرك البوت التلقائي والاكتشاف الذاتي للقناة الخاصة
+                 (بدون الحاجة لكتابة معرف البوت ولا معرف القناة يدوياً!)
+                 =================================================================== -->
+            <section id="sec-bot" class="app-section" role="tabpanel" aria-labelledby="tab-btn-bot">
+                <div class="section-card">
+                    <div class="section-title">
+                        <span>🤖 المحرك التلقائي لسحابة البوت والقناة الخاصة (بدون إدخال معرّف القناة أو البوت)</span>
+                        <span id="bot-conn-indicator" style="font-size:0.85rem; color:#34d399;">سحابة البوت الأصلية مفعلة ✅</span>
+                    </div>
 
-                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px;">
-                    <input type="text" id="new-key-label" placeholder="اسم التطبيق أو الموقع (مثال: تطبيق الأندرويد الإصدار 1)" style="flex:1; margin-bottom:0;">
-                    <button type="button" class="btn btn-yellow" onclick="generateNewApiKey()">🔑 توليد مفتاح API جديد</button>
+                    <div style="background:rgba(36,129,204,0.12); border:1px solid var(--tg-blue); border-radius:10px; padding:15px; margin-bottom:16px;">
+                        <h3 style="color:#38bdf8; font-size:1rem; margin-bottom:8px;">💡 كيف يعمل هذا البوت كحاسوب سحابي وقناة تخزين تلقائياً؟</h3>
+                        <ol style="padding-right:20px; font-size:0.9rem; color:#e5e7eb; line-height:1.8;">
+                            <li>تعطي رابط GitHub لـ <strong>@BotFather</strong> مرة واحدة فقط، ومن بعدها تفتح هذا الموقع <strong>من رابط البوت في تيليجرام مباشرة</strong>.</li>
+                            <li>يتصل الموقع تلقائياً بـ <strong>سحابة البوت المدمجة (Telegram Bot CloudStorage)</strong> لحفظ واستبدال وحذف مشاريعك بدون أن تكتب أي معرّفات!</li>
+                            <li><strong>لاكتشاف قناتك الخاصة تلقائياً بدون كتابة معرّف القناة ولا اسم البوت:</strong> فقط اجعل البوت <strong>مسؤولاً (Admin)</strong> في قناتك الخاصة، وسيكتشف الكود اسم البوت والقناة تلقائياً ويرسل إليها الملفات ويحذف القديم عند التحديث!</li>
+                        </ol>
+                    </div>
+
+                    <!-- توليد رابط جاهز لوضعه في BotFather أو التفعيل بضغطة واحدة -->
+                    <label for="auto-bot-token-input">لتفعيل إرسال وحذف الملفات الفعلي داخل القناة التي جعلت البوت مسؤولاً فيها (يكتشف اسم البوت ومعرف القناة تلقائياً):</label>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+                        <input type="password" id="auto-bot-token-input" placeholder="الصق توكن البوت من BotFather مرة واحدة فقط (أو مرره في رابط BotFather ?bot=TOKEN)..." style="flex:1; margin-bottom:0;">
+                        <button type="button" class="btn btn-tg" onclick="autoDiscoverBotAndAdminChannel()">
+                            🔍 اكتشاف البوت والقناة الخاصة تلقائياً
+                        </button>
+                    </div>
+
+                    <div id="auto-discovered-info" style="background:var(--bg-input); border:1px solid var(--border-clr); border-radius:8px; padding:12px; font-size:0.9rem; color:#a7f3d0;">
+                        ⚡ حالة السحابة: سحابة البوت الأصلية (`Telegram.WebApp.CloudStorage`) جاهزة وتعمل تلقائياً.
+                    </div>
                 </div>
 
-                <div id="api-keys-list"></div>
+                <!-- رفع ملفات مباشرة للقناة المكتشفة -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <span>📤 إرسال ملفات أو تطبيقات مباشرة عبر البوت إلى القناة الخاصة</span>
+                    </div>
+                    <input type="file" id="tg-direct-file" style="margin-bottom:12px; color:#fff;">
+                    <input type="text" id="tg-file-caption" placeholder="وصف أو ملاحظة مع الملف (اختياري)...">
+                    <button type="button" class="btn btn-blue" onclick="uploadCustomFileToTelegramChannel()">☁️ إرسال الملف للقناة عبر البوت</button>
+                </div>
+
+                <!-- إدارة وتطهير بيانات التخزين اللامركزية مع الحفاظ على الخوادم اللامركزية للإشارات -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <span>🛡️ تطهير بيانات التخزين اللامركزية (مع بقاء خوادم الإشارات لتجاوز الحماية)</span>
+                    </div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button type="button" class="btn btn-red" onclick="purgeDecentralizedStorageData(false)">
+                            🧹 حذف بيانات التخزين اللامركزية (مع بقاء خوادم الإشارات نشطة)
+                        </button>
+                        <button type="button" class="btn btn-dark" onclick="reconnectSignalingServers()">
+                            🔄 تنشيط خوادم الإشارات اللامركزية
+                        </button>
+                    </div>
+                </div>
             </section>
 
-            <!-- 4. التواصل الفوري وسجل رسائل وتسجيلات دخول المستخدمين -->
-            <section class="section-card" aria-labelledby="comms-heading">
-                <div class="section-title">
-                    <span id="comms-heading">4. البث الفوري وسجل الرسائل وتسجيلات الدخول الحية</span>
-                    <button type="button" class="btn btn-dark" onclick="clearLiveInbox()">🧹 مسح السجل</button>
-                </div>
-                
-                <label for="broadcast-input">إرسال إشعار أو أمر فوري يظهر لكل من يفتح مواقعك أو تطبيقاتك الآن:</label>
-                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px;">
-                    <input type="text" id="broadcast-input" placeholder="اكتب رسالتك أو تنبيهك هنا ليصل في الوقت الفعلي..." style="flex:1; margin-bottom:0;">
-                    <button type="button" class="btn btn-purple" onclick="sendBroadcastNow()">📢 إرسال فوري للجميع</button>
-                </div>
+            <!-- ===================================================================
+                 القسم 4: الإشارات اللامركزية الحية والبث وصندوق الحسابات والرسائل
+                 =================================================================== -->
+            <section id="sec-signals" class="app-section" role="tabpanel" aria-labelledby="tab-btn-signals">
+                <div class="section-card">
+                    <div class="section-title">
+                        <span>📡 البث الحي وسجل الرسائل وحسابات الدخول (تُرسل تلقائياً للقناة الخاصة)</span>
+                        <button type="button" class="btn btn-dark" onclick="clearLiveInbox()">🧹 مسح السجل</button>
+                    </div>
 
-                <label>سجل الأحداث الحية (تسجيلات الدخول بالاسم المستعار أو الحسابات، والرسائل الواردة من مواقعك):</label>
-                <div id="live-inbox" role="log" aria-live="polite">
-                    <div class="log-line">📡 السيرفر السحابي جاهز ويستمع لجميع مواقعك وتطبيقاتك في الوقت الفعلي...</div>
+                    <label for="broadcast-input">إرسال إشعار أو أمر فوري يظهر لكل من يفتح مواقعك أو تطبيقاتك الآن:</label>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
+                        <input type="text" id="broadcast-input" placeholder="اكتب رسالتك أو تنبيهك هنا ليصل عبر الإشارات الفورية..." style="flex:1; margin-bottom:0;">
+                        <button type="button" class="btn btn-purple" onclick="sendBroadcastNow()">📢 إرسال فوري للجميع</button>
+                    </div>
+
+                    <label>سجل الإشارات الحية الواردة (حسابات جوجل/فيسبوك، الأسماء المستعارة، والرسائل):</label>
+                    <div id="live-inbox" role="log" aria-live="polite">
+                        <div class="log-line">📡 خوادم الإشارات اللامركزية وسحابة البوت نشطة وتستمع لجميع مواقعك في الوقت الفعلي...</div>
+                    </div>
                 </div>
             </section>
         </main>
+
+        <!-- ===================================================================
+             الشريط السفلي الثابت للتنقل السريع (Bottom Navigation Bar)
+             =================================================================== -->
+        <nav class="bottom-nav" role="tablist" aria-label="شريط التنقل السفلي بين أقسام الحاسوب السحابي">
+            <button type="button" id="tab-btn-create" class="nav-tab-btn active-tab" role="tab" aria-selected="true" aria-controls="sec-create" onclick="switchSection('sec-create')">
+                <span class="nav-icon">🚀</span>
+                <span>إنشاء مشروع</span>
+            </button>
+            <button type="button" id="tab-btn-projects" class="nav-tab-btn" role="tab" aria-selected="false" aria-controls="sec-projects" onclick="switchSection('sec-projects')">
+                <span class="nav-icon">📂</span>
+                <span>المشاريع و API/IP <small id="nav-projects-count" class="nav-badge-count">0</small></span>
+            </button>
+            <button type="button" id="tab-btn-bot" class="nav-tab-btn" role="tab" aria-selected="false" aria-controls="sec-bot" onclick="switchSection('sec-bot')">
+                <span class="nav-icon">🤖</span>
+                <span>سحابة البوت والقناة</span>
+            </button>
+            <button type="button" id="tab-btn-signals" class="nav-tab-btn" role="tab" aria-selected="false" aria-controls="sec-signals" onclick="switchSection('sec-signals')">
+                <span class="nav-icon">📡</span>
+                <span>الإشارات والسجل</span>
+            </button>
+        </nav>
     </div>
 
     <script>
         /* =========================================================================
-           المرحلة 0: الفحص الفوري لوضع الزائر (Pre-Init Route Interception)
-           يدعم الروابط القصيرة النظيفة (?site=NAME) أو المسار المباشر (#!/NAME) أو (#app=)
+           القسم البرمجي 0: تطهير بيانات التخزين اللامركزية القديمة تلقائياً
+           + تهيئة بيئة بوت تيليجرام الرسمية (Telegram Mini App Environment)
            ========================================================================= */
+        (function cleanLegacyDecentralizedStorage() {
+            const legacyPrefixes = ['gun/', 'radata', 'cloud_os_v1', 'cloud_os_v2', 'cloud_os_v3', 'cloud_os_v4', 'cloud_os_v5'];
+            try {
+                Object.keys(localStorage).forEach(k => {
+                    if (legacyPrefixes.some(p => k.includes(p))) localStorage.removeItem(k);
+                });
+            } catch (e) {}
+        })();
+
+        const TG_WEBAPP = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
+        const TG_NATIVE_CLOUD = (TG_WEBAPP && TG_WEBAPP.CloudStorage) ? TG_WEBAPP.CloudStorage : null;
+
+        let TG_START_PARAM = '';
+        let IS_INSIDE_TELEGRAM_BOT = false;
+
+        if (TG_WEBAPP) {
+            try {
+                TG_WEBAPP.ready();
+                TG_WEBAPP.expand();
+                if (TG_WEBAPP.initData || (TG_WEBAPP.initDataUnsafe && Object.keys(TG_WEBAPP.initDataUnsafe).length > 0)) {
+                    IS_INSIDE_TELEGRAM_BOT = true;
+                }
+                if (TG_WEBAPP.initDataUnsafe && TG_WEBAPP.initDataUnsafe.start_param) {
+                    TG_START_PARAM = String(TG_WEBAPP.initDataUnsafe.start_param).trim();
+                }
+            } catch (e) {}
+        }
+
         const CURRENT_URL_PARAMS = new URLSearchParams(window.location.search);
         const CURRENT_HASH = window.location.hash || '';
         const HAS_HASH_APP = CURRENT_HASH.startsWith('#app=') || CURRENT_HASH.includes('#app=');
 
-        // استخراج اسم الموقع سواء جاء من ?site=NAME أو ?p=NAME أو من المسار النظيف #!/NAME
-        let VISITOR_SITE_PARAM = (CURRENT_URL_PARAMS.get('site') || CURRENT_URL_PARAMS.get('p') || '').trim();
+        // التقاط التوكن تلقائياً إذا مرره المستخدم في الرابط الذي وضعه داخل BotFather (?bot=TOKEN أو ?token=TOKEN)
+        const URL_PASSED_BOT_TOKEN = (CURRENT_URL_PARAMS.get('bot') || CURRENT_URL_PARAMS.get('token') || '').trim();
+
+        // التقاط اسم الموقع للزائر سواء فُتح من رابط البوت الرسمي (?startapp=NAME) أو من رابط الويب (?site=NAME)
+        let VISITOR_SITE_PARAM = (
+            TG_START_PARAM ||
+            CURRENT_URL_PARAMS.get('startapp') ||
+            CURRENT_URL_PARAMS.get('tgWebAppStartParam') ||
+            CURRENT_URL_PARAMS.get('site') ||
+            CURRENT_URL_PARAMS.get('p') ||
+            ''
+        ).trim();
+
         if (!VISITOR_SITE_PARAM && (CURRENT_HASH.startsWith('#!/') || CURRENT_HASH.startsWith('#/'))) {
             VISITOR_SITE_PARAM = decodeURIComponent(CURRENT_HASH.replace(/^#!?\/+/, '').trim());
         }
+
+        if (VISITOR_SITE_PARAM.toLowerCase() === 'admin' || VISITOR_SITE_PARAM.toLowerCase() === 'dashboard') {
+            VISITOR_SITE_PARAM = '';
+        }
+
+        function decodeTelegramStartParam(param) {
+            if (!param) return '';
+            if (param.startsWith('b64_')) {
+                try {
+                    const b64 = param.slice(4).replace(/-/g, '+').replace(/_/g, '/');
+                    return decodeURIComponent(escape(atob(b64)));
+                } catch (e) {}
+            }
+            return param;
+        }
+        VISITOR_SITE_PARAM = decodeTelegramStartParam(VISITOR_SITE_PARAM);
 
         const VISITOR_SERVER_PARAM = (CURRENT_URL_PARAMS.get('s') || CURRENT_URL_PARAMS.get('srv') || '').trim();
         const IS_VISITOR_MODE = Boolean(VISITOR_SITE_PARAM || HAS_HASH_APP);
@@ -335,93 +554,160 @@
         }
 
         /* =========================================================================
-           1. التأسيس السحابي الدائم + قاعدة بيانات IndexedDB + LocalStorage
+           القسم البرمجي 1: محرك التخزين السحابي الأصلي داخل البوت (Telegram.WebApp.CloudStorage)
+           يعمل بدون أي توكن وبدون أي معرّف قناة بمجرد فتح الموقع من البوت!
+           ========================================================================= */
+        const BotNativeCloudStorage = {
+            isSupported: function() {
+                return Boolean(TG_NATIVE_CLOUD && typeof TG_NATIVE_CLOUD.setItem === 'function');
+            },
+            setItem: function(key, val) {
+                return new Promise((resolve) => {
+                    if (!this.isSupported()) return resolve(false);
+                    try {
+                        TG_NATIVE_CLOUD.setItem(key, String(val), (err, ok) => resolve(!err && ok));
+                    } catch (e) { resolve(false); }
+                });
+            },
+            getItem: function(key) {
+                return new Promise((resolve) => {
+                    if (!this.isSupported()) return resolve(null);
+                    try {
+                        TG_NATIVE_CLOUD.getItem(key, (err, val) => resolve(err ? null : val));
+                    } catch (e) { resolve(null); }
+                });
+            },
+            removeItem: function(key) {
+                return new Promise((resolve) => {
+                    if (!this.isSupported()) return resolve(false);
+                    try {
+                        TG_NATIVE_CLOUD.removeItem(key, (err, ok) => resolve(!err && ok));
+                    } catch (e) { resolve(false); }
+                });
+            },
+            getKeys: function() {
+                return new Promise((resolve) => {
+                    if (!this.isSupported()) return resolve([]);
+                    try {
+                        TG_NATIVE_CLOUD.getKeys((err, keys) => resolve((!err && Array.isArray(keys)) ? keys : []));
+                    } catch (e) { resolve([]); }
+                });
+            },
+            // حفظ مشروع كامل في سحابة البوت الأصلية (مع استبدال القديم تلقائياً)
+            saveProjectToBotCloud: async function(projectName, siteRecord) {
+                if (!this.isSupported()) return;
+                const safeKey = 'p_' + projectName.replace(/[^A-Za-z0-9_]/g, '_').slice(0, 32);
+                // أولاً نحذف أي أجزاء قديمة لهذا المشروع لاستبدالها بالأحدث
+                await this.deleteProjectFromBotCloud(projectName);
+
+                const payloadStr = LZString.compressToBase64(JSON.stringify({
+                    name: siteRecord.name,
+                    code: siteRecord.code,
+                    apiKey: siteRecord.apiKey || '',
+                    shortUrl: siteRecord.shortUrl || '',
+                    tgMessageId: siteRecord.tgMessageId || null,
+                    updatedAt: siteRecord.updatedAt,
+                    time: siteRecord.time
+                }));
+
+                // تقسيم الكود إلى شرائح (كل شريحة 3800 حرف) ليتسع لأي مشروع مهما كان حجمه داخل سحابة البوت
+                const chunkSize = 3800;
+                const totalChunks = Math.ceil(payloadStr.length / chunkSize);
+                for (let i = 0; i < totalChunks; i++) {
+                    const part = payloadStr.substring(i * chunkSize, (i + 1) * chunkSize);
+                    await this.setItem(`${safeKey}_c${i}`, part);
+                }
+                await this.setItem(`${safeKey}_meta`, JSON.stringify({ name: projectName, chunks: totalChunks }));
+            },
+            // حذف مشروع نهائياً من سحابة البوت الأصلية
+            deleteProjectFromBotCloud: async function(projectName) {
+                if (!this.isSupported()) return;
+                const safeKey = 'p_' + projectName.replace(/[^A-Za-z0-9_]/g, '_').slice(0, 32);
+                const metaStr = await this.getItem(`${safeKey}_meta`);
+                if (metaStr) {
+                    try {
+                        const meta = JSON.parse(metaStr);
+                        for (let i = 0; i < (meta.chunks || 10); i++) {
+                            await this.removeItem(`${safeKey}_c${i}`);
+                        }
+                    } catch (e) {}
+                }
+                await this.removeItem(`${safeKey}_meta`);
+            },
+            // استرجاع جميع المشاريع المحفوظة داخل سحابة البوت الأصلية تلقائياً عند فتح البوت
+            loadAllProjectsFromBotCloud: async function() {
+                if (!this.isSupported()) return {};
+                const loaded = {};
+                try {
+                    const allKeys = await this.getKeys();
+                    const metaKeys = allKeys.filter(k => k.endsWith('_meta') && k.startsWith('p_'));
+                    for (const mk of metaKeys) {
+                        const metaStr = await this.getItem(mk);
+                        if (!metaStr) continue;
+                        const meta = JSON.parse(metaStr);
+                        const basePrefix = mk.slice(0, -5);
+                        let combinedB64 = '';
+                        for (let i = 0; i < (meta.chunks || 0); i++) {
+                            const part = await this.getItem(`${basePrefix}_c${i}`);
+                            if (part) combinedB64 += part;
+                        }
+                        if (combinedB64) {
+                            const jsonStr = LZString.decompressFromBase64(combinedB64);
+                            if (jsonStr) {
+                                const rec = JSON.parse(jsonStr);
+                                if (rec && rec.name) loaded[rec.name] = rec;
+                            }
+                        }
+                    }
+                } catch (e) {}
+                return loaded;
+            }
+        };
+
+        /* =========================================================================
+           القسم البرمجي 2: إعدادات الخوادم اللامركزية للإشارات + الاكتشاف التلقائي للقناة
            ========================================================================= */
         const CLOUD_NAMESPACE = 'cloud_os_v8_permanent';
-        const MQTT_BROKERS = [
+        const SIGNALING_BROKERS = [
             'wss://broker.emqx.io:8084/mqtt',
             'wss://broker.hivemq.com:8884/mqtt',
             'wss://test.mosquitto.org:8081/mqtt'
         ];
 
-        // معرف السيرفر الشخصي الدائم
         let MY_SERVER_ID = localStorage.getItem('permanent_cloud_server_id');
         if (!MY_SERVER_ID) {
-            MY_SERVER_ID = 'SRV_' + Math.random().toString(36).substring(2, 10).toUpperCase();
+            // إذا كان المستخدم يفتح من داخل تيليجرام، نشتق معرف السيرفر من معرف مستخدم تيليجرام الخاص به ليبقى ثابتاً للأبد على كل أجهزته!
+            if (TG_WEBAPP && TG_WEBAPP.initDataUnsafe && TG_WEBAPP.initDataUnsafe.user && TG_WEBAPP.initDataUnsafe.user.id) {
+                MY_SERVER_ID = 'TG_SRV_' + TG_WEBAPP.initDataUnsafe.user.id;
+            } else {
+                MY_SERVER_ID = 'SRV_' + Math.random().toString(36).substring(2, 10).toUpperCase();
+            }
             localStorage.setItem('permanent_cloud_server_id', MY_SERVER_ID);
         }
-        const srvLabelEl = document.getElementById('server-id-label');
-        if (srvLabelEl) srvLabelEl.innerText = MY_SERVER_ID;
 
-        // الخزنة المحلية للمواقع ومفاتيح الـ API وسجل الرسائل
         let savedSites = {};
         let savedApiKeys = {};
         let savedInboxLogs = [];
+        let tgConfig = {
+            botToken: '',
+            channelId: '',
+            channelTitle: '',
+            botUsername: '',
+            appShortName: '',
+            pinnedIndexMsgId: null
+        };
 
         try {
             savedSites = JSON.parse(localStorage.getItem('permanent_saved_sites') || '{}');
             savedApiKeys = JSON.parse(localStorage.getItem('permanent_api_keys') || '{}');
             savedInboxLogs = JSON.parse(localStorage.getItem('permanent_inbox_logs') || '[]');
-        } catch (e) {
-            console.warn('LocalStorage Parse Recovery:', e);
-        }
+            const loadedTg = JSON.parse(localStorage.getItem('permanent_tg_cloud_config') || '{}');
+            tgConfig = Object.assign(tgConfig, loadedTg);
+        } catch (e) {}
 
-        // محرك قاعدة البيانات الدائمة IndexedDB لدعم الأحجام غير المحدودة
-        const PermanentDB = {
-            db: null,
-            init: function() {
-                return new Promise((resolve) => {
-                    if (!window.indexedDB) return resolve(null);
-                    const req = indexedDB.open('CloudOS_PermanentDB_v9', 1);
-                    req.onupgradeneeded = function(e) {
-                        const db = e.target.result;
-                        if (!db.objectStoreNames.contains('sites')) db.createObjectStore('sites', { keyPath: 'name' });
-                        if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv', { keyPath: 'k' });
-                    };
-                    req.onsuccess = (e) => {
-                        this.db = e.target.result;
-                        resolve(this.db);
-                    };
-                    req.onerror = () => resolve(null);
-                });
-            },
-            saveSite: function(siteObj) {
-                if (!this.db || !siteObj || !siteObj.name) return;
-                try {
-                    const tx = this.db.transaction(['sites'], 'readwrite');
-                    tx.objectStore('sites').put(siteObj);
-                } catch (e) {}
-            },
-            getSite: function(name) {
-                return new Promise((resolve) => {
-                    if (!this.db) return resolve(null);
-                    try {
-                        const tx = this.db.transaction(['sites'], 'readonly');
-                        const req = tx.objectStore('sites').get(name);
-                        req.onsuccess = () => resolve(req.result || null);
-                        req.onerror = () => resolve(null);
-                    } catch (e) { resolve(null); }
-                });
-            },
-            getAllSites: function() {
-                return new Promise((resolve) => {
-                    if (!this.db) return resolve([]);
-                    try {
-                        const tx = this.db.transaction(['sites'], 'readonly');
-                        const req = tx.objectStore('sites').getAll();
-                        req.onsuccess = () => resolve(req.result || []);
-                        req.onerror = () => resolve([]);
-                    } catch (e) { resolve([]); }
-                });
-            },
-            deleteSite: function(name) {
-                if (!this.db) return;
-                try {
-                    const tx = this.db.transaction(['sites'], 'readwrite');
-                    tx.objectStore('sites').delete(name);
-                } catch (e) {}
-            }
-        };
+        if (URL_PASSED_BOT_TOKEN) {
+            tgConfig.botToken = URL_PASSED_BOT_TOKEN;
+        }
 
         function speak(msg) {
             const announcer = document.getElementById('sr-announcer');
@@ -431,26 +717,407 @@
             }
         }
 
-        function saveLocalState() {
-            try {
-                localStorage.setItem('permanent_saved_sites', JSON.stringify(savedSites));
-            } catch (e) {
-                console.warn('LocalStorage quota warning, IndexedDB holds full payload.');
+        function saveStateToSession() {
+            try { localStorage.setItem('permanent_saved_sites', JSON.stringify(savedSites)); } catch (e) {}
+            try { localStorage.setItem('permanent_api_keys', JSON.stringify(savedApiKeys)); } catch (e) {}
+            try { localStorage.setItem('permanent_tg_cloud_config', JSON.stringify(tgConfig)); } catch (e) {}
+            if (BotNativeCloudStorage.isSupported()) {
+                BotNativeCloudStorage.setItem('tg_auto_config', JSON.stringify(tgConfig));
+                BotNativeCloudStorage.setItem('tg_api_keys', JSON.stringify(savedApiKeys));
             }
+        }
+
+        function switchSection(sectionId) {
+            document.querySelectorAll('.app-section').forEach(sec => sec.classList.remove('active-section'));
+            document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+                btn.classList.remove('active-tab');
+                btn.setAttribute('aria-selected', 'false');
+            });
+
+            const targetSec = document.getElementById(sectionId);
+            if (targetSec) targetSec.classList.add('active-section');
+
+            const mapBtn = {
+                'sec-create': 'tab-btn-create',
+                'sec-projects': 'tab-btn-projects',
+                'sec-bot': 'tab-btn-bot',
+                'sec-signals': 'tab-btn-signals'
+            };
+            const targetBtn = document.getElementById(mapBtn[sectionId]);
+            if (targetBtn) {
+                targetBtn.classList.add('active-tab');
+                targetBtn.setAttribute('aria-selected', 'true');
+                speak('تم الانتقال إلى قسم ' + targetBtn.innerText.replace(/\n/g, ' '));
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* =========================================================================
+           القسم البرمجي 3: محرك الاكتشاف الذاتي للبوت والقناة الخاصة + الحذف والاستبدال التلقائي
+           (يكتشف @BotUsername ومعرف القناة الخاصة -100xxxx التي جعلت البوت مسؤولاً فيها تلقائياً!)
+           ========================================================================= */
+        function updateTelegramHeaderStatus() {
+            const envEl = document.getElementById('env-mode-label');
+            const chanEl = document.getElementById('auto-channel-label');
+            const badge = document.getElementById('tg-cloud-badge');
+            const infoBox = document.getElementById('auto-discovered-info');
+
+            if (envEl) {
+                envEl.innerText = IS_INSIDE_TELEGRAM_BOT
+                    ? 'داخل بوت تيليجرام الرسمي (Mini App) ✈️'
+                    : 'متصفح الويب المباشر 🌐';
+            }
+
+            if (tgConfig.channelId) {
+                const titleTxt = tgConfig.channelTitle ? `${tgConfig.channelTitle} (${tgConfig.channelId})` : tgConfig.channelId;
+                if (chanEl) chanEl.innerText = titleTxt + ' ✅';
+                if (badge) {
+                    badge.innerText = `🤖 البوت @${tgConfig.botUsername || 'متصل'} + القناة نشطة 🟢`;
+                    badge.style.background = '#064e3b';
+                    badge.style.borderColor = '#10b981';
+                }
+                if (infoBox) {
+                    infoBox.innerHTML = `✅ <strong>تم الاكتشاف والربط التلقائي بنجاح!</strong><br>` +
+                        `🤖 البوت الرسمي: <strong>@${tgConfig.botUsername || 'نشط'}</strong><br>` +
+                        `📢 القناة الخاصة المكتشفة: <strong>${titleTxt}</strong><br>` +
+                        `🔄 نظام التحديث والحذف: عند تعديل أي مشروع يحذف البوت الملف القديم من القناة ويضع الأحدث، وعند حذفه يمسحه من القناة نهائياً!`;
+                }
+            } else {
+                if (chanEl) chanEl.innerText = 'سحابة البوت المدمجة (CloudStorage)';
+                if (badge) {
+                    badge.innerText = '🤖 سحابة البوت المدمجة: نشطة 🟢';
+                }
+            }
+        }
+
+        // دالة ذكية تكتشف اسم البوت (@username) وتفتش في تحديثات البوت (getUpdates) عن القناة الخاصة التي جعلت البوت مسؤولاً (Admin) فيها بدون أن تكتب معرّف القناة!
+        async function autoDiscoverBotAndAdminChannel(silentMode) {
+            const inputEl = document.getElementById('auto-bot-token-input');
+            const token = (inputEl && inputEl.value.trim()) ? inputEl.value.trim() : tgConfig.botToken;
+
+            if (!token) {
+                if (!silentMode) {
+                    alert('الرجاء لصق توكن البوت من @BotFather مرة واحدة فقط ليقوم النظام باكتشاف اسم البوت وقناتك الخاصة تلقائياً.');
+                }
+                return false;
+            }
+
+            if (!silentMode) speak('جاري اكتشاف البوت والبحث التلقائي عن القناة الخاصة التي عينت البوت مسؤولاً فيها...');
+
             try {
-                localStorage.setItem('permanent_api_keys', JSON.stringify(savedApiKeys));
+                // 1. اكتشاف معرف البوت الرسمي (@username) تلقائياً
+                const meRes = await fetch(`https://api.telegram.org/bot${token}/getMe`);
+                const meData = await meRes.json();
+                if (!meData.ok || !meData.result) {
+                    if (!silentMode) alert('❌ التوكن غير صالح. تأكد من نسخه من @BotFather.');
+                    return false;
+                }
+                tgConfig.botToken = token;
+                tgConfig.botUsername = meData.result.username || '';
+
+                // 2. اكتشاف القناة الخاصة التي أُضيف البوت فيها كمسؤول (Admin) تلقائياً عبر getUpdates
+                const upRes = await fetch(`https://api.telegram.org/bot${token}/getUpdates?limit=100`);
+                const upData = await upRes.json();
+
+                let discoveredChannelId = tgConfig.channelId || '';
+                let discoveredChannelTitle = tgConfig.channelTitle || '';
+
+                if (upData.ok && Array.isArray(upData.result)) {
+                    for (let i = upData.result.length - 1; i >= 0; i--) {
+                        const upd = upData.result[i];
+                        // فحص حدث ترقية البوت كمسؤول في القناة (my_chat_member) أو أي منشور في القناة (channel_post)
+                        const chatObj = (upd.my_chat_member && upd.my_chat_member.chat)
+                            || (upd.channel_post && upd.channel_post.chat)
+                            || (upd.edited_channel_post && upd.edited_channel_post.chat)
+                            || (upd.message && upd.message.sender_chat);
+
+                        if (chatObj && (chatObj.type === 'channel' || chatObj.type === 'supergroup' || String(chatObj.id).startsWith('-100'))) {
+                            discoveredChannelId = String(chatObj.id);
+                            discoveredChannelTitle = chatObj.title || 'قناتي السحابية الخاصة';
+                            break;
+                        }
+                    }
+                }
+
+                if (discoveredChannelId) {
+                    tgConfig.channelId = discoveredChannelId;
+                    tgConfig.channelTitle = discoveredChannelTitle;
+                }
+
+                saveStateToSession();
+                updateTelegramHeaderStatus();
+                renderSavedSitesList();
+
+                if (!silentMode) {
+                    if (tgConfig.channelId) {
+                        speak('تم اكتشاف البوت والقناة الخاصة ' + tgConfig.channelTitle + ' تلقائياً بنجاح');
+                        alert(`✅ تم الاكتشاف التلقائي بنجاح!\n\n🤖 البوت: @${tgConfig.botUsername}\n📢 القناة المكتشفة: ${tgConfig.channelTitle} (${tgConfig.channelId})\n\nالآن أي مشروع تستضيفه سيُرسل للقناة، وعند تعديله سيُحذف القديم ويُستبدل بالأحدث، وعند حذفه سيُحذف نهائياً من القناة!`);
+                    } else {
+                        speak('تم التعرف على البوت. لاكتشاف القناة الخاصة تلقائياً، أضف البوت كمسؤول في قناتك أو أرسل أي كلمة في القناة ثم اضغط اكتشاف');
+                        alert(`✅ تم التعرف على البوت @${tgConfig.botUsername}!\n\n💡 لاكتشاف قناتك الخاصة تلقائياً بدون كتابة معرفها: فقط اذهب لقناتك الخاصة في تيليجرام (التي جعلت البوت مسؤولاً فيها) واكتب فيها أي حرف أو رسالة تجريبية، ثم اضغط هذا الزر مرة أخرى ليلتقطها البوت فوراً!`);
+                    }
+                }
+                return true;
+            } catch (e) {
+                if (!silentMode) alert('حدث خطأ أثناء الاتصال بواجهة تيليجرام.');
+                return false;
+            }
+        }
+
+        // توليد رابط البوت الرسمي على تيليجرام باسم المشروع
+        function buildOfficialTelegramProjectLink(projectName) {
+            let startParam = projectName.trim();
+            if (/[^A-Za-z0-9_\-]/.test(startParam)) {
+                try {
+                    const b64 = btoa(unescape(encodeURIComponent(startParam)))
+                        .replace(/\+/g, '-')
+                        .replace(/\//g, '_')
+                        .replace(/=+$/, '');
+                    startParam = 'b64_' + b64;
+                } catch (e) {
+                    startParam = encodeURIComponent(startParam);
+                }
+            }
+
+            const botUser = (tgConfig.botUsername || '').trim().replace(/^@/, '');
+            const appShort = (tgConfig.appShortName || '').trim().replace(/^\/+|\/+$/g, '');
+
+            if (botUser) {
+                if (appShort) {
+                    return `https://t.me/${botUser}/${appShort}?startapp=${startParam}`;
+                }
+                return `https://t.me/${botUser}?startapp=${startParam}`;
+            }
+            const fallbackBase = getCleanHostingBaseUrl();
+            return `${fallbackBase}?startapp=${encodeURIComponent(projectName)}`;
+        }
+
+        // إرسال المشروع للقناة الخاصة، وإذا كان تحديثاً لمشروع موجود: يحذف البوت الملف القديم من القناة (deleteMessage) ويضع الملف الأحدث مكانه!
+        async function syncProjectFileWithPrivateChannel(siteRecord, tgOfficialUrl, shortCleanUrl, cloudDirectUrl) {
+            // إذا لم تكن القناة مكتشفة بعد وكان التوكن موجوداً، نحاول اكتشافها تلقائياً أولاً
+            if (tgConfig.botToken && !tgConfig.channelId) {
+                await autoDiscoverBotAndAdminChannel(true);
+            }
+            if (!tgConfig.botToken || !tgConfig.channelId || !siteRecord) return;
+
+            try {
+                // 1. إذا كان للمشروع ملف قديم في القناة (tgMessageId)، يقوم البوت بحذفه من القناة فوراً قبل إرسال النسخة الأحدث!
+                if (siteRecord.tgMessageId) {
+                    await fetch(`https://api.telegram.org/bot${tgConfig.botToken}/deleteMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: tgConfig.channelId,
+                            message_id: siteRecord.tgMessageId
+                        })
+                    }).catch(() => {});
+                }
+
+                // 2. إرسال الملف الأحدث (.html) وتفاصيل المشروع إلى القناة الخاصة
+                const caption = `🚀 *مشروع مستضاف في سحابة البوت: ${siteRecord.name}*\n\n` +
+                    `🔑 مفتاح API/IP: \`${siteRecord.apiKey || 'بدون مفتاح'}\`\n` +
+                    `✈️ رابط البوت الرسمي للمشروع:\n${tgOfficialUrl}\n\n` +
+                    `🌟 الرابط المختصر المستقل:\n${shortCleanUrl}\n\n` +
+                    `🕒 آخر تحديث: ${siteRecord.time}`;
+
+                const fileBlob = new Blob([siteRecord.code], { type: 'text/html;charset=utf-8' });
+                const formData = new FormData();
+                formData.append('chat_id', tgConfig.channelId);
+                formData.append('document', fileBlob, `${siteRecord.name}.html`);
+                formData.append('caption', caption);
+                formData.append('parse_mode', 'Markdown');
+
+                const docRes = await fetch(`https://api.telegram.org/bot${tgConfig.botToken}/sendDocument`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const docData = await docRes.json();
+
+                if (docData.ok && docData.result) {
+                    siteRecord.tgMessageId = docData.result.message_id;
+                    if (docData.result.document) {
+                        siteRecord.tgFileId = docData.result.document.file_id;
+                    }
+                    savedSites[siteRecord.name] = siteRecord;
+                    saveStateToSession();
+                    await BotNativeCloudStorage.saveProjectToBotCloud(siteRecord.name, siteRecord);
+                }
+
+                // 3. تحديث الفهرس المثبت في القناة (يحذف الفهرس القديم ويضع الفهرس المحدث)
+                await updatePinnedCloudIndexInTelegramChannel();
+            } catch (e) {
+                console.warn('Channel Sync Warning:', e);
+            }
+        }
+
+        // حذف ملف المشروع نهائياً من القناة الخاصة عند حذفه من لوحة التحكم
+        async function deleteProjectFileFromPrivateChannel(tgMessageId) {
+            if (!tgConfig.botToken || !tgConfig.channelId || !tgMessageId) return;
+            try {
+                await fetch(`https://api.telegram.org/bot${tgConfig.botToken}/deleteMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: tgConfig.channelId,
+                        message_id: tgMessageId
+                    })
+                });
+            } catch (e) {}
+        }
+
+        // تحديث الفهرس المثبت في القناة مع حذف رسالة الفهرس القديمة لكي لا تتراكم الرسائل
+        async function updatePinnedCloudIndexInTelegramChannel() {
+            if (!tgConfig.botToken || !tgConfig.channelId) return;
+            try {
+                if (tgConfig.pinnedIndexMsgId) {
+                    await fetch(`https://api.telegram.org/bot${tgConfig.botToken}/deleteMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: tgConfig.channelId,
+                            message_id: tgConfig.pinnedIndexMsgId
+                        })
+                    }).catch(() => {});
+                }
+
+                const fullIndexObject = {
+                    cloudOsIndex: true,
+                    version: 10.5,
+                    serverId: MY_SERVER_ID,
+                    updatedAt: Date.now(),
+                    sites: savedSites,
+                    apiKeys: savedApiKeys
+                };
+                const compressedIndex = LZString.compressToBase64(JSON.stringify(fullIndexObject));
+                const indexText = `📌 *CLOUD_OS_BOT_DATABASE_INDEX*\n` +
+                    `عدد المشاريع المستضافة حالياً: ${Object.keys(savedSites).length}\n\n` +
+                    `\`CLOUD_DB_START:${compressedIndex}:CLOUD_DB_END\``;
+
+                if (indexText.length <= 4000) {
+                    const res = await fetch(`https://api.telegram.org/bot${tgConfig.botToken}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: tgConfig.channelId,
+                            text: indexText,
+                            parse_mode: 'Markdown'
+                        })
+                    });
+                    const data = await res.json();
+                    if (data.ok && data.result) {
+                        tgConfig.pinnedIndexMsgId = data.result.message_id;
+                        saveStateToSession();
+                        await fetch(`https://api.telegram.org/bot${tgConfig.botToken}/pinChatMessage`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                chat_id: tgConfig.channelId,
+                                message_id: data.result.message_id,
+                                disable_notification: true
+                            })
+                        }).catch(() => {});
+                    }
+                }
+            } catch (e) {}
+        }
+
+        async function uploadCustomFileToTelegramChannel() {
+            if (tgConfig.botToken && !tgConfig.channelId) {
+                await autoDiscoverBotAndAdminChannel(true);
+            }
+            if (!tgConfig.botToken || !tgConfig.channelId) {
+                alert('تأكد من جعل البوت مسؤولاً في قناتك الخاصة والضغط على زر الاكتشاف التلقائي أولاً.');
+                return;
+            }
+            const fileInput = document.getElementById('tg-direct-file');
+            const captionInput = document.getElementById('tg-file-caption');
+            if (!fileInput.files || !fileInput.files[0]) {
+                alert('اختر ملفاً أولاً لرفعه إلى القناة.');
+                return;
+            }
+            const file = fileInput.files[0];
+            speak('جاري إرسال الملف إلى القناة الخاصة عبر البوت...');
+
+            try {
+                const fd = new FormData();
+                fd.append('chat_id', tgConfig.channelId);
+                fd.append('document', file, file.name);
+                fd.append('caption', captionInput.value.trim() || `📦 ملف مخزن عبر البوت السحابي: ${file.name}`);
+
+                const res = await fetch(`https://api.telegram.org/bot${tgConfig.botToken}/sendDocument`, {
+                    method: 'POST',
+                    body: fd
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    fileInput.value = '';
+                    captionInput.value = '';
+                    speak('تم إرسال وتخزين الملف في القناة الخاصة بنجاح');
+                    alert('✅ تم تخزين الملف في قناتك الخاصة بنجاح!');
+                } else {
+                    alert('❌ تعذر إرسال الملف: ' + (data.description || ''));
+                }
+            } catch (e) {
+                alert('حدث خطأ أثناء رفع الملف.');
+            }
+        }
+
+        async function forwardEventToTelegramChannel(eventData) {
+            if (!tgConfig.botToken || !tgConfig.channelId || !eventData) return;
+            try {
+                const msg = `🔔 *تسجيل دخول / رسالة جديدة في مواقعك*\n\n` +
+                    `🌐 المشروع: \`${eventData.site || 'موقع مستضاف'}\`\n` +
+                    `📌 الحدث: *${eventData.type || 'تفاعل زائر'}*\n` +
+                    `👤 المستخدم / الحساب: \`${eventData.user || 'زائر'}\`\n` +
+                    (eventData.text ? `💬 البيانات / الرسالة: ${eventData.text}\n` : '') +
+                    `🕒 الوقت: ${eventData.time || new Date().toLocaleTimeString('ar-EG')}`;
+
+                await fetch(`https://api.telegram.org/bot${tgConfig.botToken}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: tgConfig.channelId,
+                        text: msg,
+                        parse_mode: 'Markdown'
+                    })
+                });
             } catch (e) {}
         }
 
         /* =========================================================================
-           2. محرك فك وضغط الأكواد الذكي (يدعم Base64 الآمن للشبكة + التوافق مع UTF16 و URI)
+           القسم البرمجي 4: تطهير التخزين اللامركزي مع الحفاظ على خوادم الإشارات
            ========================================================================= */
-        function encodeSitePayloadForCloud(finalHtml, rawCode, siteName) {
+        function purgeDecentralizedStorageData(silent) {
+            try {
+                Object.keys(localStorage).forEach(k => {
+                    if (k.startsWith('visitor_cache_') || k.startsWith('gun') || k.includes('decentralized')) {
+                        localStorage.removeItem(k);
+                    }
+                });
+                if (window.indexedDB && window.indexedDB.deleteDatabase) {
+                    window.indexedDB.deleteDatabase('CloudOS_PermanentDB_v9');
+                    window.indexedDB.deleteDatabase('radata');
+                }
+            } catch (e) {}
+
+            republishAllToSignalingCluster();
+
+            if (!silent) {
+                speak('تم حذف بيانات التخزين اللامركزية مع الحفاظ على خوادم الإشارات اللامركزية لتجاوز الحماية');
+                alert('✅ تم حذف بيانات التخزين اللامركزية بالكامل، مع إبقاء خوادم الإشارات اللامركزية نشطة لتجاوز الحماية!');
+            }
+        }
+
+        /* =========================================================================
+           القسم البرمجي 5: ضغط وفك ضغط حزم الإشارات + حقن حقيبة البوت في المواقع المستضافة
+           ========================================================================= */
+        function encodeSitePayloadForCloud(finalHtml, rawCode, siteName, apiKey) {
             const compressedBase64 = LZString.compressToBase64(finalHtml);
             const rawBase64 = LZString.compressToBase64(rawCode || finalHtml);
             return JSON.stringify({
-                v: 9,
+                v: 10.5,
                 name: siteName,
+                apiKey: apiKey || '',
                 serverId: MY_SERVER_ID,
                 updatedAt: Date.now(),
                 time: new Date().toLocaleTimeString('ar-EG'),
@@ -472,6 +1139,7 @@
                             return {
                                 html: html,
                                 rawCode: rawCode || html,
+                                apiKey: parsed.apiKey || '',
                                 updatedAt: parsed.updatedAt || Date.now(),
                                 time: parsed.time || new Date().toLocaleTimeString('ar-EG'),
                                 serverId: parsed.serverId || ''
@@ -483,40 +1151,68 @@
             try {
                 const fromUtf16 = LZString.decompressFromUTF16(rawMessageString);
                 if (fromUtf16 && (fromUtf16.includes('<') || fromUtf16.length > 10)) {
-                    return { html: fromUtf16, rawCode: fromUtf16, updatedAt: 0, time: 'محفوظ سحابياً' };
+                    return { html: fromUtf16, rawCode: fromUtf16, updatedAt: 0, time: 'إشارة سحابية' };
                 }
             } catch (e) {}
             try {
                 const fromB64 = LZString.decompressFromBase64(rawMessageString);
                 if (fromB64 && fromB64.includes('<')) {
-                    return { html: fromB64, rawCode: fromB64, updatedAt: 0, time: 'محفوظ سحابياً' };
+                    return { html: fromB64, rawCode: fromB64, updatedAt: 0, time: 'إشارة سحابية' };
                 }
             } catch (e) {}
             return null;
         }
 
-        /* =========================================================================
-           3. حقيبة السيرفر السحابي الاختيارية (injectOptionalCloudHelper)
-           ========================================================================= */
-        function injectOptionalCloudHelper(rawHtml, targetServerId) {
+        function injectOptionalCloudHelper(rawHtml, targetServerId, boundApiKey, projectName) {
             const activeServerId = targetServerId || MY_SERVER_ID;
+            const activeProjectName = projectName || 'موقع مستضاف';
+            const autoKey = (boundApiKey && boundApiKey !== 'NONE') ? boundApiKey : '';
+
+            const encodedTgRelay = (tgConfig.botToken && tgConfig.channelId)
+                ? btoa(unescape(encodeURIComponent(JSON.stringify({ t: tgConfig.botToken, c: tgConfig.channelId }))))
+                : '';
+
             if (!rawHtml) return '';
-            if (rawHtml.includes('id="cloud-os-sdk-v9"')) return rawHtml;
+            const cleanedHtml = rawHtml.replace(/<script id="cloud-os-sdk-v9">[\s\S]*?<\/script>/gi, '');
 
             const helperScript = `<script id="cloud-os-sdk-v9">
 (function(){
-    if(window.Cloud && window.Cloud.__v9) return;
+    if(window.Cloud && window.Cloud.__v10) return;
     const SRV_ID = "${activeServerId}";
+    const PROJ_NAME = "${activeProjectName.replace(/"/g, '\\"')}";
+    const AUTO_API_KEY = "${autoKey}";
+    const TG_RELAY_B64 = "${encodedTgRelay}";
     const NS = "${CLOUD_NAMESPACE}";
     const BROKERS = [
         "wss://broker.emqx.io:8084/mqtt",
-        "wss://broker.hivemq.com:8884/mqtt"
+        "wss://broker.hivemq.com:8884/mqtt",
+        "wss://test.mosquitto.org:8081/mqtt"
     ];
     let sdkClients = [];
     let pendingActions = [];
     let isLockedByGuard = false;
     let activeGuardKeys = {};
     let seenBroadcasts = new Set();
+
+    if(AUTO_API_KEY) activeGuardKeys[AUTO_API_KEY] = true;
+
+    function sendDirectToTelegramChannel(packet) {
+        if(!TG_RELAY_B64) return;
+        try {
+            const cfg = JSON.parse(decodeURIComponent(escape(atob(TG_RELAY_B64))));
+            if(!cfg.t || !cfg.c) return;
+            const text = "🔔 *حدث جديد من موقع: " + PROJ_NAME + "*\\n\\n" +
+                         "📌 النوع: *" + (packet.type || "إشارة") + "*\\n" +
+                         "👤 المستخدم/الحساب: \`" + (packet.user || "زائر") + "\`\\n" +
+                         (packet.text ? "💬 المحتوى: " + packet.text + "\\n" : "") +
+                         "🕒 الوقت: " + (packet.time || "");
+            fetch("https://api.telegram.org/bot" + cfg.t + "/sendMessage", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ chat_id: cfg.c, text: text, parse_mode: "Markdown" })
+            }).catch(function(){});
+        } catch(e){}
+    }
 
     function flushPending(client) {
         while(pendingActions.length > 0) {
@@ -547,7 +1243,7 @@
         Object.keys(activeGuardKeys).forEach(k => {
             if(topic === NS + "/api_guard/" + k && msg === "BLOCKED" && !isLockedByGuard) {
                 isLockedByGuard = true;
-                document.body.innerHTML = '<div dir="rtl" style="background:#450a0a;color:#fff;height:100vh;width:100vw;position:fixed;inset:0;z-index:2147483647;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-family:sans-serif;padding:20px;"><h1>🚫 تم إيقاف هذا التطبيق / الموقع بأمر مباشر من السيرفر</h1><p style="margin-top:12px;color:#fca5a5;font-size:1.1rem;">مفتاح الـ API المستخدم (' + k + ') تم حظره وإلغاء صلاحيته الفورية.</p></div>';
+                document.body.innerHTML = '<div dir="rtl" style="background:#450a0a;color:#fff;height:100vh;width:100vw;position:fixed;inset:0;z-index:2147483647;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-family:sans-serif;padding:20px;"><h1>🚫 تم إيقاف هذا الموقع / التطبيق بأمر فوري من البوت السحابي</h1><p style="margin-top:12px;color:#fca5a5;font-size:1.1rem;">مفتاح الـ API / IP المرتبط بهذا المشروع (' + k + ') تم حظره وإلغاء صلاحيته.</p></div>';
             }
         });
     }
@@ -560,7 +1256,7 @@
         bar.setAttribute('role', 'alert');
         bar.dir = 'rtl';
         bar.style.cssText = 'position:fixed;top:15px;left:50%;transform:translateX(-50%);background:#1d4ed8;color:#fff;padding:12px 24px;border-radius:99px;z-index:2147483646;font-weight:bold;box-shadow:0 8px 25px rgba(0,0,0,0.6);font-family:sans-serif;border:2px solid #93c5fd;';
-        bar.innerText = '📢 إشعار من إدارة السيرفر: ' + msg;
+        bar.innerText = '📢 إشعار من السيرفر: ' + msg;
         if(document.body) {
             document.body.appendChild(bar);
             setTimeout(() => bar.remove(), 8000);
@@ -592,7 +1288,7 @@
         if(typeof mqtt === 'undefined' || sdkClients.length > 0) return;
         BROKERS.forEach(url => {
             try {
-                const c = mqtt.connect(url, { clientId: 'app_' + Math.random().toString(16).slice(2, 10), connectTimeout: 6000 });
+                const c = mqtt.connect(url, { clientId: 'sig_' + Math.random().toString(16).slice(2, 10), connectTimeout: 6000 });
                 sdkClients.push(c);
                 c.on('connect', () => {
                     c.subscribe(NS + "/" + SRV_ID + "/broadcast");
@@ -613,8 +1309,9 @@
     bootMqttSdk();
 
     window.Cloud = {
-        __v9: true,
+        __v10: true,
         serverId: SRV_ID,
+        projectName: PROJ_NAME,
         useApiKey: function(apiKey) {
             if(!apiKey) return;
             const cleanKey = apiKey.trim();
@@ -630,41 +1327,48 @@
         },
         loginWithNickname: function(nickname, callback) {
             if(!nickname || !nickname.trim()) return;
-            const userObj = { type: 'دخول باسم مستعار', user: nickname.trim(), time: new Date().toLocaleTimeString('ar-EG') };
+            const userObj = { site: PROJ_NAME, type: 'دخول باسم مستعار', user: nickname.trim(), time: new Date().toLocaleTimeString('ar-EG') };
             localStorage.setItem('cloud_user_session', JSON.stringify(userObj));
             pubToCloud(NS + "/" + SRV_ID + "/live_inbox", JSON.stringify(userObj));
+            sendDirectToTelegramChannel(userObj);
             if(typeof callback === 'function') callback(userObj);
         },
         loginWithAccount: function(provider, accountName, callback) {
-            const userObj = { type: 'دخول بحساب ' + provider, user: accountName, time: new Date().toLocaleTimeString('ar-EG') };
+            const userObj = { site: PROJ_NAME, type: 'دخول بحساب ' + provider, user: accountName, time: new Date().toLocaleTimeString('ar-EG') };
             localStorage.setItem('cloud_user_session', JSON.stringify(userObj));
             pubToCloud(NS + "/" + SRV_ID + "/live_inbox", JSON.stringify(userObj));
+            sendDirectToTelegramChannel(userObj);
             if(typeof callback === 'function') callback(userObj);
         },
         sendToServer: function(messageText) {
             if(!messageText) return;
-            let savedUser = { user: 'زائر بدون تسجيل' };
-            try { savedUser = JSON.parse(localStorage.getItem('cloud_user_session') || '{"user":"زائر بدون تسجيل"}'); } catch(e){}
-            const packet = { type: 'رسالة من الموقع', user: savedUser.user || 'زائر', text: messageText, time: new Date().toLocaleTimeString('ar-EG') };
+            let savedUser = { user: 'زائر' };
+            try { savedUser = JSON.parse(localStorage.getItem('cloud_user_session') || '{"user":"زائر"}'); } catch(e){}
+            const packet = { site: PROJ_NAME, type: 'رسالة من الموقع', user: savedUser.user || 'زائر', text: messageText, time: new Date().toLocaleTimeString('ar-EG') };
             pubToCloud(NS + "/" + SRV_ID + "/live_inbox", JSON.stringify(packet));
+            sendDirectToTelegramChannel(packet);
         }
     };
+
+    if(AUTO_API_KEY) {
+        setTimeout(() => window.Cloud.useApiKey(AUTO_API_KEY), 50);
+    }
 })();
 <\/script>`;
 
-            if (/<head[^>]*>/i.test(rawHtml)) {
-                return rawHtml.replace(/(<head[^>]*>)/i, '$1\n' + helperScript + '\n');
-            } else if (/<html[^>]*>/i.test(rawHtml)) {
-                return rawHtml.replace(/(<html[^>]*>)/i, '$1\n<head>' + helperScript + '</head>\n');
-            } else if (/<!doctype\s+html>/i.test(rawHtml)) {
-                return rawHtml.replace(/(<!doctype\s+html>)/i, '$1\n' + helperScript + '\n');
+            if (/<head[^>]*>/i.test(cleanedHtml)) {
+                return cleanedHtml.replace(/(<head[^>]*>)/i, '$1\n' + helperScript + '\n');
+            } else if (/<html[^>]*>/i.test(cleanedHtml)) {
+                return cleanedHtml.replace(/(<html[^>]*>)/i, '$1\n<head>' + helperScript + '</head>\n');
+            } else if (/<!doctype\s+html>/i.test(cleanedHtml)) {
+                return cleanedHtml.replace(/(<!doctype\s+html>)/i, '$1\n' + helperScript + '\n');
             } else {
-                return helperScript + '\n' + rawHtml;
+                return helperScript + '\n' + cleanedHtml;
             }
         }
 
         /* =========================================================================
-           4. عارض المواقع في إطار نظيف ومتزامن + تنظيف شريط عنوان المتصفح تلقائياً
+           القسم البرمجي 6: عارض المواقع المعزول + خوادم الإشارات اللامركزية
            ========================================================================= */
         function sanitizeBrowserAddressBarForVisitor(siteNameLabel, customTitle) {
             try {
@@ -673,8 +1377,7 @@
                 } else if (siteNameLabel) {
                     document.title = siteNameLabel;
                 }
-                // مسح ?site=...&s=... و #app=... من شريط عنوان المتصفح واستبدالها باسم المشروع النظيف فقط
-                if (siteNameLabel && window.history && window.history.replaceState) {
+                if (siteNameLabel && window.history && window.history.replaceState && !IS_INSIDE_TELEGRAM_BOT) {
                     const cleanPath = window.location.pathname + '#!/' + encodeURIComponent(siteNameLabel);
                     window.history.replaceState({ site: siteNameLabel }, document.title, cleanPath);
                 }
@@ -706,9 +1409,7 @@
                     }
                     return iframe;
                 }
-            } catch (err) {
-                console.warn('Direct document.write fallback to Blob URL:', err);
-            }
+            } catch (err) {}
 
             const blob = new Blob([fullCompiledHtml], { type: 'text/html;charset=utf-8' });
             iframe.src = URL.createObjectURL(blob);
@@ -718,9 +1419,6 @@
             return iframe;
         }
 
-        /* =========================================================================
-           5. عنقود الاتصالات السحابية الفورية متعدد السيرفرات (Multi-Broker Cluster)
-           ========================================================================= */
         const activeMqttClients = [];
         const processedMessagesCache = new Set();
 
@@ -728,11 +1426,38 @@
             const opts = options || { qos: 1 };
             activeMqttClients.forEach(client => {
                 if (client && client.connected) {
-                    try {
-                        client.publish(topic, payload, opts);
-                    } catch (e) {}
+                    try { client.publish(topic, payload, opts); } catch (e) {}
                 }
             });
+        }
+
+        function republishAllToSignalingCluster() {
+            Object.keys(savedSites).forEach(siteName => {
+                const s = savedSites[siteName];
+                if (s && s.code) {
+                    const compiled = s.compiledHtml || injectOptionalCloudHelper(s.code, MY_SERVER_ID, s.apiKey, siteName);
+                    const cloudPayload = encodeSitePayloadForCloud(compiled, s.code, siteName, s.apiKey);
+                    const cleanKey = encodeURIComponent(siteName);
+                    publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sites/${cleanKey}`, cloudPayload, { qos: 1, retain: true });
+                    publishToCluster(`${CLOUD_NAMESPACE}/sites/${cleanKey}`, cloudPayload, { qos: 1, retain: true });
+                }
+            });
+            Object.keys(savedApiKeys).forEach(k => {
+                const kObj = savedApiKeys[k];
+                if (kObj) {
+                    publishToCluster(`${CLOUD_NAMESPACE}/api_guard/${k}`, kObj.status, { qos: 1, retain: true });
+                }
+            });
+        }
+
+        function reconnectSignalingServers() {
+            speak('جاري تنشيط خوادم الإشارات اللامركزية...');
+            activeMqttClients.forEach(c => {
+                try { if (c && !c.connected) c.reconnect(); } catch (e) {}
+            });
+            republishAllToSignalingCluster();
+            updateClusterStatusBadge();
+            speak('تم تنشيط خوادم الإشارات اللامركزية بنجاح');
         }
 
         window.__CLOUD_OS_BRIDGE__ = {
@@ -749,17 +1474,17 @@
         };
 
         /* =========================================================================
-           6. مشغل وضع الزائر الفوري (Visitor Mode Engine)
+           القسم البرمجي 7: مشغل الزائر الفوري (يجلب من سحابة البوت الأصلية + خوادم الإشارات)
            ========================================================================= */
         let visitorHasRendered = false;
         let visitorRenderedTimestamp = 0;
 
-        function renderVisitorApplication(rawOrCompiledHtml, siteNameLabel, timestamp) {
+        function renderVisitorApplication(rawOrCompiledHtml, siteNameLabel, timestamp, boundKey) {
             if (!rawOrCompiledHtml || !rawOrCompiledHtml.trim()) return;
             visitorHasRendered = true;
             visitorRenderedTimestamp = timestamp || Date.now();
 
-            const finalHtml = injectOptionalCloudHelper(rawOrCompiledHtml, VISITOR_SERVER_PARAM || MY_SERVER_ID);
+            const finalHtml = injectOptionalCloudHelper(rawOrCompiledHtml, VISITOR_SERVER_PARAM || MY_SERVER_ID, boundKey, siteNameLabel);
             const viewport = document.getElementById('visitor-viewport');
             const loader = document.getElementById('visitor-loader');
 
@@ -769,56 +1494,22 @@
         }
 
         async function startVisitorEngine() {
-            await PermanentDB.init();
-
-            // 1. دعم التوافق العكسي إذا فتح شخص رابطاً قديماً يحتوي على #app=
-            if (HAS_HASH_APP) {
-                try {
-                    const hashIndex = CURRENT_HASH.indexOf('#app=');
-                    const encodedApp = CURRENT_HASH.substring(hashIndex + 5).trim();
-                    if (encodedApp) {
-                        let decodedHtml = LZString.decompressFromEncodedURIComponent(encodedApp);
-                        if (!decodedHtml || !decodedHtml.includes('<')) {
-                            decodedHtml = LZString.decompressFromBase64(encodedApp);
-                        }
-                        if (decodedHtml && decodedHtml.trim().length > 0) {
-                            renderVisitorApplication(decodedHtml, VISITOR_SITE_PARAM || 'تطبيق سحابي', Date.now());
-                            if (VISITOR_SITE_PARAM) {
-                                try { localStorage.setItem('visitor_cache_' + VISITOR_SITE_PARAM, decodedHtml); } catch (e) {}
-                            }
-                        }
-                    }
-                } catch (e) {}
-            }
-
-            // 2. الجلب الفوري من الذاكرة المحلية إذا سبق فتح الموقع
-            if (!visitorHasRendered && VISITOR_SITE_PARAM) {
-                if (savedSites[VISITOR_SITE_PARAM] && savedSites[VISITOR_SITE_PARAM].code) {
-                    renderVisitorApplication(
-                        savedSites[VISITOR_SITE_PARAM].compiledHtml || savedSites[VISITOR_SITE_PARAM].code,
-                        VISITOR_SITE_PARAM,
-                        savedSites[VISITOR_SITE_PARAM].updatedAt || 0
-                    );
-                }
-                if (!visitorHasRendered) {
-                    const idbRecord = await PermanentDB.getSite(VISITOR_SITE_PARAM);
-                    if (idbRecord && (idbRecord.compiledHtml || idbRecord.code)) {
-                        renderVisitorApplication(
-                            idbRecord.compiledHtml || idbRecord.code,
-                            VISITOR_SITE_PARAM,
-                            idbRecord.updatedAt || 0
-                        );
-                    }
-                }
-                if (!visitorHasRendered) {
-                    const cachedVisitorHtml = localStorage.getItem('visitor_cache_' + VISITOR_SITE_PARAM);
-                    if (cachedVisitorHtml && cachedVisitorHtml.trim().length > 0) {
-                        renderVisitorApplication(cachedVisitorHtml, VISITOR_SITE_PARAM, 0);
-                    }
+            // 1. الجلب من سحابة البوت الأصلية (Telegram.WebApp.CloudStorage) إن كان مفتوحاً داخل البوت
+            if (!visitorHasRendered && VISITOR_SITE_PARAM && BotNativeCloudStorage.isSupported()) {
+                const botProjects = await BotNativeCloudStorage.loadAllProjectsFromBotCloud();
+                if (botProjects[VISITOR_SITE_PARAM] && botProjects[VISITOR_SITE_PARAM].code) {
+                    const bp = botProjects[VISITOR_SITE_PARAM];
+                    renderVisitorApplication(bp.code, VISITOR_SITE_PARAM, bp.updatedAt || 0, bp.apiKey);
                 }
             }
 
-            // 3. الجلب الفوري المتوازي من عنقود سيرفرات MQTT الثلاثة
+            // 2. الجلب من الذاكرة المحلية إن وجد
+            if (!visitorHasRendered && VISITOR_SITE_PARAM && savedSites[VISITOR_SITE_PARAM]) {
+                const s = savedSites[VISITOR_SITE_PARAM];
+                renderVisitorApplication(s.compiledHtml || s.code, VISITOR_SITE_PARAM, s.updatedAt || 0, s.apiKey);
+            }
+
+            // 3. الجلب الفوري من خوادم الإشارات اللامركزية الثلاثة (لتجاوز الحماية ولأي زائر)
             if (VISITOR_SITE_PARAM) {
                 const cleanTarget = encodeURIComponent(VISITOR_SITE_PARAM);
                 const topicsToRace = [
@@ -829,7 +1520,7 @@
                     topicsToRace.push(`${CLOUD_NAMESPACE}/${VISITOR_SERVER_PARAM}/sync_sites/${cleanTarget}`);
                 }
 
-                MQTT_BROKERS.forEach((brokerUrl) => {
+                SIGNALING_BROKERS.forEach((brokerUrl) => {
                     try {
                         const vClient = mqtt.connect(brokerUrl, {
                             clientId: 'vis_' + Math.random().toString(16).slice(2, 10),
@@ -844,16 +1535,12 @@
 
                         vClient.on('message', (topic, message) => {
                             if (!topicsToRace.includes(topic)) return;
-                            const rawMsg = message.toString();
-                            const decodedObj = decodeSitePayloadFromCloud(rawMsg);
-
+                            const decodedObj = decodeSitePayloadFromCloud(message.toString());
                             if (decodedObj && decodedObj.html) {
-                                try { localStorage.setItem('visitor_cache_' + VISITOR_SITE_PARAM, decodedObj.html); } catch (e) {}
-
                                 if (!visitorHasRendered) {
-                                    renderVisitorApplication(decodedObj.html, VISITOR_SITE_PARAM, decodedObj.updatedAt);
+                                    renderVisitorApplication(decodedObj.html, VISITOR_SITE_PARAM, decodedObj.updatedAt, decodedObj.apiKey);
                                 } else if (decodedObj.updatedAt && decodedObj.updatedAt > visitorRenderedTimestamp) {
-                                    renderVisitorApplication(decodedObj.html, VISITOR_SITE_PARAM, decodedObj.updatedAt);
+                                    renderVisitorApplication(decodedObj.html, VISITOR_SITE_PARAM, decodedObj.updatedAt, decodedObj.apiKey);
                                 }
                             }
                         });
@@ -864,8 +1551,8 @@
                     if (!visitorHasRendered) {
                         const spinner = document.getElementById('visitor-spinner');
                         if (spinner) spinner.style.display = 'none';
-                        document.getElementById('visitor-status-title').innerText = '⚠️ لم يتم العثور على الموقع أو أن الاتصال بالسيرفر بطيء';
-                        document.getElementById('visitor-status-sub').innerText = 'تأكد من صحة الرابط أو اضغط إعادة المحاولة للجلب من السيرفر الاحتياطي.';
+                        document.getElementById('visitor-status-title').innerText = '⚠️ لم يتم العثور على إشارة هذا المشروع بعد';
+                        document.getElementById('visitor-status-sub').innerText = 'تأكد من صحة اسم المشروع أو اضغط إعادة المحاولة.';
                         document.getElementById('visitor-retry-box').style.display = 'block';
                     }
                 }, 11000);
@@ -873,18 +1560,18 @@
         }
 
         /* =========================================================================
-           7. مشغل لوحة التحكم الرئيسية (Admin Dashboard Engine)
+           القسم البرمجي 8: تهيئة لوحة التحكم داخل البوت ومزامنة سحابة البوت تلقائياً
            ========================================================================= */
         function updateClusterStatusBadge() {
             const badge = document.getElementById('cloud-status');
             if (!badge) return;
             const connectedCount = activeMqttClients.filter(c => c && c.connected).length;
             if (connectedCount > 0) {
-                badge.innerText = `متصل بالسيرفر السحابي الدائم (${connectedCount} عقد نشطة) 🟢`;
+                badge.innerText = `📡 خوادم الإشارات: متصلة (${connectedCount}/3) 🟢`;
                 badge.style.background = '#064e3b';
                 badge.style.borderColor = '#10b981';
             } else {
-                badge.innerText = 'جاري مزامنة العقد السحابية... 🔄';
+                badge.innerText = '📡 جاري الاتصال بخوادم الإشارات... 🔄';
                 badge.style.background = '#78350f';
                 badge.style.borderColor = '#f59e0b';
             }
@@ -899,41 +1586,62 @@
 
             try {
                 const data = JSON.parse(rawMsg);
-                const logText = `[${data.time || new Date().toLocaleTimeString('ar-EG')}] 👤 (${data.type || 'حدث'} - ${data.user || 'زائر'}): ${data.text ? data.text : 'تم تسجيل الدخول بنجاح ✅'}`;
+                const siteLabel = data.site ? `[موقع: ${data.site}] ` : '';
+                const logText = `[${data.time || new Date().toLocaleTimeString('ar-EG')}] ${siteLabel}👤 (${data.type || 'حدث'} - ${data.user || 'زائر'}): ${data.text ? data.text : 'تم تسجيل الدخول بنجاح ✅'}`;
                 logToInbox(logText, true);
-                speak('حدث جديد في السيرفر: ' + (data.user || '') + ' ' + (data.text || data.type || ''));
+                forwardEventToTelegramChannel(data);
+                speak('إشارة جديدة من ' + (data.site || 'موقعك') + ': ' + (data.user || '') + ' ' + (data.text || data.type || ''));
             } catch (e) {}
         }
 
         async function initAdminDashboard() {
-            await PermanentDB.init();
-
-            const idbSites = await PermanentDB.getAllSites();
-            if (idbSites && idbSites.length > 0) {
-                idbSites.forEach(s => {
-                    if (s && s.name) {
-                        if (!savedSites[s.name] || (s.updatedAt || 0) >= (savedSites[s.name].updatedAt || 0)) {
-                            savedSites[s.name] = s;
-                        }
+            // 1. استرجاع إعدادات البوت والمشاريع المحفوظة داخل سحابة البوت الأصلية (Telegram.WebApp.CloudStorage) تلقائياً
+            if (BotNativeCloudStorage.isSupported()) {
+                try {
+                    const cloudCfgStr = await BotNativeCloudStorage.getItem('tg_auto_config');
+                    if (cloudCfgStr) {
+                        const parsedCfg = JSON.parse(cloudCfgStr);
+                        tgConfig = Object.assign(tgConfig, parsedCfg);
                     }
-                });
+                    const cloudKeysStr = await BotNativeCloudStorage.getItem('tg_api_keys');
+                    if (cloudKeysStr) {
+                        const parsedKeys = JSON.parse(cloudKeysStr);
+                        savedApiKeys = Object.assign(savedApiKeys, parsedKeys);
+                    }
+                    const botCloudSites = await BotNativeCloudStorage.loadAllProjectsFromBotCloud();
+                    Object.keys(botCloudSites).forEach(sName => {
+                        const bSite = botCloudSites[sName];
+                        if (!savedSites[sName] || (bSite.updatedAt || 0) >= (savedSites[sName].updatedAt || 0)) {
+                            bSite.compiledHtml = injectOptionalCloudHelper(bSite.code, MY_SERVER_ID, bSite.apiKey, sName);
+                            savedSites[sName] = bSite;
+                        }
+                    });
+                    saveStateToSession();
+                } catch (e) {}
             }
 
+            if (tgConfig.botToken) {
+                const tokenInp = document.getElementById('auto-bot-token-input');
+                if (tokenInp) tokenInp.value = tgConfig.botToken;
+                // تشغيل الاكتشاف التلقائي للبوت والقناة الخاصة في الخلفية بدون إزعاج المستخدم
+                autoDiscoverBotAndAdminChannel(true);
+            }
+
+            updateTelegramHeaderStatus();
+
+            // استعادة سجل الإشارات
             const inboxEl = document.getElementById('live-inbox');
             if (inboxEl && savedInboxLogs.length > 0) {
-                savedInboxLogs.slice(0, 50).reverse().forEach(txt => {
-                    logToInbox(txt, false);
-                });
+                savedInboxLogs.slice(0, 50).reverse().forEach(txt => logToInbox(txt, false));
             }
 
+            // استعادة مسودة المحرر أو تحميل القالب الحر
             const draftName = localStorage.getItem('cloud_editor_draft_name');
             const draftCode = localStorage.getItem('cloud_editor_draft_code');
             const nameInput = document.getElementById('site-name');
             const codeEditor = document.getElementById('code-editor');
 
-            if (draftName && nameInput && !nameInput.value) {
-                nameInput.value = draftName;
-            }
+            if (draftName && nameInput && !nameInput.value) nameInput.value = draftName;
             if (draftCode && draftCode.trim().length > 0 && codeEditor) {
                 codeEditor.value = draftCode;
             } else {
@@ -941,9 +1649,7 @@
             }
 
             if (nameInput) {
-                nameInput.addEventListener('input', () => {
-                    localStorage.setItem('cloud_editor_draft_name', nameInput.value);
-                });
+                nameInput.addEventListener('input', () => localStorage.setItem('cloud_editor_draft_name', nameInput.value));
             }
             if (codeEditor) {
                 codeEditor.addEventListener('input', () => {
@@ -951,10 +1657,11 @@
                 });
             }
 
-            renderSavedSitesList();
             renderApiKeysList();
+            renderSavedSitesList();
 
-            MQTT_BROKERS.forEach((brokerUrl, idx) => {
+            // الاتصال المتوازي بخوادم الإشارات اللامركزية الثلاثة لتجاوز الحماية
+            SIGNALING_BROKERS.forEach((brokerUrl, idx) => {
                 try {
                     const client = mqtt.connect(brokerUrl, {
                         clientId: 'admin_' + MY_SERVER_ID + '_' + idx + '_' + Math.random().toString(16).slice(2, 6),
@@ -968,24 +1675,7 @@
                         client.subscribe(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/live_inbox`, { qos: 1 });
                         client.subscribe(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_sites/+`, { qos: 1 });
                         client.subscribe(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_keys/+`, { qos: 1 });
-
-                        Object.keys(savedSites).forEach(siteName => {
-                            const s = savedSites[siteName];
-                            if (s && s.code) {
-                                const compiled = s.compiledHtml || injectOptionalCloudHelper(s.code, MY_SERVER_ID);
-                                const cloudPayload = encodeSitePayloadForCloud(compiled, s.code, siteName);
-                                const cleanKey = encodeURIComponent(siteName);
-                                client.publish(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sites/${cleanKey}`, cloudPayload, { qos: 1, retain: true });
-                                client.publish(`${CLOUD_NAMESPACE}/sites/${cleanKey}`, cloudPayload, { qos: 1, retain: true });
-                            }
-                        });
-
-                        Object.keys(savedApiKeys).forEach(k => {
-                            const kObj = savedApiKeys[k];
-                            if (kObj) {
-                                client.publish(`${CLOUD_NAMESPACE}/api_guard/${k}`, kObj.status, { qos: 1, retain: true });
-                            }
-                        });
+                        republishAllToSignalingCluster();
                     });
 
                     client.on('close', updateClusterStatusBadge);
@@ -1000,8 +1690,8 @@
 
                         if (topic.startsWith(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_sites/`)) {
                             const siteName = decodeURIComponent(topic.split('/sync_sites/')[1] || '');
-                            if (!siteName || !rawMsg) return;
-
+                            if (!siteName) return;
+                            if (!rawMsg) return;
                             const decodedCloud = decodeSitePayloadFromCloud(rawMsg);
                             if (decodedCloud && decodedCloud.rawCode) {
                                 const existing = savedSites[siteName];
@@ -1010,12 +1700,13 @@
                                         name: siteName,
                                         code: decodedCloud.rawCode,
                                         compiledHtml: decodedCloud.html,
+                                        apiKey: decodedCloud.apiKey || (existing ? existing.apiKey : ''),
                                         shortUrl: existing ? existing.shortUrl : '',
+                                        tgMessageId: existing ? existing.tgMessageId : null,
                                         updatedAt: decodedCloud.updatedAt || Date.now(),
-                                        time: decodedCloud.time || 'مسترجع سحابياً'
+                                        time: decodedCloud.time || 'متزامن'
                                     };
-                                    PermanentDB.saveSite(savedSites[siteName]);
-                                    saveLocalState();
+                                    saveStateToSession();
                                     renderSavedSitesList();
                                 }
                             }
@@ -1026,8 +1717,9 @@
                             if (keyId && rawMsg) {
                                 try {
                                     savedApiKeys[keyId] = JSON.parse(rawMsg);
-                                    saveLocalState();
+                                    saveStateToSession();
                                     renderApiKeysList();
+                                    renderSavedSitesList();
                                 } catch (e) {}
                             }
                         }
@@ -1037,8 +1729,7 @@
         }
 
         /* =========================================================================
-           8. دالة إنشاء الموقع وحفظه وتوليد الروابط النظيفة والمختصرة باسم المشروع
-           (بدون #app= الطويلة وبدون ظهور اسم GitHub في الرابط المختصر)
+           القسم البرمجي 9: استضافة المشروع أو تحديثه (مع حذف القديم من القناة واستبداله بالأحدث)
            ========================================================================= */
         function getCleanHostingBaseUrl() {
             const urlObj = new URL(window.location.href);
@@ -1047,30 +1738,26 @@
             return urlObj.toString();
         }
 
-        // تحويل اسم المشروع إلى لاحقة (Slug) صالحة للروابط المختصرة المخصصة (مثل algeria_shop)
         function buildCustomAliasFromProjectName(projectName) {
-            let slug = projectName
-                .trim()
-                .replace(/[\s\-]+/g, '_')
-                .replace(/[^a-zA-Z0-9_]/g, '');
+            let slug = projectName.trim().replace(/[\s\-]+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
             if (slug.length < 5) {
                 slug = (slug ? slug + '_' : 'app_') + MY_SERVER_ID.toLowerCase().replace(/[^a-z0-9]/g, '').slice(-5);
             }
-            if (slug.length > 26) {
-                slug = slug.substring(0, 26);
-            }
+            if (slug.length > 26) slug = slug.substring(0, 26);
             return slug;
         }
 
-        function publishAndSaveWebsite() {
+        async function publishAndSaveWebsite() {
             const nameInput = document.getElementById('site-name');
             const codeEditor = document.getElementById('code-editor');
+            const keySelect = document.getElementById('site-api-key-select');
+
             let rawName = nameInput.value.trim();
             const rawCode = codeEditor.value;
 
             if (!rawCode.trim()) {
-                alert('الرجاء كتابة أو لصق كود الموقع في المحرر أولاً.');
-                speak('الرجاء كتابة كود الموقع أولاً');
+                alert('الرجاء كتابة أو لصق كود المشروع في المحرر أولاً.');
+                speak('الرجاء كتابة كود المشروع أولاً');
                 return;
             }
 
@@ -1082,41 +1769,72 @@
             const cleanName = rawName.replace(/\s+/g, '-').replace(/[?#&/\\]/g, '');
             nameInput.value = cleanName;
 
-            const finalHtmlToPublish = injectOptionalCloudHelper(rawCode, MY_SERVER_ID);
+            const isUpdatingExisting = Boolean(savedSites[cleanName]);
+            const previousTgMsgId = isUpdatingExisting ? savedSites[cleanName].tgMessageId : null;
+            const existingShortUrl = isUpdatingExisting ? (savedSites[cleanName].shortUrl || '') : '';
+
+            // تحديد أو توليد مفتاح API / IP الخاص بهذا المشروع
+            let assignedApiKey = keySelect ? keySelect.value : 'AUTO';
+            if (assignedApiKey === 'AUTO') {
+                if (isUpdatingExisting && savedSites[cleanName].apiKey && savedApiKeys[savedSites[cleanName].apiKey]) {
+                    assignedApiKey = savedSites[cleanName].apiKey;
+                } else {
+                    assignedApiKey = 'API_' + cleanName.replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 6) + '_' + Math.random().toString(36).substring(2, 7).toUpperCase();
+                    savedApiKeys[assignedApiKey] = {
+                        label: `مفتاح مشروع: ${cleanName}`,
+                        project: cleanName,
+                        status: 'ACTIVE',
+                        createdAt: new Date().toLocaleDateString('ar-EG')
+                    };
+                    publishToCluster(`${CLOUD_NAMESPACE}/api_guard/${assignedApiKey}`, 'ACTIVE', { qos: 1, retain: true });
+                    publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_keys/${assignedApiKey}`, JSON.stringify(savedApiKeys[assignedApiKey]), { qos: 1, retain: true });
+                }
+            } else if (assignedApiKey === 'NONE') {
+                assignedApiKey = '';
+            }
+
+            const finalHtmlToPublish = injectOptionalCloudHelper(rawCode, MY_SERVER_ID, assignedApiKey, cleanName);
             const nowTimestamp = Date.now();
             const nowTimeStr = new Date().toLocaleTimeString('ar-EG');
 
-            const existingShortUrl = (savedSites[cleanName] && savedSites[cleanName].shortUrl) ? savedSites[cleanName].shortUrl : '';
-
-            // 1. الحفظ الرباعي الدائم
             const siteRecord = {
                 name: cleanName,
                 code: rawCode,
                 compiledHtml: finalHtmlToPublish,
+                apiKey: assignedApiKey,
                 shortUrl: existingShortUrl,
+                tgMessageId: previousTgMsgId,
                 serverId: MY_SERVER_ID,
                 updatedAt: nowTimestamp,
                 time: nowTimeStr
             };
             savedSites[cleanName] = siteRecord;
-            PermanentDB.saveSite(siteRecord);
-            saveLocalState();
-            localStorage.setItem('cloud_editor_draft_name', cleanName);
-            try { localStorage.setItem('cloud_editor_draft_code', rawCode); } catch (e) {}
-            try { localStorage.setItem('visitor_cache_' + cleanName, finalHtmlToPublish); } catch (e) {}
+            saveStateToSession();
 
-            // 2. البث والاحتفاظ الدائم على عنقود سيرفرات MQTT الثلاثة
-            const cloudPayload = encodeSitePayloadForCloud(finalHtmlToPublish, rawCode, cleanName);
+            // 1. الحفظ والاستبدال الفوري داخل سحابة البوت الأصلية (Telegram.WebApp.CloudStorage)
+            await BotNativeCloudStorage.saveProjectToBotCloud(cleanName, siteRecord);
+
+            // 2. البث الفوري عبر خوادم الإشارات اللامركزية الثلاثة لتجاوز الحماية
+            const cloudPayload = encodeSitePayloadForCloud(finalHtmlToPublish, rawCode, cleanName, assignedApiKey);
             const encodedName = encodeURIComponent(cleanName);
 
             publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sites/${encodedName}`, cloudPayload, { qos: 1, retain: true });
             publishToCluster(`${CLOUD_NAMESPACE}/sites/${encodedName}`, cloudPayload, { qos: 1, retain: true });
             publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_sites/${encodedName}`, cloudPayload, { qos: 1, retain: true });
 
-            // 3. بناء الرابط السحابي القصير والنظيف (بدون #app=DwQgIg8... نهائياً!)
+            // 3. بناء الروابط الرسمية
             const baseUrl = getCleanHostingBaseUrl();
             const cleanCloudUrl = `${baseUrl}?site=${encodedName}`;
+            const officialTelegramUrl = buildOfficialTelegramProjectLink(cleanName);
 
+            const headingEl = document.getElementById('publish-result-heading');
+            if (headingEl) {
+                headingEl.innerText = isUpdatingExisting
+                    ? `🔄 تم تحديث المشروع (${cleanName}) وحذف النسخة القديمة من القناة واستبدالها بالأحدث!`
+                    : `✅ تمت استضافة المشروع (${cleanName}) وإرساله لسحابة البوت والقناة بنجاح!`;
+            }
+
+            document.getElementById('out-tg-url').value = officialTelegramUrl;
             document.getElementById('out-cloud-url').value = cleanCloudUrl;
             document.getElementById('generated-links-box').style.display = 'block';
 
@@ -1124,22 +1842,25 @@
                 refreshLivePreview();
             }
 
-            // 4. توليد الرابط المختصر المستقل الذي يحمل اسم المشروع ولا يظهر فيه اسم GitHub
-            generateBrandedShortLink(cleanCloudUrl, cleanName);
+            renderApiKeysList();
             renderSavedSitesList();
 
-            speak('تم إنشاء الموقع وحفظه دائماً، الروابط النظيفة والمختصرة باسم مشروعك جاهزة الآن');
+            // 4. توليد الرابط المختصر + إرسال الملف للقناة (مع حذف الملف القديم من القناة إن كان تحديثاً)
+            generateBrandedShortLink(cleanCloudUrl, cleanName).then((finalShortUrl) => {
+                syncProjectFileWithPrivateChannel(siteRecord, officialTelegramUrl, finalShortUrl || cleanCloudUrl, cleanCloudUrl);
+            });
+
+            speak(isUpdatingExisting
+                ? 'تم تحديث المشروع وحذف الملف القديم من القناة واستبداله بالملف الأحدث'
+                : 'تم إنشاء واستضافة المشروع في سحابة البوت والقناة بنجاح');
         }
 
-        // توليد رابط مختصر نظيف يحمل اسم المشروع (عبر is.gd / v.gd / TinyURL)
         async function fetchViaCorsProxy(targetUrl) {
-            // محاولة 1: AllOrigins Raw
             try {
                 const r1 = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl));
                 const d1 = await r1.json();
                 if (d1 && d1.contents) return d1.contents.trim();
             } catch (e) {}
-            // محاولة 2: CodeTabs Proxy
             try {
                 const r2 = await fetch('https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(targetUrl));
                 const t2 = await r2.text();
@@ -1151,24 +1872,21 @@
         async function generateBrandedShortLink(cleanCloudUrl, projectName) {
             const shortInput = document.getElementById('out-short-url');
 
-            // إذا كان لهذا المشروع رابط مختصر محفوظ مسبقاً، نعرضه فوراً لأنه يشير لنفس القناة السحابية المتجددة!
             if (savedSites[projectName] && savedSites[projectName].shortUrl && savedSites[projectName].shortUrl.startsWith('http')) {
                 shortInput.value = savedSites[projectName].shortUrl;
-                return;
+                return savedSites[projectName].shortUrl;
             }
 
-            shortInput.value = 'جاري صناعة الرابط المختصر المخصص باسم (' + projectName + ')...';
+            shortInput.value = 'جاري صناعة الرابط المختصر باسم (' + projectName + ')...';
             const baseAlias = buildCustomAliasFromProjectName(projectName);
             const suffixRand = Math.floor(10 + Math.random() * 89);
 
-            // قائمة المحاولات الذكية: أولاً بالاسم الصريح للمشروع، ثم بإضافة رقم بسيط إن كان الاسم محجوزاً عالمياً، ثم TinyURL
             const attempts = [
                 `https://is.gd/create.php?format=simple&url=${encodeURIComponent(cleanCloudUrl)}&shorturl=${baseAlias}`,
                 `https://v.gd/create.php?format=simple&url=${encodeURIComponent(cleanCloudUrl)}&shorturl=${baseAlias}`,
                 `https://is.gd/create.php?format=simple&url=${encodeURIComponent(cleanCloudUrl)}&shorturl=${baseAlias}_${suffixRand}`,
                 `https://v.gd/create.php?format=simple&url=${encodeURIComponent(cleanCloudUrl)}&shorturl=${baseAlias}_${suffixRand}`,
-                `https://tinyurl.com/api-create.php?url=${encodeURIComponent(cleanCloudUrl)}`,
-                `https://is.gd/create.php?format=simple&url=${encodeURIComponent(cleanCloudUrl)}`
+                `https://tinyurl.com/api-create.php?url=${encodeURIComponent(cleanCloudUrl)}`
             ];
 
             for (let i = 0; i < attempts.length; i++) {
@@ -1177,92 +1895,38 @@
                     shortInput.value = result;
                     if (savedSites[projectName]) {
                         savedSites[projectName].shortUrl = result;
-                        PermanentDB.saveSite(savedSites[projectName]);
-                        saveLocalState();
+                        saveStateToSession();
                         renderSavedSitesList();
                     }
-                    return;
+                    return result;
                 }
             }
 
             shortInput.value = cleanCloudUrl;
+            return cleanCloudUrl;
         }
 
         /* =========================================================================
-           9. إدارة المعاينة الحية المحسّنة (Live Preview Engine)
-           ========================================================================= */
-        function toggleLivePreview(forceOpenAndRefresh) {
-            const box = document.getElementById('preview-container');
-            const code = document.getElementById('code-editor').value;
-
-            if (!code.trim()) {
-                alert('المحرر فارغ! اكتب أو الصق الكود أولاً لمعاينته.');
-                speak('المحرر فارغ، اكتب الكود أولاً');
-                return;
-            }
-
-            if (forceOpenAndRefresh || box.style.display === 'none' || box.style.display === '') {
-                box.style.display = 'block';
-                refreshLivePreview();
-                box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            } else {
-                closeLivePreview();
-            }
-        }
-
-        function refreshLivePreview() {
-            const code = document.getElementById('code-editor').value;
-            const wrapper = document.getElementById('preview-frame-wrapper');
-            if (!wrapper) return;
-
-            const compiledPreviewHtml = injectOptionalCloudHelper(code, MY_SERVER_ID);
-            mountCleanIframe(wrapper, compiledPreviewHtml, false, '');
-            speak('تم تشغيل وتحديث المعاينة الحية للكود بنجاح');
-        }
-
-        function closeLivePreview() {
-            const box = document.getElementById('preview-container');
-            const wrapper = document.getElementById('preview-frame-wrapper');
-            if (wrapper) {
-                wrapper.classList.remove('fullscreen-preview');
-                wrapper.innerHTML = '';
-            }
-            if (box) box.style.display = 'none';
-            speak('تم إغلاق شاشة المعاينة');
-        }
-
-        function toggleFullscreenPreview() {
-            const wrapper = document.getElementById('preview-frame-wrapper');
-            if (!wrapper) return;
-            wrapper.classList.toggle('fullscreen-preview');
-            if (wrapper.classList.contains('fullscreen-preview')) {
-                speak('تم تكبير المعاينة لملء الشاشة. اضغط Escape أو زر ملء الشاشة للعودة');
-            }
-        }
-
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                const wrapper = document.getElementById('preview-frame-wrapper');
-                if (wrapper && wrapper.classList.contains('fullscreen-preview')) {
-                    wrapper.classList.remove('fullscreen-preview');
-                }
-            }
-        });
-
-        /* =========================================================================
-           10. إدارة وتعديل المواقع المحفوظة دائماً + النسخ الاحتياطي
+           القسم البرمجي 10: عرض المشاريع وحذفها نهائياً من القناة وسحابة البوت
            ========================================================================= */
         function renderSavedSitesList() {
-            const container = document.getElementById('saved-sites-list');
-            if (!container) return;
+            const fullContainer = document.getElementById('saved-sites-list');
+            const quickBottomContainer = document.getElementById('quick-bottom-projects-list');
+            const countBadge = document.getElementById('nav-projects-count');
+
             const names = Object.keys(savedSites);
+            if (countBadge) countBadge.innerText = names.length;
+
             if (names.length === 0) {
-                container.innerHTML = '<p style="color:var(--text-dim);">لا توجد مواقع محفوظة بعد. أنشئ موقعك الأول في الأعلى.</p>';
+                const emptyHtml = '<p style="color:var(--text-dim);">لا توجد مواقع أو مشاريع مستضافة حالياً.</p>';
+                if (fullContainer) fullContainer.innerHTML = emptyHtml;
+                if (quickBottomContainer) quickBottomContainer.innerHTML = emptyHtml;
                 return;
             }
 
             const baseUrl = getCleanHostingBaseUrl();
-            container.innerHTML = '';
+            if (fullContainer) fullContainer.innerHTML = '';
+            if (quickBottomContainer) quickBottomContainer.innerHTML = '';
 
             names.sort((a, b) => (savedSites[b].updatedAt || 0) - (savedSites[a].updatedAt || 0));
 
@@ -1270,120 +1934,143 @@
                 const item = savedSites[name];
                 const encodedName = encodeURIComponent(name);
                 const cloudLink = `${baseUrl}?site=${encodedName}`;
+                const tgOfficialLink = buildOfficialTelegramProjectLink(name);
                 const preferredShareLink = (item.shortUrl && item.shortUrl.startsWith('http')) ? item.shortUrl : cloudLink;
                 const safeNameAttr = name.replace(/'/g, "\\'");
 
-                const div = document.createElement('div');
-                div.className = 'item-box';
-                div.innerHTML = `
-                    <div>
-                        <strong style="font-size:1.1rem; color:#60a5fa;">🌐 ${name}</strong>
-                        <span style="font-size:0.8rem; color:var(--text-dim); margin-right:10px;">آخر حفظ: ${item.time || 'دائم'}</span>
-                        ${item.shortUrl ? `<div style="font-size:0.82rem; color:#fde047; direction:ltr; text-align:right; margin-top:4px;">🔗 ${item.shortUrl}</div>` : ''}
+                const keyId = item.apiKey || '';
+                const keyStatusObj = (keyId && savedApiKeys[keyId]) ? savedApiKeys[keyId] : null;
+                const isKeyBlocked = keyStatusObj && keyStatusObj.status === 'BLOCKED';
+
+                const cardHtml = `
+                    <div class="item-meta">
+                        <div>
+                            <strong style="font-size:1.1rem; color:#60a5fa;">🌐 المشروع: ${name}</strong>
+                            <span style="font-size:0.8rem; color:var(--text-dim); margin-right:8px;">(${item.time || 'نشط'})</span>
+                        </div>
+                        <div style="margin-top:4px;">
+                            <span class="key-pill">🔑 مفتاح API / IP: ${keyId ? keyId : 'غير مقيد'}</span>
+                            ${keyId ? `<span style="margin-right:6px; font-size:0.78rem; padding:2px 8px; border-radius:99px; background:${isKeyBlocked ? '#7f1d1d' : '#064e3b'};">${isKeyBlocked ? 'محظور 🚫' : 'نشط ✅'}</span>` : ''}
+                        </div>
+                        <div style="font-size:0.82rem; color:#38bdf8; direction:ltr; text-align:right; margin-top:3px;">
+                            ✈️ رابط تيليجرام الرسمي: ${tgOfficialLink}
+                        </div>
+                        ${item.shortUrl ? `<div style="font-size:0.82rem; color:#fde047; direction:ltr; text-align:right;">🌟 الرابط المختصر: ${item.shortUrl}</div>` : ''}
                     </div>
                     <div class="item-actions">
-                        <button type="button" class="btn btn-yellow" style="padding:8px 14px; font-size:0.9rem;" onclick="loadSiteIntoEditor('${safeNameAttr}')">✏️ تعديل الكود</button>
-                        <a href="${preferredShareLink}" target="_blank" class="btn btn-blue" style="padding:8px 14px; font-size:0.9rem;">🌐 فتح الموقع</a>
-                        <button type="button" class="btn btn-purple" style="padding:8px 14px; font-size:0.9rem;" onclick="copyDirectText('${preferredShareLink}')">📋 نسخ الرابط المختصر</button>
-                        <button type="button" class="btn btn-dark" onclick="copyDirectText('${cloudLink}')">🔗 نسخ الرابط السحابي</button>
-                        <button type="button" class="btn btn-red" style="padding:8px 12px; font-size:0.85rem;" onclick="deleteSavedSite('${safeNameAttr}')">🗑️ حذف</button>
+                        <button type="button" class="btn btn-tg" style="padding:8px 12px; font-size:0.85rem;" onclick="copyDirectText('${tgOfficialLink}')">✈️ نسخ رابط تيليجرام</button>
+                        <button type="button" class="btn btn-purple" style="padding:8px 12px; font-size:0.85rem;" onclick="copyDirectText('${preferredShareLink}')">📋 نسخ المختصر</button>
+                        <a href="${cloudLink}" target="_blank" class="btn btn-blue" style="padding:8px 12px; font-size:0.85rem;">🌐 فتح</a>
+                        <button type="button" class="btn btn-yellow" style="padding:8px 12px; font-size:0.85rem;" onclick="loadSiteIntoEditor('${safeNameAttr}')">✏️ تعديل واستبدال</button>
+                        ${keyId ? `<button type="button" class="btn ${isKeyBlocked ? 'btn-blue' : 'btn-red'}" style="padding:8px 12px; font-size:0.85rem;" onclick="toggleApiKeyStatus('${keyId}')">${isKeyBlocked ? '✅ تفعيل API/IP' : '🛑 إيقاف API/IP'}</button>` : ''}
+                        <button type="button" class="btn btn-dark" style="padding:8px 10px;" title="حذف نهائي من القناة والبوت" onclick="deleteSavedSite('${safeNameAttr}')">🗑️ حذف من القناة</button>
                     </div>
                 `;
-                container.appendChild(div);
+
+                if (fullContainer) {
+                    const div1 = document.createElement('div');
+                    div1.className = 'item-box';
+                    div1.innerHTML = cardHtml;
+                    fullContainer.appendChild(div1);
+                }
+
+                if (quickBottomContainer) {
+                    const div2 = document.createElement('div');
+                    div2.className = 'item-box';
+                    div2.innerHTML = cardHtml;
+                    quickBottomContainer.appendChild(div2);
+                }
             });
         }
 
         function loadSiteIntoEditor(name) {
             const site = savedSites[name];
             if (!site) return;
+            switchSection('sec-create');
             document.getElementById('site-name').value = name;
             document.getElementById('code-editor').value = site.code;
+            const keySelect = document.getElementById('site-api-key-select');
+            if (keySelect && site.apiKey && savedApiKeys[site.apiKey]) {
+                keySelect.value = site.apiKey;
+            }
             localStorage.setItem('cloud_editor_draft_name', name);
             try { localStorage.setItem('cloud_editor_draft_code', site.code); } catch (e) {}
 
             if (document.getElementById('preview-container').style.display === 'block') {
                 refreshLivePreview();
             }
-
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            speak('تم تحميل كود الموقع ' + name + ' في المحرر للتعديل عليه');
+            speak('تم فتح المشروع ' + name + ' للتعديل. عند الضغط على حفظ سيقوم البوت بحذف النسخة القديمة من القناة واستبدالها بالأحدث');
         }
 
-        function deleteSavedSite(name) {
-            if (!confirm(`هل أنت متأكد من حذف المشروع "${name}"؟`)) return;
-            delete savedSites[name];
-            PermanentDB.deleteSite(name);
-            saveLocalState();
+        // حذف المشروع نهائياً من القناة الخاصة ومن سحابة البوت ومن خوادم الإشارات
+        async function deleteSavedSite(name) {
+            if (!confirm(`هل أنت متأكد من حذف المشروع "${name}" نهائياً من القناة الخاصة ومن سحابة البوت؟`)) return;
 
+            const targetSite = savedSites[name];
+            const msgIdToDelete = targetSite ? targetSite.tgMessageId : null;
+
+            delete savedSites[name];
+            saveStateToSession();
+
+            // 1. الحذف النهائي من داخل القناة الخاصة في تيليجرام (deleteMessage)
+            if (msgIdToDelete) {
+                await deleteProjectFileFromPrivateChannel(msgIdToDelete);
+            }
+
+            // 2. الحذف النهائي من سحابة البوت الأصلية (Telegram.WebApp.CloudStorage)
+            await BotNativeCloudStorage.deleteProjectFromBotCloud(name);
+
+            // 3. مسح الإشارة من الخوادم اللامركزية
             const encodedName = encodeURIComponent(name);
             publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_sites/${encodedName}`, '', { qos: 1, retain: true });
+            publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sites/${encodedName}`, '', { qos: 1, retain: true });
+            publishToCluster(`${CLOUD_NAMESPACE}/sites/${encodedName}`, '', { qos: 1, retain: true });
+
             renderSavedSitesList();
-            speak('تم حذف المشروع ' + name);
-        }
-
-        function exportFullBackup() {
-            const backupObj = {
-                version: 9.5,
-                serverId: MY_SERVER_ID,
-                exportedAt: new Date().toISOString(),
-                sites: savedSites,
-                apiKeys: savedApiKeys
-            };
-            const blob = new Blob([JSON.stringify(backupObj, null, 2)], { type: 'application/json' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `cloud-os-backup-${MY_SERVER_ID}.json`;
-            a.click();
-            speak('تم تصدير النسخة الاحتياطية بنجاح');
-        }
-
-        function importFullBackup(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if (data.sites) {
-                        Object.keys(data.sites).forEach(k => {
-                            savedSites[k] = data.sites[k];
-                            PermanentDB.saveSite(savedSites[k]);
-                        });
-                    }
-                    if (data.apiKeys) {
-                        Object.keys(data.apiKeys).forEach(k => {
-                            savedApiKeys[k] = data.apiKeys[k];
-                        });
-                    }
-                    saveLocalState();
-                    renderSavedSitesList();
-                    renderApiKeysList();
-                    speak('تم استيراد النسخة الاحتياطية واستعادة جميع المواقع والمفاتيح بنجاح');
-                    alert('✅ تم استعادة جميع المواقع ومفاتيح الـ API بنجاح!');
-                } catch (err) {
-                    alert('ملف النسخة الاحتياطية غير صالح.');
-                }
-            };
-            reader.readAsText(file);
+            await updatePinnedCloudIndexInTelegramChannel();
+            speak('تم حذف المشروع ' + name + ' نهائياً من القناة الخاصة ومن سحابة البوت');
         }
 
         /* =========================================================================
-           11. إدارة وحظر مفاتيح الـ API في الوقت الفعلي (لحماية تطبيقات APK والمواقع)
+           القسم البرمجي 11: إدارة مفاتيح API / IP وقاطع الحماية الفوري
            ========================================================================= */
+        function updateProjectApiKeyDropdown() {
+            const select = document.getElementById('site-api-key-select');
+            if (!select) return;
+            const currentVal = select.value;
+            select.innerHTML = `
+                <option value="AUTO">🔑 توليد/ربط مفتاح API / IP تلقائي خاص بهذا المشروع</option>
+                <option value="NONE">🔓 بدون قيد مفتاح API / IP</option>
+            `;
+            Object.keys(savedApiKeys).forEach(k => {
+                const info = savedApiKeys[k];
+                const opt = document.createElement('option');
+                opt.value = k;
+                opt.textContent = `${k} (${info.label || 'مفتاح نشط'})`;
+                select.appendChild(opt);
+            });
+            if (currentVal && (currentVal === 'AUTO' || currentVal === 'NONE' || savedApiKeys[currentVal])) {
+                select.value = currentVal;
+            }
+        }
+
         function generateNewApiKey() {
             const labelInput = document.getElementById('new-key-label');
-            const label = labelInput.value.trim() || 'تطبيق أندرويد / موقع';
-            const newKey = 'API_' + Math.random().toString(36).substring(2, 10).toUpperCase() + '_' + Date.now().toString(36).slice(-4).toUpperCase();
+            const label = labelInput.value.trim() || 'مشروع / تطبيق APK';
+            const newKey = 'API_' + Math.random().toString(36).substring(2, 10).toUpperCase();
 
             savedApiKeys[newKey] = { label: label, status: 'ACTIVE', createdAt: new Date().toLocaleDateString('ar-EG') };
-            saveLocalState();
+            saveStateToSession();
             labelInput.value = '';
             renderApiKeysList();
+            renderSavedSitesList();
 
             publishToCluster(`${CLOUD_NAMESPACE}/api_guard/${newKey}`, 'ACTIVE', { qos: 1, retain: true });
             publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_keys/${newKey}`, JSON.stringify(savedApiKeys[newKey]), { qos: 1, retain: true });
+            updatePinnedCloudIndexInTelegramChannel();
 
-            speak('تم توليد مفتاح API جديد وتفعيله على عنقود السيرفرات');
+            speak('تم توليد مفتاح API و IP جديد وتفعيله');
         }
 
         function toggleApiKeyStatus(key) {
@@ -1391,25 +2078,28 @@
             const current = savedApiKeys[key].status;
             const nextStatus = current === 'ACTIVE' ? 'BLOCKED' : 'ACTIVE';
             savedApiKeys[key].status = nextStatus;
-            saveLocalState();
+            saveStateToSession();
             renderApiKeysList();
+            renderSavedSitesList();
 
             publishToCluster(`${CLOUD_NAMESPACE}/api_guard/${key}`, nextStatus, { qos: 1, retain: true });
             publishToCluster(`${CLOUD_NAMESPACE}/${MY_SERVER_ID}/sync_keys/${key}`, JSON.stringify(savedApiKeys[key]), { qos: 1, retain: true });
+            updatePinnedCloudIndexInTelegramChannel();
 
             if (nextStatus === 'BLOCKED') {
-                speak('تم حظر مفتاح الـ API وإيقاف جميع التطبيقات والمواقع المرتبطة به فوراً');
+                speak('تم حظر مفتاح API وإرسال إشارة الإيقاف الفوري للموقع أو التطبيق');
             } else {
-                speak('تم إعادة تفعيل مفتاح الـ API بنجاح');
+                speak('تم إعادة تفعيل مفتاح API بنجاح');
             }
         }
 
         function renderApiKeysList() {
+            updateProjectApiKeyDropdown();
             const container = document.getElementById('api-keys-list');
             if (!container) return;
             const keys = Object.keys(savedApiKeys);
             if (keys.length === 0) {
-                container.innerHTML = '<p style="color:var(--text-dim);">لا توجد مفاتيح API حالياً. ولّد مفتاحاً لربط تطبيقاتك ومواقعك.</p>';
+                container.innerHTML = '<p style="color:var(--text-dim);">لا توجد مفاتيح API / IP حالياً. يتم توليد مفتاح تلقائياً مع كل مشروع تنشئه.</p>';
                 return;
             }
 
@@ -1429,9 +2119,9 @@
                         </span>
                     </div>
                     <div class="item-actions">
-                        <button type="button" class="btn btn-dark" onclick="copyDirectText('Cloud.useApiKey(\\'${k}\\');')">📋 نسخ كود الحماية للكود</button>
+                        <button type="button" class="btn btn-dark" onclick="copyDirectText('Cloud.useApiKey(\\'${k}\\');')">📋 نسخ كود الحماية</button>
                         <button type="button" class="btn ${isBlocked ? 'btn-blue' : 'btn-red'}" style="padding:8px 14px; font-size:0.9rem;" onclick="toggleApiKeyStatus('${k}')">
-                            ${isBlocked ? '✅ إعادة تفعيل المفتاح' : '🛑 حظر وإيقاف التطبيق فوراً'}
+                            ${isBlocked ? '✅ إعادة تفعيل المفتاح' : '🛑 حظر وإيقاف المشروع فوراً'}
                         </button>
                     </div>
                 `;
@@ -1440,8 +2130,54 @@
         }
 
         /* =========================================================================
-           12. البث الفوري وسجل الرسائل الحية
+           القسم البرمجي 12: المعاينة الحية، البث الفوري، القوالب الثلاثة، والأدوات
            ========================================================================= */
+        function toggleLivePreview(forceOpenAndRefresh) {
+            const box = document.getElementById('preview-container');
+            const code = document.getElementById('code-editor').value;
+
+            if (!code.trim()) {
+                alert('المحرر فارغ! اكتب أو الصق الكود أولاً لمعاينته.');
+                return;
+            }
+
+            if (forceOpenAndRefresh || box.style.display === 'none' || box.style.display === '') {
+                box.style.display = 'block';
+                refreshLivePreview();
+                box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                closeLivePreview();
+            }
+        }
+
+        function refreshLivePreview() {
+            const code = document.getElementById('code-editor').value;
+            const name = document.getElementById('site-name').value.trim() || 'معاينة-حية';
+            const wrapper = document.getElementById('preview-frame-wrapper');
+            if (!wrapper) return;
+
+            const compiledPreviewHtml = injectOptionalCloudHelper(code, MY_SERVER_ID, '', name);
+            mountCleanIframe(wrapper, compiledPreviewHtml, false, '');
+            speak('تم تشغيل وتحديث المعاينة الحية للكود');
+        }
+
+        function closeLivePreview() {
+            const box = document.getElementById('preview-container');
+            const wrapper = document.getElementById('preview-frame-wrapper');
+            if (wrapper) {
+                wrapper.classList.remove('fullscreen-preview');
+                wrapper.innerHTML = '';
+            }
+            if (box) box.style.display = 'none';
+            speak('تم إغلاق المعاينة');
+        }
+
+        function toggleFullscreenPreview() {
+            const wrapper = document.getElementById('preview-frame-wrapper');
+            if (!wrapper) return;
+            wrapper.classList.toggle('fullscreen-preview');
+        }
+
         function sendBroadcastNow() {
             const input = document.getElementById('broadcast-input');
             const msg = input.value.trim();
@@ -1456,9 +2192,9 @@
                 } catch (e) {}
             }
 
-            logToInbox(`📢 [بث من الإدارة للجميع]: ${msg}`, true);
+            logToInbox(`📢 [بث فوري لجميع المواقع]: ${msg}`, true);
             input.value = '';
-            speak('تم إرسال الإشعار الفوري لجميع الزوار والتطبيقات المفتوحة');
+            speak('تم إرسال الإشعار الفوري عبر خوادم الإشارات');
         }
 
         function logToInbox(text, persist) {
@@ -1481,14 +2217,49 @@
             try { localStorage.removeItem('permanent_inbox_logs'); } catch (e) {}
             const inbox = document.getElementById('live-inbox');
             if (inbox) {
-                inbox.innerHTML = '<div class="log-line">📡 تم مسح السجل. السيرفر السحابي يستمع للأحداث الجديدة...</div>';
+                inbox.innerHTML = '<div class="log-line">📡 تم مسح السجل. خوادم الإشارات وسحابة البوت تستمع للأحداث الجديدة...</div>';
             }
-            speak('تم مسح سجل الأحداث');
+            speak('تم مسح السجل الحي');
         }
 
-        /* =========================================================================
-           13. القوالب الثلاثة الاختيارية + أدوات المحرر المساعدة
-           ========================================================================= */
+        function exportFullBackup() {
+            const backupObj = {
+                version: 10.5,
+                serverId: MY_SERVER_ID,
+                exportedAt: new Date().toISOString(),
+                sites: savedSites,
+                apiKeys: savedApiKeys
+            };
+            const blob = new Blob([JSON.stringify(backupObj, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `bot-cloud-backup-${MY_SERVER_ID}.json`;
+            a.click();
+            speak('تم تصدير النسخة الاحتياطية');
+        }
+
+        function importFullBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.sites) Object.assign(savedSites, data.sites);
+                    if (data.apiKeys) Object.assign(savedApiKeys, data.apiKeys);
+                    saveStateToSession();
+                    renderApiKeysList();
+                    renderSavedSitesList();
+                    republishAllToSignalingCluster();
+                    speak('تم استيراد النسخة الاحتياطية بنجاح');
+                    alert('✅ تم استعادة جميع المشاريع ومفاتيح الـ API/IP بنجاح!');
+                } catch (err) {
+                    alert('ملف النسخة الاحتياطية غير صالح.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
         function loadTemplate(type, silent) {
             const editor = document.getElementById('code-editor');
             if (!editor) return;
@@ -1509,23 +2280,18 @@
 </head>
 <body>
     <div class="box">
-        <h1>🚀 مرحباً بك في موقعي</h1>
-        <p style="color:#94a3b8;">هذا موقع حر يعمل مباشرة بدون طلب أي تسجيل دخول من الزائر.</p>
-        
-        <input type="text" id="msg" placeholder="أرسل رسالة فورية إلى صاحب الموقع...">
-        <button onclick="sendMsg()">إرسال للسيرفر الآن</button>
+        <h1>🚀 مرحباً بك في موقعي السحابي</h1>
+        <p style="color:#94a3b8;">مستضاف عبر سحابة البوت والقناة الخاصة بدون طلب تسجيل دخول.</p>
+        <input type="text" id="msg" placeholder="أرسل رسالة فورية تصل للقناة الخاصة...">
+        <button onclick="sendMsg()">إرسال الآن</button>
         <p id="status" style="color:#34d399; margin-top:12px;"></p>
     </div>
-
     <script>
-        // اختياري: إذا أردت حماية الموقع أو التطبيق بمفتاح API يمكنك تفعيل السطر التالي:
-        // Cloud.useApiKey("ضع_مفتاح_API_هنا");
-
         function sendMsg() {
             const val = document.getElementById('msg').value;
             if(!val) return;
             Cloud.sendToServer(val);
-            document.getElementById('status').innerText = "✅ وصلت رسالتك إلى السيرفر في الوقت الفعلي!";
+            document.getElementById('status').innerText = "✅ تم الإرسال فوراً إلى القناة الخاصة!";
             document.getElementById('msg').value = "";
         }
     <\/script>
@@ -1533,7 +2299,6 @@
 </html>`;
                 if (!silent) speak('تم إدراج قالب موقع حر بدون تسجيل دخول');
             }
-
             else if (type === 'nickname') {
                 editor.value = `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -1549,46 +2314,39 @@
     </style>
 </head>
 <body>
-    <!-- شاشة الدخول بالاسم المستعار فقط بدون بريد ولا جوجل -->
     <div class="box" id="login-screen">
         <h2>👤 دخول سريع بالاسم المستعار</h2>
-        <p style="color:#94a3b8;">لا نطلب بريد إلكتروني ولا حسابات تواصل، اكتب لقباً فقط:</p>
+        <p style="color:#94a3b8;">اكتب اسماً مستعاراً فقط للدخول:</p>
         <input type="text" id="nick-input" placeholder="اكتب اسمك المستعار هنا...">
         <button onclick="enterSite()">دخول للموقع</button>
     </div>
-
-    <!-- محتوى الموقع بعد الدخول -->
     <div class="box" id="app-screen" style="display:none;">
         <h2 id="welcome-title" style="color:#34d399;"></h2>
-        <input type="text" id="chat-msg" placeholder="اكتب رسالة لإدارة السيرفر...">
+        <input type="text" id="chat-msg" placeholder="اكتب رسالة تصل للقناة الخاصة...">
         <button onclick="sendChat()" style="background:#10b981;">إرسال الرسالة</button>
     </div>
-
     <script>
         function enterSite() {
             const nick = document.getElementById('nick-input').value.trim();
             if(!nick) return alert("اكتب اسماً مستعاراً أولاً");
-            
             Cloud.loginWithNickname(nick, function(user) {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('app-screen').style.display = 'block';
                 document.getElementById('welcome-title').innerText = "أهلاً بك يا " + user.user;
             });
         }
-
         function sendChat() {
             const txt = document.getElementById('chat-msg').value;
             if(!txt) return;
             Cloud.sendToServer(txt);
-            alert("تم الإرسال للسيرفر بنجاح!");
+            alert("تم الإرسال للقناة الخاصة بنجاح!");
             document.getElementById('chat-msg').value = "";
         }
     <\/script>
 </body>
 </html>`;
-                if (!silent) speak('تم إدراج قالب الدخول بالاسم المستعار فقط');
+                if (!silent) speak('تم إدراج قالب الدخول بالاسم المستعار');
             }
-
             else if (type === 'social') {
                 editor.value = `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -1611,13 +2369,11 @@
         <button class="btn-google" onclick="socialLogin('Google')">🔴 المتابعة باستخدام حساب Google</button>
         <button class="btn-fb" onclick="socialLogin('Facebook')">🔵 المتابعة باستخدام حساب Facebook</button>
     </div>
-
     <div class="box" id="home-box" style="display:none;">
         <h2 id="user-badge" style="color:#60a5fa;"></h2>
-        <input type="text" id="user-note" placeholder="أرسل طلباً أو رسالة للسيرفر...">
-        <button style="background:#10b981; color:#fff;" onclick="sendNote()">إرسال للسيرفر</button>
+        <input type="text" id="user-note" placeholder="أرسل طلباً أو رسالة للقناة الخاصة...">
+        <button style="background:#10b981; color:#fff;" onclick="sendNote()">إرسال الآن</button>
     </div>
-
     <script>
         function socialLogin(provider) {
             const account = document.getElementById('acc-email').value.trim() || ("مستخدم_" + provider);
@@ -1627,10 +2383,9 @@
                 document.getElementById('user-badge').innerText = "✅ متصل عبر " + provider + " (" + res.user + ")";
             });
         }
-
         function sendNote() {
             const val = document.getElementById('user-note').value;
-            if(val) { Cloud.sendToServer(val); alert("تم الإرسال للسيرفر!"); }
+            if(val) { Cloud.sendToServer(val); alert("تم الإرسال للقناة الخاصة!"); }
         }
     <\/script>
 </body>
@@ -1651,13 +2406,11 @@
                     const editor = document.getElementById('code-editor');
                     editor.value = text;
                     try { localStorage.setItem('cloud_editor_draft_code', text); } catch (e) {}
-                    speak('تم لصق الكود من الحافظة في المحرر بنجاح');
-                    if (document.getElementById('preview-container').style.display === 'block') {
-                        refreshLivePreview();
-                    }
+                    speak('تم لصق الكود في المحرر');
+                    if (document.getElementById('preview-container').style.display === 'block') refreshLivePreview();
                 }
             } catch (e) {
-                alert('يمكنك اللصق مباشرة داخل مربع المحرر بالضغط المطول ثم لصق أو Ctrl+V.');
+                alert('يمكنك اللصق مباشرة داخل مربع المحرر بالضغط المطول ثم لصق.');
             }
         }
 
@@ -1667,7 +2420,7 @@
             editor.value = '';
             localStorage.removeItem('cloud_editor_draft_code');
             editor.focus();
-            speak('تم تفريغ المحرر، يمكنك الآن كتابة أو لصق الكود الخاص بك من الصفر');
+            speak('تم تفريغ المحرر');
         }
 
         function copyInput(id) {
@@ -1691,7 +2444,7 @@
         }
 
         /* =========================================================================
-           14. نقطة الانطلاق الرئيسية (Bootloader)
+           القسم البرمجي 13: نقطة الانطلاق (Bootloader)
            ========================================================================= */
         if (IS_VISITOR_MODE) {
             startVisitorEngine();
